@@ -50,7 +50,7 @@ class Screen {
 public:
   Screen() { main = NULL; };
   virtual ~Screen() { if(main) delete main; };
-  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Start(SimpleGUI *gui);
   virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
   virtual void Finish(SimpleGUI *gui);
 protected:
@@ -70,7 +70,7 @@ class Screen_Config : public Screen {
 public:
   Screen_Config();
   virtual ~Screen_Config();
-  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Start(SimpleGUI *gui);
   virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
 protected:
   SG_Button *backb;
@@ -108,7 +108,7 @@ class Screen_Equip : public Screen {
 public:
   Screen_Equip();
   virtual ~Screen_Equip();
-  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Start(SimpleGUI *gui);
   virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
 protected:
   SG_TextArea *name;
@@ -119,7 +119,7 @@ class Screen_Play : public Screen {
 public:
   Screen_Play();
   virtual ~Screen_Play();
-  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Start(SimpleGUI *gui);
   virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
   virtual void Finish(SimpleGUI *gui);
 protected:
@@ -130,7 +130,7 @@ class Screen_Results : public Screen {
 public:
   Screen_Results();
   virtual ~Screen_Results();
-  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Start(SimpleGUI *gui);
   virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
 protected:
   SG_Button *replb, *saveb, *doneb, *quitb;
@@ -141,7 +141,7 @@ class Popup : public Screen {
 public:
   Popup() { main = NULL; };
   virtual ~Popup() {};
-  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Start(SimpleGUI *gui);
   virtual void Finish(SimpleGUI *gui);
   };
 
@@ -236,7 +236,8 @@ void Screens::Set(ScreenNum s) {
     }
 
   if(sscr.count(screen)) {
-    sscr[screen]->Start(gui);
+    ScreenNum res = sscr[screen]->Start(gui);
+    if(res != SCREEN_SAME) Set(res);
     }
   }
 
@@ -298,8 +299,9 @@ int Screens::Handle() {
   }
 
 
-void Screen::Start(SimpleGUI *gui) {
+ScreenNum Screen::Start(SimpleGUI *gui) {
   gui->MasterWidget()->AddWidget(main);
+  return SCREEN_SAME;
   }
 
 void Screen::Finish(SimpleGUI *gui) {
@@ -310,8 +312,9 @@ ScreenNum Screen::Handle(SimpleGUI *gui, SDL_Event &event) {
   return SCREEN_SAME;
   }
 
-void Popup::Start(SimpleGUI *gui) {
+ScreenNum Popup::Start(SimpleGUI *gui) {
   gui->SetPopupWidget(main);
+  return SCREEN_SAME;
   }
 
 void Popup::Finish(SimpleGUI *gui) {
@@ -359,8 +362,9 @@ Screen_Config::~Screen_Config() {
   //FIXME: Fill!
   }
 
-void Screen_Config::Start(SimpleGUI *gui) {
+ScreenNum Screen_Config::Start(SimpleGUI *gui) {
   Screen::Start(gui);
+  return SCREEN_SAME;
   }
 
 ScreenNum Screen_Config::Handle(SimpleGUI *gui, SDL_Event &event) {
@@ -379,7 +383,7 @@ Screen_Equip::~Screen_Equip() {
   //FIXME: Fill!
   }
 
-void Screen_Equip::Start(SimpleGUI *gui) {
+ScreenNum Screen_Equip::Start(SimpleGUI *gui) {
   if(main == NULL) {
     if(!cur_game) {
       fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded map!\n");
@@ -439,6 +443,7 @@ void Screen_Equip::Start(SimpleGUI *gui) {
     }
 
   Screen::Start(gui);
+  return SCREEN_SAME;
   }
 
 ScreenNum Screen_Equip::Handle(SimpleGUI *gui, SDL_Event &event) {
@@ -616,8 +621,9 @@ Screen_Results::~Screen_Results() {
   //FIXME: Fill!
   }
 
-void Screen_Results::Start(SimpleGUI *gui) {
+ScreenNum Screen_Results::Start(SimpleGUI *gui) {
   Screen::Start(gui);
+  return SCREEN_SAME;
   }
 
 ScreenNum Screen_Results::Handle(SimpleGUI *gui, SDL_Event &event) {
@@ -633,36 +639,37 @@ ScreenNum Screen_Results::Handle(SimpleGUI *gui, SDL_Event &event) {
   }
 
 Screen_Play::Screen_Play() {
-  //Setup SCREEN_PLAY (Temporary - will be handled by Game, not Screens)
-  main = new SG_Table(6, 7, 0.0625, 0.125);
-  main->AddWidget(new SG_TextArea("Playing LDO", drkred),
-	0, 0, 4, 2);
-  optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  main->AddWidget(optb, 0, 6);
-  doneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
-  main->AddWidget(doneb, 5, 6);
+//  //Setup SCREEN_PLAY (Temporary - will be handled by Game, not Screens)
+//  main = new SG_Table(6, 7, 0.0625, 0.125);
+//  main->AddWidget(new SG_TextArea("Playing LDO", drkred),
+//	0, 0, 4, 2);
+//  optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+//  main->AddWidget(optb, 0, 6);
+//  doneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
+//  main->AddWidget(doneb, 5, 6);
   }
 
 Screen_Play::~Screen_Play() {
-  //FIXME: Fill!
   }
 
-void Screen_Play::Start(SimpleGUI *gui) {
-  Screen::Start(gui);
-  cur_game->Play();
+ScreenNum Screen_Play::Start(SimpleGUI *gui) {
+  PlayResult res = cur_game->Play();
+  if(res == PLAY_FINISHED) return SCREEN_RESULTS;
+  else if(res == PLAY_CONFIG) return SCREEN_CONFIG;
+  else if(res == PLAY_SAVE) return SCREEN_RESULTS; //For now
+  else {
+    fprintf(stderr, "ERROR: Game::Play() failure!\n");
+    exit(1);
+    }
+  return SCREEN_SAME;
   }
 
 void Screen_Play::Finish(SimpleGUI *gui) {
-  Screen::Finish(gui);
+//  Do Nothing!
   }
 
 ScreenNum Screen_Play::Handle(SimpleGUI *gui, SDL_Event &event) {
-  if(event.type == SDL_SG_EVENT) {
-    if(event.user.code == SG_EVENT_BUTTONCLICK) {
-      if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
-      else if(event.user.data1 == (void*)doneb) return SCREEN_RESULTS;
-      }
-    }
+//  Do Nothing!
   return SCREEN_SAME;
   }
 

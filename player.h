@@ -23,10 +23,13 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <SDL/SDL.h>
+
+#include "../simplegui/simplegui.h"
+
 #include "percept.h"
 
 class Game;
-class SimpleGUI;
 
 enum PlayerType {
   PLAYER_GONE,
@@ -64,7 +67,24 @@ public:
   virtual bool Run();
 
 protected:
+  void HandleEquip();
+  void HandleReplay();
+  void HandleDeclare();
+
+  int phase;  // 0: Equiping, 1: Replaying, 2: Defining
+
   SimpleGUI *gui;
+
+  SG_Table *wind[3];		//Screens for each phase
+
+  SG_DNDBoxes *ednd;		//Widgets for Equip phase
+  SG_TextArea *estats;
+  SG_Button *ecancelb, *edoneb;
+  SDL_Surface *equip_bg;
+
+  SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
+
+  SG_Button *doptb, *ddoneb;	//Widgets for Declare phase
   };
 
 #endif // PLAYER_H
