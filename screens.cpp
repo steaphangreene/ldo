@@ -391,7 +391,7 @@ int Screens::Handle() {
 		filename.c_str());
 	    }
 	  else {
-	    cur_map->Save(filename); // For auto-upgrade of mapfile
+	    //cur_map->Save(filename); // For auto-upgrade of mapfile
 	    gui->UnsetPopupWidget();
 	    if(readymap.count(screen) == 0 || readymap[screen]->IsOn()) {
 	      gomap[screen]->Enable();
