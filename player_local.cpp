@@ -74,6 +74,18 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 6);
   rtext = new SG_TextArea("Play/Replay Turn", drkred);
   wind[PHASE_REPLAY]->AddWidget(rtext, 1, 3, 4, 1);
+  vector<string> conts;			//Temporary - until textures
+  conts.push_back("<<");
+  conts.push_back("<");
+  conts.push_back("<|");
+  conts.push_back("||");
+  conts.push_back("|>");
+  conts.push_back(">");
+  conts.push_back(">>");
+  rcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
+  rcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
+  rcontrols->Set(5);
+  wind[PHASE_REPLAY]->AddWidget(rcontrols, 2, 6, 2, 1);
 
   //Define base GUI for Declare phase
   wind[PHASE_DECLARE] = new SG_Table(6, 7, 0.0625, 0.125);

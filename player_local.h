@@ -75,6 +75,7 @@ protected:
 
   SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
   SG_TextArea *rtext;
+  SG_Tabs *rcontrols;
 
   SG_Button *doptb;		//Widgets for Declare phase
   SG_StickyButton *ddoneb;
