@@ -151,7 +151,7 @@ Screens::Screens() {
   cur_music = audio_loop(music, 16, 0);
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
-  gui->LoadFont("fonts/Denmark Regular.ttf", 50);
+  gui->LoadFont("fonts/Denmark Regular.ttf", 24);
 
   mouse_cursor = SDL_CreateRGBSurfaceFrom(cursor, 256, 256, 32, 256*4, TGA_COLFIELDS);
   gui->SetMouseCursor(mouse_cursor, 0.125, 0.125);
@@ -375,6 +375,7 @@ Screen_Title::Screen_Title() {
 
   SG_TextArea *title = new SG_TextArea("LDO", drkred);
   title->SetMargins(0.125, 0.0);
+  title->SetFontSize(100);
   main->AddWidget(title, 0, 0, 2, 2);
 
   FILE *credfl = fopen("CREDITS", "r");
