@@ -273,7 +273,7 @@ int Game::ThreadHandler() {
       ret = (ret && (*itrp)->Ready());
       }
 
-    SDL_Delay(250);	// Check for done 4 times per second
+    SDL_Delay(250);	// Check for done 4 times per second (Temporary)
     }
 
   return 0;

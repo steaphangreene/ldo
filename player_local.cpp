@@ -155,8 +155,6 @@ bool Player_Local::Run() {
 
   gui->MasterWidget()->RemoveWidget(wind[phase]);
 
-//  ready = true;
-
   if(cur_music) audio_stop(cur_music);
   cur_music = NULL;
 
