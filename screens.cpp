@@ -26,6 +26,8 @@
 #include "click.h"
 
 #include "game.h"
+#include "player.h"
+#include "player_local.h"
 
 SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
 

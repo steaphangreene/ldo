@@ -26,10 +26,6 @@
 #include <vector>
 using namespace std;
 
-#include <SDL/SDL.h>
-
-#include "../simplegui/simplegui.h"
-
 #include "percept.h"
 #include "orders.h"
 
@@ -63,58 +59,6 @@ protected:
   Orders orders;
   int pround;
   Game *game;
-  };
-
-class Sound;
-
-enum Phase {
-  PHASE_NONE = -1,
-  PHASE_EQUIP,
-  PHASE_REPLAY,
-  PHASE_DECLARE,
-  PHASE_MAX,
-  };
-enum PopPhase {
-  POPPHASE_NONE = -1,
-  POPPHASE_OPTIONS,
-  POPPHASE_MAX
-  };
-
-class Player_Local : public Player {
-public:
-  Player_Local(Game *gm, PlayerType tp, int num);
-  virtual ~Player_Local();
-  virtual bool Run();
-
-protected:
-  void UpdateEquipIDs();
-
-  Phase phase;		//Current phase of main window GUI
-  PopPhase popphase;	//Current phase of popup
-
-  SimpleGUI *gui;
-
-  SG_Table *wind[PHASE_MAX];	//Screens for each phase
-  int drkred;			//Colors
-
-  SG_MultiTab *ednd;		//Widgets for Equip phase
-  SG_TextArea *estats;
-  SG_Button *ecancelb, *edoneb;
-  vector<int> eqid;		//Data for Equip phase
-
-				//Textures for Equip phase
-  SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
-  SDL_Surface *gun_icon, *gren_icon;
-  SDL_Surface *equip_bg;
-
-
-  SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
-
-  SG_Button *doptb;		//Widgets for Declare phase
-  SG_StickyButton *ddoneb;
-
-  int music;			//Background Music (Temporary)
-  Sound *cur_music;		//Currently Playing Music (Temporary)
   };
 
 #endif // PLAYER_H
