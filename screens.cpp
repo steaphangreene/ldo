@@ -25,6 +25,8 @@
 #include "audio.h"
 #include "click.h"
 
+#include "map.h"
+
 SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
 SDL_Surface *equip_bg;
 
@@ -40,22 +42,25 @@ SDL_Surface *gun_icon, *gren_icon;
 map<ScreenNum, SG_Widget *> gomap;	//Map of go buttons per screen
 					//Temporary, just for testing
 
-map<ScreenNum, SG_Widget *> saymap;	//Map of go buttons per screen
+map<ScreenNum, SG_Widget *> readymap;	//Map of ready buttons per screen
 					//Temporary, just for testing
 
-vector<string> troops;			//Just for example
-SG_Tabs *chars;				//Just for example
+map<ScreenNum, SG_Widget *> saymap;	//Map of go buttons per screen
+					//Temporary, just for testing
 
 int music;				//Background music
 					//Temporary, just for testing
 
+Map *cur_map = NULL;			//Temporary, just for testing
+
 #define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
+
+static int drkred = 0;	//Global colordef
 
 
 Screens::Screens() {
   screen = SCREEN_NONE;
   last_screen = SCREEN_NONE;
-  swidget.resize(SCREEN_MAX, NULL);
 
   init_renderer(640, 360);
   audio_init(256);
@@ -81,7 +86,11 @@ Screens::Screens() {
   SG_Widget *wid;	// For temporary storage;
   SG_Alignment *align;	// For temporary storage;
 
-  int drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
+  drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
+
+  //Setup POPUP_LOADMAP
+  tab = new SG_FileBrowser("*.map");
+  swidget[POPUP_LOADMAP] = tab;
 
   //Setup SCREEN_TITLE
   tab = new SG_Table(3, 7, 0.0625, 0.125);
@@ -152,7 +161,7 @@ Screens::Screens() {
   smap[wid] = SCREEN_CONFIG;
   wid = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 2);
-//  smap[wid] = SCREEN_TITLE;
+  smap[wid] = POPUP_LOADMAP;
   wid = new SG_Button("Go", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 6);
   smap[wid] = SCREEN_EQUIP;
@@ -172,13 +181,14 @@ Screens::Screens() {
   smap[wid] = SCREEN_CONFIG;
   wid = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 2);
-//  smap[wid] = SCREEN_TITLE;
+  smap[wid] = POPUP_LOADMAP;
   wid = new SG_Button("Connect to Game", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 3);
 //  smap[wid] = SCREEN_TITLE;
   wid = new SG_StickyButton("Ready to Play", but_normal, but_disabled, but_pressed, but_activated);
   tab->AddWidget(wid, 2, 5);
 //  smap[wid] = SCREEN_TITLE;
+  readymap[SCREEN_MULTI] = wid;
   wid = new SG_Button("Go", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 6);
   smap[wid] = SCREEN_EQUIP;
@@ -206,59 +216,8 @@ Screens::Screens() {
   wid->Disable();
 
 
-//  vector<string> troops;  //Just for example
-  troops.push_back("Clark, John");
-  troops.push_back("Chaves, Ding");
-  troops.push_back("Johnston, Homer");
-
-  //Setup SCREEN_EQUIP
-//  tab = new SG_Table(16, 9, 0.0625, 0.125);
-  tab = new SG_Table(16, 9, 0.0, 0.0);
-  swidget[SCREEN_EQUIP] = tab;
-//  wid = new SG_TextArea("Equip Your Team", drkred);
-//  tab->AddWidget(wid, 12, 3, 4, 1);
-  wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 12, 0, 2, 1);
-  smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 14, 0, 2, 1);
-  smap[wid] = SCREEN_PLAY;
-
-  vector<SG_Alignment *> dnds;
-  for(int troop = 0; troop < (int)(troops.size()); ++troop) {
-    SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
-    dnd->Include(1, 1, 2, 1);
-    dnd->Include(7, 1, 2, 1);
-    dnd->Include(11, 2, 3, 3);
-    dnd->Include(0, 3, 2, 3);
-    dnd->Include(8, 3, 2, 3);
-    dnd->Include(0, 7, 2, 1);
-    dnd->Include(8, 7, 2, 1);
-    dnd->Include(11, 6, 4, 1);
-    dnd->Include(11, 7);
-    dnd->Include(14, 7);
-    dnd->Include(0, 9, 18, 3);
-
-    if(troop != 2) dnd->AddItem(gun_icon, 8, 3, 2, 3);
-    if(troop != 1) dnd->AddItem(gren_icon, 11, 7);
-
-    wid = new SG_Panel(equip_bg);
-    dnd->SetBackground(wid);
-
-    dnds.push_back(dnd);
-    }
-
-  wid = new SG_MultiTab(troops, dnds, 9,
-	but_normal, but_disabled, but_pressed, but_activated);
-  tab->AddWidget(wid, 0, 0, 12, 9);
-
-//  chars = new SG_Tabs(troops, SG_AUTOSIZE, 1,
-//	but_normal, but_disabled, but_pressed, but_activated);
-//  tab->AddWidget(chars, 0, 0, 12, 1);
-
-  wid = new SG_TextArea(troops[0], drkred);
-  tab->AddWidget(wid, 12, 1, 4, 1);
-  saymap[SCREEN_EQUIP] = wid;
+  //Setup of SCREEN_EQUIP is done after map load!
+  swidget[SCREEN_EQUIP] = NULL;
 
   //Setup SCREEN_PLAY
   tab = new SG_Table(6, 7, 0.0625, 0.125);
@@ -297,14 +256,89 @@ Screens::~Screens() {
 
 void Screens::Set(ScreenNum s) {
   if(screen != SCREEN_NONE) gui->MasterWidget()->RemoveWidget(swidget[screen]);
-  if(gomap.count(screen)) gomap[screen]->Disable();
+  if(gomap.count(s)) {
+    if(cur_map && (readymap.count(s) == 0 || readymap[s]->IsOn())) {
+      gomap[s]->Enable();
+      }
+    else gomap[s]->Disable();
+    }
+  if(screen != s && readymap.count(screen)) readymap[screen]->TurnOff();
+  gui->UnsetPopupWidget();
   if(s == SCREEN_BACK) {
     screen = last_screen;
+    }
+  else if(s < SCREEN_BACK) {	//Popup!
+    gui->SetPopupWidget(swidget[s]);
     }
   else {
     last_screen = screen;
     screen = s;
     }
+
+  if(screen == SCREEN_EQUIP && swidget[screen] == NULL) {
+    if(!cur_map) {
+      fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded map!\n");
+      exit(1);
+      }
+
+    vector<string> troops;  //Just for example
+    for(int n = 0; cur_map->PlayerUnit(0, n) != NULL; ++n) {
+      troops.push_back(cur_map->PlayerUnit(0, n)->name);
+      }
+
+    if(troops.size() < 1) {
+      fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded non-empty map!\n");
+      exit(1);
+      }
+
+    SG_Table *tab;
+    SG_Widget *wid;
+//    tab = new SG_Table(16, 9, 0.0625, 0.125);
+    tab = new SG_Table(16, 9, 0.0, 0.0);
+    swidget[SCREEN_EQUIP] = tab;
+//    wid = new SG_TextArea("Equip Your Team", drkred);
+//    tab->AddWidget(wid, 12, 3, 4, 1);
+    wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
+    tab->AddWidget(wid, 12, 0, 2, 1);
+    smap[wid] = SCREEN_TITLE;
+    wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
+    tab->AddWidget(wid, 14, 0, 2, 1);
+    smap[wid] = SCREEN_PLAY;
+
+    vector<SG_Alignment *> dnds;
+    for(int troop = 0; troop < (int)(troops.size()); ++troop) {
+      SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
+      dnd->Include(1, 1, 2, 1);
+      dnd->Include(7, 1, 2, 1);
+      dnd->Include(11, 2, 3, 3);
+      dnd->Include(0, 3, 2, 3);
+      dnd->Include(8, 3, 2, 3);
+      dnd->Include(0, 7, 2, 1);
+      dnd->Include(8, 7, 2, 1);
+      dnd->Include(11, 6, 4, 1);
+      dnd->Include(11, 7);
+      dnd->Include(14, 7);
+      dnd->Include(0, 9, 18, 3);
+
+	// Hardcoded loadout for now
+      if(troop != 2) dnd->AddItem(gun_icon, 8, 3, 2, 3);
+      if(troop != 1) dnd->AddItem(gren_icon, 11, 7);
+
+      wid = new SG_Panel(equip_bg);
+      dnd->SetBackground(wid);
+
+      dnds.push_back(dnd);
+      }
+
+    wid = new SG_MultiTab(troops, dnds, 9,
+	but_normal, but_disabled, but_pressed, but_activated);
+    tab->AddWidget(wid, 0, 0, 12, 9);
+
+    wid = new SG_TextArea(troops[0], drkred);
+    tab->AddWidget(wid, 12, 1, 4, 1);
+    saymap[SCREEN_EQUIP] = wid;
+    }
+
   if(screen != SCREEN_NONE) gui->MasterWidget()->AddWidget(swidget[screen]);
   }
 
@@ -328,7 +362,8 @@ int Screens::Handle() {
           }
         else if(event.user.code == SG_EVENT_STICKYON) {
           audio_play(click, 8, 8);
-	  if(((SG_TextArea *)(event.user.data1))->Text() == "Ready to Play") {
+	  if(((SG_TextArea *)(event.user.data1))->Text() == "Ready to Play"
+		&& cur_map != NULL) {
 	    gomap[screen]->Enable();
 	    }
           }
@@ -340,20 +375,34 @@ int Screens::Handle() {
           }
         else if(event.user.code == SG_EVENT_SELECT) {
           audio_play(click, 8, 8);
-	  if(screen == SCREEN_EQUIP) ((SG_TextArea*)(saymap[screen]))->
-		SetText(troops[*((int*)(event.user.data2))]);
+	  if(screen == SCREEN_EQUIP) {
+	    const Unit *u = cur_map->PlayerUnit(0, *((int*)(event.user.data2)));
+	    if(u) ((SG_TextArea*)(saymap[screen]))->SetText(u->name);
+	    }
+          }
+        else if(event.user.code == SG_EVENT_FILEOPEN) {
+          audio_play(click, 8, 8);
+	  string filename = ((SG_FileBrowser*)(event.user.data1))->FileName();
+	  if(!cur_map) cur_map = new Map;
+	  if(!cur_map->Load(filename)) {
+	    delete cur_map;
+	    cur_map = NULL;
+	    fprintf(stderr, "WARNING: Could not load map file '%s'\n",
+		filename.c_str());
+	    }
+	  else {
+	    //cur_map->Save(filename); // For auto-upgrade of mapfile
+	    gui->UnsetPopupWidget();
+	    if(readymap.count(screen) == 0 || readymap[screen]->IsOn()) {
+	      gomap[screen]->Enable();
+	      }
+	    }
           }
         }
       else if(event.type == SDL_KEYDOWN) {
         if(event.key.keysym.sym == SDLK_ESCAPE) {
           if(screen != SCREEN_TITLE) Set(SCREEN_TITLE);
 	  else Set(SCREEN_NONE);
-          }
-        else if(screen == SCREEN_EQUIP && event.key.keysym.sym == SDLK_LEFT) {
-	  chars->Left();
-          }
-        else if(screen == SCREEN_EQUIP && event.key.keysym.sym == SDLK_RIGHT) {
-	  chars->Right();
           }
         }
       else if(event.type == SDL_QUIT) {

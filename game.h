@@ -3,18 +3,23 @@
 
 #include <map>
 #include <vector>
+#include <cstdio>
 using namespace std;
 
 #include "unit.h"
 
 class Map {
 public:
-  Map(const string &filename);
-  void Load(const string &filename);
-  void Save(const string &filename);
+  Map();
+  int Load(const string &filename);
+  int Save(const string &filename);
+  int Load(FILE *fl);
+  int Save(FILE *fl);
+
+  const Unit *PlayerUnit(int pl, int un);
 
 private:
-  map<int, Unit> units;
+  map<int, Unit *> units;
   vector< vector<int> > plunits;	// List of unit ids per player
   };
 

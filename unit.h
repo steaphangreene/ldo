@@ -66,9 +66,9 @@ using namespace std;
 
 class Unit {
 public:
-  Unit(int id = 0, const string &nm = "");
-  void Load(FILE *f);
-  void Save(FILE *f);
+  Unit();
+  int Load(FILE *f);
+  int Save(FILE *f);
 
   int id;
   string name;

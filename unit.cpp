@@ -5,19 +5,19 @@ using namespace std;
 #include "unit.h"
 #include "defs.h"
 
-Unit::Unit(int ident, const string &nm) {
-  id = ident;
-  name = nm;
+Unit::Unit() {
   }
 
 static char buf[BUF_LEN];
 
-void Unit::Load(FILE *f) {
+int Unit::Load(FILE *f) {
   memset(buf, 0, BUF_LEN);
-  fscanf(f, "%d;%s;\n", &id, buf);
+  if(fscanf(f, "%d;%[^\n;];\n", &id, buf) < 2) return 0;
   name = buf;
+  return 1;
   }
 
-void Unit::Save(FILE *f) {
-  fprintf(f, "%d;%s;\n", id, name.c_str());
+int Unit::Save(FILE *f) {
+  if(fprintf(f, "%d;%s;\n", id, name.c_str()) < 4) return 0;
+  return 1;
   }
