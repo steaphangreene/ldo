@@ -45,13 +45,7 @@ map<ScreenNum, SG_Widget *> gomap;	//Map of go buttons per screen
 map<ScreenNum, SG_Widget *> readymap;	//Map of ready buttons per screen
 					//Temporary, just for testing
 
-map<ScreenNum, SG_Widget *> saymap;	//Map of go buttons per screen
-					//Temporary, just for testing
-
 int music;				//Background music
-					//Temporary, just for testing
-
-int click;				//Button click
 					//Temporary, just for testing
 
 Game *cur_map = NULL;			//Temporary, just for testing
@@ -59,6 +53,96 @@ Game *cur_map = NULL;			//Temporary, just for testing
 #define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
 static int drkred = 0;	//Global colordef
+
+
+class Screen {
+public:
+  Screen() { main = NULL; };
+  virtual ~Screen() {};
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual void Finish(SimpleGUI *gui);
+protected:
+  SG_Table *main;
+  };
+
+class Screen_LoadMap : public Screen {
+public:
+  Screen_LoadMap();
+  virtual ~Screen_LoadMap();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual void Finish(SimpleGUI *gui);
+  };
+
+class Screen_Title : public Screen {
+public:
+  Screen_Title();
+  virtual ~Screen_Title();
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+protected:
+  SG_Button *optb, *multb, *singb, *replb, *quitb;
+  };
+
+class Screen_Config : public Screen {
+public:
+  Screen_Config();
+  virtual ~Screen_Config();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+protected:
+  SG_Button *backb;
+  };
+
+class Screen_Multi : public Screen {
+public:
+  Screen_Multi();
+  virtual ~Screen_Multi();
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  };
+
+class Screen_Single : public Screen {
+public:
+  Screen_Single();
+  virtual ~Screen_Single();
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  };
+
+class Screen_Replay : public Screen {
+public:
+  Screen_Replay();
+  virtual ~Screen_Replay();
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  };
+
+class Screen_Equip : public Screen {
+public:
+  Screen_Equip();
+  virtual ~Screen_Equip();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+protected:
+  SG_TextArea *name;
+  SG_Button *cancelb, *doneb;
+  };
+
+class Screen_Play : public Screen {
+public:
+  Screen_Play();
+  virtual ~Screen_Play();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual void Finish(SimpleGUI *gui);
+  };
+
+class Screen_Results : public Screen {
+public:
+  Screen_Results();
+  virtual ~Screen_Results();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  };
+
 
 Screens::Screens() {
   screen = SCREEN_NONE;
@@ -93,62 +177,9 @@ Screens::Screens() {
   tab = new SG_FileBrowser("*.map");
   swidget[POPUP_LOADMAP] = tab;
 
-  //Setup SCREEN_TITLE
-  tab = new SG_Table(3, 7, 0.0625, 0.125);
-  swidget[SCREEN_TITLE] = tab;
-  tab->AddWidget(new SG_TextArea("LDO", drkred), 0, 0, 2, 4);
-  wid = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 2, 1);
-  smap[wid] = SCREEN_CONFIG;
-  wid = new SG_Button("Multiplayer", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 2, 3);
-  smap[wid] = SCREEN_MULTI;
-  wid = new SG_Button("Single Player", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 2, 4);
-  smap[wid] = SCREEN_SINGLE;
-  wid = new SG_Button("View Replay", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 2, 5);
-  smap[wid] = SCREEN_REPLAY;
-  wid = new SG_Button("Quit Game", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 2, 6);
-  smap[wid] = SCREEN_NONE;
-
+  sscr[SCREEN_TITLE] = new Screen_Title;
 
   sscr[SCREEN_CONFIG] = new Screen_Config;
-//  //Setup SCREEN_CONFIG
-//  tab = new SG_Table(6, 7, 0.0625, 0.125);
-//  swidget[SCREEN_CONFIG] = tab;
-//
-//  vector<string> cfg_tab;
-//  vector<SG_Alignment *> cfg_scr;
-//
-//  cfg_tab.push_back("Video");
-//  align = new SG_Table(3, 7, 0.0625, 0.125);
-//  cfg_scr.push_back(align);
-//
-//  cfg_tab.push_back("Audio");
-//  align = new SG_Table(3, 7, 0.0625, 0.125);
-//  cfg_scr.push_back(align);
-//
-//  cfg_tab.push_back("Mouse");
-//  align = new SG_Table(3, 7, 0.0625, 0.125);
-//  cfg_scr.push_back(align);
-//
-//  cfg_tab.push_back("Keyboard");
-//  align = new SG_Table(3, 7, 0.0625, 0.125);
-//  cfg_scr.push_back(align);
-//
-//  cfg_tab.push_back("Game");
-//  align = new SG_Table(3, 7, 0.0625, 0.125);
-//  cfg_scr.push_back(align);
-//
-//  tab->AddWidget(new SG_MultiTab(cfg_tab, cfg_scr, 12,
-//	but_normal, but_disabled, but_pressed, but_activated),
-//	0, 0, 5, 7);
-//
-//  wid = new SG_Button("Back", but_normal, but_disabled, but_pressed);
-//  tab->AddWidget(wid, 5, 0);
-//  smap[wid] = SCREEN_BACK;
 
 
   //Setup SCREEN_SINGLE
@@ -217,9 +248,7 @@ Screens::Screens() {
   gomap[SCREEN_REPLAY] = wid;
   wid->Disable();
 
-
-  //Setup of SCREEN_EQUIP is done after map load!
-  swidget[SCREEN_EQUIP] = NULL;
+  sscr[SCREEN_EQUIP] = new Screen_Equip;
 
   //Setup SCREEN_PLAY
   tab = new SG_Table(6, 7, 0.0625, 0.125);
@@ -283,70 +312,6 @@ void Screens::Set(ScreenNum s) {
     screen = s;
     }
 
-  if(screen == SCREEN_EQUIP && swidget[screen] == NULL) {
-    if(!cur_map) {
-      fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded map!\n");
-      exit(1);
-      }
-
-    vector<string> troops;  //Just for example
-    for(int n = 0; cur_map->PlayerUnit(0, 0, n) != NULL; ++n) {
-      troops.push_back(cur_map->PlayerUnit(0, 0, n)->name);
-      }
-
-    if(troops.size() < 1) {
-      fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded non-empty map!\n");
-      exit(1);
-      }
-
-    SG_Table *tab;
-    SG_Widget *wid;
-//    tab = new SG_Table(16, 9, 0.0625, 0.125);
-    tab = new SG_Table(16, 9, 0.0, 0.0);
-    swidget[SCREEN_EQUIP] = tab;
-//    wid = new SG_TextArea("Equip Your Team", drkred);
-//    tab->AddWidget(wid, 12, 3, 4, 1);
-    wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
-    tab->AddWidget(wid, 12, 0, 2, 1);
-    smap[wid] = SCREEN_TITLE;
-    wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
-    tab->AddWidget(wid, 14, 0, 2, 1);
-    smap[wid] = SCREEN_PLAY;
-
-    vector<SG_Alignment *> dnds;
-    for(int troop = 0; troop < (int)(troops.size()); ++troop) {
-      SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
-      dnd->Include(1, 1, 2, 1);
-      dnd->Include(7, 1, 2, 1);
-      dnd->Include(11, 2, 3, 3);
-      dnd->Include(0, 3, 2, 3);
-      dnd->Include(8, 3, 2, 3);
-      dnd->Include(0, 7, 2, 1);
-      dnd->Include(8, 7, 2, 1);
-      dnd->Include(11, 6, 4, 1);
-      dnd->Include(11, 7);
-      dnd->Include(14, 7);
-      dnd->Include(0, 9, 18, 3);
-
-	// Hardcoded loadout for now
-      if(troop != 2) dnd->AddItem(gun_icon, 8, 3, 2, 3);
-      if(troop != 1) dnd->AddItem(gren_icon, 11, 7);
-
-      wid = new SG_Panel(equip_bg);
-      dnd->SetBackground(wid);
-
-      dnds.push_back(dnd);
-      }
-
-    wid = new SG_MultiTab(troops, dnds, 9,
-	but_normal, but_disabled, but_pressed, but_activated);
-    tab->AddWidget(wid, 0, 0, 12, 9);
-
-    wid = new SG_TextArea(troops[0], drkred);
-    tab->AddWidget(wid, 12, 1, 4, 1);
-    saymap[SCREEN_EQUIP] = wid;
-    }
-
   if(sscr.count(screen)) {
     sscr[screen]->Start(gui);
     }
@@ -376,20 +341,25 @@ int Screens::Handle() {
 	Set(SCREEN_NONE);
 	continue;
         }
+      if(event.type == SDL_SG_EVENT) {
+	if(event.user.code == SG_EVENT_BUTTONPRESS) {
+	  audio_play(click, 8, 8);
+	  }
+	else if(event.user.code == SG_EVENT_SELECT) {
+	  audio_play(click, 8, 8);
+	  }
+	}
 
       //This calls the individual screen(s)
       if(sscr.count(screen)) {
 	ScreenNum next = sscr[screen]->Handle(gui, event);
-	if(next != SCREEN_NONE) Set(next);
+	if(next != SCREEN_SAME) Set(next);
 	continue;
 	}
 
-      //This is obsolete
+      //This is all obsolete - being replaced now
       if(event.type == SDL_SG_EVENT) {
-        if(event.user.code == SG_EVENT_BUTTONPRESS) {
-          audio_play(click, 8, 8);
-	  }
-        else if(event.user.code == SG_EVENT_BUTTONCLICK) {
+        if(event.user.code == SG_EVENT_BUTTONCLICK) {
 	  if(smap.count((SG_Widget*)event.user.data1)) {
 	    Set(smap[(SG_Widget*)event.user.data1]);
 	    }
@@ -405,13 +375,6 @@ int Screens::Handle() {
           audio_play(click, 8, 8);
 	  if(((SG_TextArea *)(event.user.data1))->Text() == "Ready to Play") {
 	    gomap[screen]->Disable();
-	    }
-          }
-        else if(event.user.code == SG_EVENT_SELECT) {
-          audio_play(click, 8, 8);
-	  if(screen == SCREEN_EQUIP) {
-	    const Unit *u = cur_map->PlayerUnit(0, 0, *((int*)(event.user.data2)));
-	    if(u) ((SG_TextArea*)(saymap[screen]))->SetText(u->name);
 	    }
           }
         else if(event.user.code == SG_EVENT_FILEOPEN) {
@@ -453,7 +416,7 @@ void Screen::Finish(SimpleGUI *gui) {
   }
 
 ScreenNum Screen::Handle(SimpleGUI *gui, SDL_Event &event) {
-  return SCREEN_NONE;
+  return SCREEN_SAME;
   }
 
 Screen_Config::Screen_Config() {
@@ -496,23 +459,142 @@ Screen_Config::Screen_Config() {
   }
 
 Screen_Config::~Screen_Config() {
+  //FIXME: Fill!
   }
 
 void Screen_Config::Start(SimpleGUI *gui) {
-  gui->MasterWidget()->AddWidget(main);
+  Screen::Start(gui);
   }
 
 ScreenNum Screen_Config::Handle(SimpleGUI *gui, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
-    if(event.user.code == SG_EVENT_BUTTONPRESS) {
-      audio_play(click, 8, 8);
-      }
-    else if(event.user.code == SG_EVENT_BUTTONCLICK) {
+    if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)backb) return SCREEN_BACK;
       }
-    else if(event.user.code == SG_EVENT_SELECT) {
-      audio_play(click, 8, 8);
+    }
+  return SCREEN_SAME;
+  }
+
+Screen_Equip::Screen_Equip() {
+  }
+
+Screen_Equip::~Screen_Equip() {
+  //FIXME: Fill!
+  }
+
+void Screen_Equip::Start(SimpleGUI *gui) {
+  if(main == NULL) {
+    if(!cur_map) {
+      fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded map!\n");
+      exit(1);
+      }
+
+    vector<string> troops;
+    for(int n = 0; cur_map->PlayerUnit(0, 0, n) != NULL; ++n) {
+      troops.push_back(cur_map->PlayerUnit(0, 0, n)->name);
+      }
+
+    if(troops.size() < 1) {
+      fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded non-empty map!\n");
+      exit(1);
+      }
+
+    SG_Widget *wid;
+    main = new SG_Table(16, 9, 0.0, 0.0);
+//    wid = new SG_TextArea("Equip Your Team", drkred);
+//    main->AddWidget(wid, 12, 3, 4, 1);
+    cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
+    main->AddWidget(cancelb, 12, 0, 2, 1);
+//    smap[wid] = SCREEN_TITLE;
+    doneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
+    main->AddWidget(doneb, 14, 0, 2, 1);
+//    smap[wid] = SCREEN_PLAY;
+
+    vector<SG_Alignment *> dnds;
+    for(int troop = 0; troop < (int)(troops.size()); ++troop) {
+      SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
+      dnd->Include(1, 1, 2, 1);
+      dnd->Include(7, 1, 2, 1);
+      dnd->Include(11, 2, 3, 3);
+      dnd->Include(0, 3, 2, 3);
+      dnd->Include(8, 3, 2, 3);
+      dnd->Include(0, 7, 2, 1);
+      dnd->Include(8, 7, 2, 1);
+      dnd->Include(11, 6, 4, 1);
+      dnd->Include(11, 7);
+      dnd->Include(14, 7);
+      dnd->Include(0, 9, 18, 3);
+
+	// Hardcoded loadout for now
+      if(troop != 2) dnd->AddItem(gun_icon, 8, 3, 2, 3);
+      if(troop != 1) dnd->AddItem(gren_icon, 11, 7);
+
+      wid = new SG_Panel(equip_bg);
+      dnd->SetBackground(wid);
+
+      dnds.push_back(dnd);
+      }
+
+    wid = new SG_MultiTab(troops, dnds, 9,
+	but_normal, but_disabled, but_pressed, but_activated);
+    main->AddWidget(wid, 0, 0, 12, 9);
+
+    name = new SG_TextArea(troops[0], drkred);
+    main->AddWidget(name, 12, 1, 4, 1);
+    }
+
+  Screen::Start(gui);
+  }
+
+ScreenNum Screen_Equip::Handle(SimpleGUI *gui, SDL_Event &event) {
+  if(event.type == SDL_SG_EVENT) {
+    if(event.user.code == SG_EVENT_SELECT) {	//Sound already played!
+      const Unit *u = cur_map->PlayerUnit(0, 0, *((int*)(event.user.data2)));
+      if(u) name->SetText(u->name);
+      }
+    else if(event.user.code == SG_EVENT_BUTTONCLICK) {
+      if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
+      else if(event.user.data1 == (void*)doneb) return SCREEN_PLAY;
       }
     }
-  return SCREEN_NONE;
+  return SCREEN_SAME;
   }
+
+
+Screen_Title::Screen_Title() {
+  main = new SG_Table(3, 7, 0.0625, 0.125);
+  main->AddWidget(new SG_TextArea("LDO", drkred), 0, 0, 2, 4);
+  optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  main->AddWidget(optb, 2, 1);
+//  smap[optb] = SCREEN_CONFIG;
+  multb = new SG_Button("Multiplayer", but_normal, but_disabled, but_pressed);
+  main->AddWidget(multb, 2, 3);
+//  smap[multb] = SCREEN_MULTI;
+  singb = new SG_Button("Single Player", but_normal, but_disabled, but_pressed);
+  main->AddWidget(singb, 2, 4);
+//  smap[singb] = SCREEN_SINGLE;
+  replb = new SG_Button("View Replay", but_normal, but_disabled, but_pressed);
+  main->AddWidget(replb, 2, 5);
+//  smap[replb] = SCREEN_REPLAY;
+  quitb = new SG_Button("Quit Game", but_normal, but_disabled, but_pressed);
+  main->AddWidget(quitb, 2, 6);
+  }
+
+Screen_Title::~Screen_Title() {
+  //FIXME: Fill!
+  }
+
+ScreenNum Screen_Title::Handle(SimpleGUI *gui, SDL_Event &event) {
+  if(event.type == SDL_SG_EVENT) {
+    if(event.user.code == SG_EVENT_BUTTONCLICK) {
+      if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
+      else if(event.user.data1 == (void*)multb) return SCREEN_MULTI;
+      else if(event.user.data1 == (void*)singb) return SCREEN_SINGLE;
+      else if(event.user.data1 == (void*)replb) return SCREEN_REPLAY;
+      else if(event.user.data1 == (void*)quitb) return SCREEN_NONE;
+      }
+    }
+  return SCREEN_SAME;
+  }
+
+
