@@ -55,7 +55,7 @@ OBJS:=	screens.o percept.o orders.o world.o \
 #PRODUCTION OPTIONS (CROSS-COMPILED FOR WINDOWS)
 WCXX=	i586-mingw32msvc-g++
 WCXXFLAGS=	-s -O2 -Wall `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --cflags`
-WLIBS=	../simplegui/libsimplegui.win32_a ../simplegui/libsimplemodel.win32_a `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` -lSDL_ttf -lSDL_image -lopengl32 -lglu32
+WLIBS=	../simplegui/libsimplegui.win32_a ../simplemodel/libsimplemodel.win32_a `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` -lSDL_ttf -lSDL_image -lSDL -lpng -ljpeg -lz -lpng -lopengl32 -lglu32
 
 WOBJS:=	screens.win32_o percept.win32_o orders.win32_o world.win32_o \
 	game.win32_o unit.win32_o player.win32_o player_local.win32_o \
