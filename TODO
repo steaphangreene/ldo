@@ -1,7 +1,9 @@
 -=Codebase=-
+Implement the missing Player_Local popups
 
 -=Mapfile=-
 Add Scoring Options
+Add actual map definition itself
 
 -=Design Flaws=-
 Figure out how config screen really fits in and update design
