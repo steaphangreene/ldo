@@ -177,7 +177,7 @@ Screens::Screens() {
   dnd->Include(14, 7);
   dnd->Include(0, 9, 18, 3);
 
-  dnd->AddItem(gun_icon, 11, 2, 2, 3);
+  dnd->AddItem(gun_icon, 8, 3, 2, 3);
 
   wid = new SG_Panel(equip_bg);
   dnd->SetBackground(wid);
