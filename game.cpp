@@ -24,7 +24,8 @@
 #include "unit.h"
 #include "defs.h"
 
-#define MAPFILE_VERSION	0x00000001 // 0.0.0-r1
+#define HEADER_STRING "LDO_GAMESAVE_FILE"
+#define SAVEFILE_VERSION	0x00000002 // 0.0.0-r2
 
 Map::Map() {
   }
@@ -33,7 +34,7 @@ Map::~Map() {
   Clear();
   }
 
-//static char buf[BUF_LEN];
+static char buf[BUF_LEN];
 
 int Map::Load(const string &filename) {
   FILE *fl = fopen(filename.c_str(), "r");
@@ -47,11 +48,14 @@ int Map::Load(const string &filename) {
   }
 
 int Map::Load(FILE *fl) {
-
   unsigned int num;
 
+  memset(buf, 0, BUF_LEN);
+  if(fscanf(fl, "%s\n", buf) < 1) return 0;
+  if(strcmp(buf, HEADER_STRING)) return 0;
+
   if(fscanf(fl, "0x%X\n", &num) < 1) return 0;
-  if(num != MAPFILE_VERSION) return 0;
+  if(num != SAVEFILE_VERSION) return 0;
 
   if(fscanf(fl, "%d\n", &num) < 1) return 0;
 
@@ -83,7 +87,10 @@ int Map::Save(const string &filename) {
   }
 
 int Map::Save(FILE *fl) {
-  if(fprintf(fl, "0x%.8X\n", MAPFILE_VERSION) < 11) return 0;
+  if(fprintf(fl, "%s\n", HEADER_STRING) < (int)(strlen(HEADER_STRING))+1)
+    return 0;
+
+  if(fprintf(fl, "0x%.8X\n", SAVEFILE_VERSION) < 11) return 0;
 
   if(fprintf(fl, "%d\n", (int)(units.size())) < 2) return 0;
 
