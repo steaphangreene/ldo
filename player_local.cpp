@@ -411,7 +411,19 @@ void Player_Local::CalcOffset(Uint32 cur_time) { // off_mut must
 	playback_speed);	// Should never happen
       }break;
     }
-  if(offset > 2147483647U) offset = 0;	//Compare to INT_MAX, since is unsigned
-  else if(offset > 3000) offset = 3000;
+  if(offset > 2147483647U) {	//Compare to INT_MAX, since is unsigned
+    offset = 0;
+    playback_speed = 3; //Auto-stop
+    SDL_mutexP(gui_mut);
+    rcontrols->Set(playback_speed);
+    SDL_mutexV(gui_mut);
+    }
+  else if(offset > 3000) {
+    offset = 3000;
+    playback_speed = 3; //Auto-stop
+    SDL_mutexP(gui_mut);
+    rcontrols->Set(playback_speed);
+    SDL_mutexV(gui_mut);
+    }
   SDL_mutexV(off_mut);
   }
