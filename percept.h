@@ -41,6 +41,7 @@ enum Act {	// For Example
 
 struct UnitAct {
 public:
+  UnitAct(int i, int t, Act a) { id = i; time = t; act = a; };
   int id;
   int time;
   Act act;

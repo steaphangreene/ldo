@@ -126,6 +126,7 @@ int Game::Load(FILE *fl) {
       }
     units[unit_ptr->id] = unit_ptr;
     master[0].my_units.insert(unit_ptr->id);
+    master[0].my_acts.push_back(UnitAct(unit_ptr->id, 0, ACT_EQUIP));
     }
   return 1;
   }
