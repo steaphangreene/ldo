@@ -110,7 +110,7 @@ int Player_Local::event_thread_func(void *arg) {
 int Player_Local::EventHandler() {
   SDL_Event event;
   while(exiting == 0) {
-    while(exiting == 0 && SDL_WaitEvent(&event)) {
+    while(exiting == 0 && SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_ALLEVENTS)) {
       SDL_mutexP(gui_mut);
       int handle = gui->ProcessEvent(&event);
       SDL_mutexV(gui_mut);
