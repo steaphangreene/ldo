@@ -23,11 +23,15 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <set>
+using namespace std;
+
 #include <SDL/SDL.h>
 
 #include "../simplegui/simplegui.h"
 
 #include "percept.h"
+#include "orders.h"
 
 class Game;
 
@@ -56,6 +60,7 @@ protected:
   PlayerType type;
   bool ready;
   Percept percept;
+  Orders orders;
   int pround;
   Game *game;
   };
@@ -76,11 +81,18 @@ protected:
   SimpleGUI *gui;
 
   SG_Table *wind[3];		//Screens for each phase
+  int drkred;			//Colors
 
-  SG_DNDBoxes *ednd;		//Widgets for Equip phase
+  SG_MultiTab *ednd;		//Widgets for Equip phase
   SG_TextArea *estats;
   SG_Button *ecancelb, *edoneb;
+  set<int> eqid;		//Data for Equip phase
+
+				//Textures for Equip phase
+  SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
+  SDL_Surface *gun_icon, *gren_icon;
   SDL_Surface *equip_bg;
+
 
   SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
 

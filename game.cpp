@@ -154,6 +154,10 @@ int Game::Save(FILE *fl) {
   return 1;
   }
 
+const Unit *Game::UnitRef(int id) {
+  return units[id];
+  }
+
 const Unit *Game::PlayerUnit(int pl, int sq, int un) {
   if(pl >= (int)(plsquads.size())) return NULL;
   if(sq >= (int)(plsquads[pl].size())) return NULL;
@@ -181,6 +185,15 @@ void Game::Clear() {
   squnits.clear();
   master.clear();
   percept.clear();
+  orders.clear();
+  }
+
+void Game::SetOrders(int plnum, Orders *ord) {
+  if(orders.count(plnum)) {
+    fprintf(stderr, "ERROR: Multiple orders requested for one player!\n");
+    exit(1);
+    }
+  orders[plnum] = ord;
   }
 
 void Game::SetPercept(int plnum, Percept *prcpt) {

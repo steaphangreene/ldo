@@ -20,53 +20,44 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-#ifndef SCREENS_H
-#define	SCREENS_H
+#ifndef ORDERS_H
+#define ORDERS_H
 
-#include <map>
+#include <set>
 #include <vector>
+#include <cstdio>
 using namespace std;
 
-#include "../simplegui/simplegui.h"
+#include "unit.h"
 
-enum ScreenNum {
-  POPUP_MIN,
-  POPUP_LOADMAP,
-  POPUP_MAX,
-  POPUP_CLEAR,
-  SCREEN_BACK,
-  SCREEN_SAME,
-  SCREEN_NONE,
-  SCREEN_MIN,
-  SCREEN_TITLE,
-  SCREEN_CONFIG,
-  SCREEN_SINGLE,
-  SCREEN_MULTI,
-  SCREEN_REPLAY,
-  SCREEN_PLAY,    //Actually not handled here but in the player object
-//  SCREEN_EQUIP,   //Not really going to be handled within Screens class
-//  SCREEN_DECLARE, //Not really going to be handled within Screens class
-//  SCREEN_WATCH,   //Not really going to be handled within Screens class
-  SCREEN_RESULTS,
-  SCREEN_MAX
+enum Order {	// For Example
+  ORDER_NONE,
+  ORDER_EQUIP,	// Unit got (re)equipped
+  ORDER_DUCK,
+  ORDER_STAND,
+  ORDER_MAX
   };
 
-class Screen;
-
-class Screens {
+struct UnitOrder {
 public:
-  Screens();
-  ~Screens();
-  int Handle();
-
-private:
-  void Set(ScreenNum s);
-  ScreenNum screen, last_screen, popup;
-  SimpleGUI *gui;
-
-  map<ScreenNum, Screen *> sscr;		//Map of ScreenNums to Screens
-  int click;				//Button Click Sound
-  int music;				//Background Music (Temporary)
+  UnitOrder(int i, int t, Order o) { id = i; time = t; order = o; };
+  int id;
+  int time;
+  Order order;
   };
 
-#endif // SCREENS_H
+class Orders {
+public:
+  Orders();
+  ~Orders();
+
+  int Load(FILE *fl, unsigned int ver);
+  int Save(FILE *fl, unsigned int ver);
+
+  void Clear();
+
+  vector<UnitOrder> orders;	//List of unit orders
+  };
+
+#endif // ORDERS_H
+

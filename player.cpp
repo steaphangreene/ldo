@@ -26,6 +26,10 @@
 #include "player.h"
 #include "game.h"
 
+#include "m41.h"
+#include "mark2.h"
+#define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
+
 extern Game *cur_game;
 
 Player::Player(Game *gm, PlayerType tp, int num) {
@@ -37,6 +41,7 @@ Player::Player(Game *gm, PlayerType tp, int num) {
   pround = -1;
 
   cur_game->SetPercept(num, &percept);
+  cur_game->SetOrders(num, &orders);
   }
 
 Player::~Player() {
@@ -63,11 +68,14 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
     }
   phase = -1;
 
-  SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
+  drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
+
   but_normal = SDL_LoadBMP("buttontex_normal.bmp");
   but_pressed = SDL_LoadBMP("buttontex_pressed.bmp");
   but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
   but_activated = SDL_LoadBMP("buttontex_activated.bmp");
+  gun_icon = SDL_CreateRGBSurfaceFrom(m41, 170, 256, 32, 170*4, TGA_COLFIELDS);
+  gren_icon = SDL_CreateRGBSurfaceFrom(mark2, 256, 256, 32, 256*4, TGA_COLFIELDS);
   equip_bg = SDL_LoadBMP("equip_bg.bmp");
 
   //Define base GUI for Equip phase
@@ -76,6 +84,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[0]->AddWidget(ecancelb, 12, 0, 2, 1);
   edoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   wind[0]->AddWidget(edoneb, 14, 0, 2, 1);
+  estats = new SG_TextArea("", drkred);
+  wind[0]->AddWidget(estats, 12, 1, 4, 1);
   ednd = NULL;
 
   //Define base GUI for Replay phase
@@ -99,12 +109,61 @@ Player_Local::~Player_Local() {
 bool Player_Local::Run() {
   Player::Run();	//Start with the basics
 
-  //Temporary - for structure testing!
-  fprintf(stderr, "Player_Local Running\n");
+  vector<UnitAct>::iterator act = percept.my_acts.begin();
+  for(; act != percept.my_acts.end(); ++act) {
+    if(act->act == ACT_EQUIP) eqid.insert(act->id);
+    }
 
-  if(phase == -1) {	//Temporary (should check for ACT_EQUIP)!
-    if(pround == 0) phase = 0;	//EQUIP
-    else phase = 1;		//REPLAY
+  vector<UnitOrder>::iterator order = orders.orders.begin();
+  for(; order != orders.orders.end(); ++order) {
+    if(order->order == ORDER_EQUIP) eqid.erase(order->id);
+    }
+
+  vector<string> troops;
+  vector<SG_Alignment *> dnds;
+  set<int>::iterator id = eqid.begin();
+  for(; id != eqid.end(); ++id) {
+    troops.push_back(game->UnitRef(*id)->name);
+
+    if(ednd != NULL) {
+      wind[0]->RemoveWidget(ednd);
+      delete ednd;
+      ednd = NULL;
+      }
+
+    SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
+    dnd->Include(1, 1, 2, 1);
+    dnd->Include(7, 1, 2, 1);
+    dnd->Include(11, 2, 3, 3);
+    dnd->Include(0, 3, 2, 3);
+    dnd->Include(8, 3, 2, 3);
+    dnd->Include(0, 7, 2, 1);
+    dnd->Include(8, 7, 2, 1);
+    dnd->Include(11, 6, 4, 1);
+    dnd->Include(11, 7);
+    dnd->Include(14, 7);
+    dnd->Include(0, 9, 18, 3);
+
+      // Hardcoded loadout for now - Temporary!
+    if(troops.size() != 2) dnd->AddItem(gun_icon, 8, 3, 2, 3);
+    if(troops.size() != 1) dnd->AddItem(gren_icon, 11, 7);
+
+    dnd->SetBackground(new SG_Panel(equip_bg));
+
+    dnds.push_back(dnd);
+    }
+
+  if(troops.size() > 0) {
+    phase = 0;	//Equip
+    if(ednd == NULL) {
+      ednd = new SG_MultiTab(troops, dnds, 9,
+	but_normal, but_disabled, but_pressed, but_activated);
+      wind[0]->AddWidget(ednd, 0, 0, 12, 9);
+      estats->SetText(troops[0]);
+      }
+    }
+  else {
+    phase = 1;
     }
 
   gui->MasterWidget()->AddWidget(wind[phase]);
@@ -118,7 +177,24 @@ bool Player_Local::Run() {
 	ret = 1;
 	}
       else if(event.type == SDL_SG_EVENT) {
-	ret = 1;
+	if(event.user.code == SG_EVENT_BUTTONCLICK) {
+	  if(event.user.data1 == (void*)edoneb) {
+	    set<int>::iterator id = eqid.begin();
+	    for(; id != eqid.end(); ++id) {
+	      orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
+	      }
+	    gui->MasterWidget()->RemoveWidget(wind[phase]);
+	    phase = 1;
+	    gui->MasterWidget()->AddWidget(wind[phase]);
+	    }
+	  else {
+	    ret = 1;  //Return
+	    }
+	  }
+	else if(event.user.code == SG_EVENT_SELECT) {
+	  const Unit *u = cur_game->PlayerUnit(0, 0, *((int*)(event.user.data2)));
+	  if(u) estats->SetText(u->name);
+	  }
 	}
       }
 

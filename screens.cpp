@@ -28,20 +28,12 @@
 #include "game.h"
 
 SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
-SDL_Surface *equip_bg;
 
 #include "cursor.h"
-
 SDL_Surface *mouse_cursor;
-
-#include "m41.h"
-#include "mark2.h"
-
-SDL_Surface *gun_icon, *gren_icon;
+#define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
 Game *cur_game = NULL;			//Temporary, just for testing
-
-#define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
 static int drkred = 0;	//Global colordef
 
@@ -104,17 +96,6 @@ protected:
   SG_Button *cancelb, *optb, *loadb, *gob;
   };
 
-class Screen_Equip : public Screen {
-public:
-  Screen_Equip();
-  virtual ~Screen_Equip();
-  virtual ScreenNum Start(SimpleGUI *gui);
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
-protected:
-  SG_TextArea *name;
-  SG_Button *cancelb, *doneb;
-  };
-
 class Screen_Play : public Screen {
 public:
   Screen_Play();
@@ -175,9 +156,6 @@ Screens::Screens() {
   but_pressed = SDL_LoadBMP("buttontex_pressed.bmp");
   but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
   but_activated = SDL_LoadBMP("buttontex_activated.bmp");
-  equip_bg = SDL_LoadBMP("equip_bg.bmp");
-  gun_icon = SDL_CreateRGBSurfaceFrom(m41, 170, 256, 32, 170*4, TGA_COLFIELDS);
-  gren_icon = SDL_CreateRGBSurfaceFrom(mark2, 256, 256, 32, 256*4, TGA_COLFIELDS);
 
   drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
@@ -186,7 +164,6 @@ Screens::Screens() {
   sscr[SCREEN_SINGLE] = new Screen_Single;
   sscr[SCREEN_MULTI] = new Screen_Multi;
   sscr[SCREEN_REPLAY] = new Screen_Replay;
-  sscr[SCREEN_EQUIP] = new Screen_Equip;
   sscr[SCREEN_PLAY] = new Screen_Play;
   sscr[SCREEN_RESULTS] = new Screen_Results;
 
@@ -376,91 +353,6 @@ ScreenNum Screen_Config::Handle(SimpleGUI *gui, SDL_Event &event) {
   return SCREEN_SAME;
   }
 
-Screen_Equip::Screen_Equip() {
-  }
-
-Screen_Equip::~Screen_Equip() {
-  //FIXME: Fill!
-  }
-
-ScreenNum Screen_Equip::Start(SimpleGUI *gui) {
-  if(main == NULL) {
-    if(!cur_game) {
-      fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded map!\n");
-      exit(1);
-      }
-
-    vector<string> troops;
-    for(int n = 0; cur_game->PlayerUnit(0, 0, n) != NULL; ++n) {
-      troops.push_back(cur_game->PlayerUnit(0, 0, n)->name);
-      }
-
-    if(troops.size() < 1) {
-      fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded non-empty map!\n");
-      exit(1);
-      }
-
-    SG_Widget *wid;
-    main = new SG_Table(16, 9, 0.0, 0.0);
-//    wid = new SG_TextArea("Equip Your Team", drkred);
-//    main->AddWidget(wid, 12, 3, 4, 1);
-    cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
-    main->AddWidget(cancelb, 12, 0, 2, 1);
-    doneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
-    main->AddWidget(doneb, 14, 0, 2, 1);
-
-    vector<SG_Alignment *> dnds;
-    for(int troop = 0; troop < (int)(troops.size()); ++troop) {
-      SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
-      dnd->Include(1, 1, 2, 1);
-      dnd->Include(7, 1, 2, 1);
-      dnd->Include(11, 2, 3, 3);
-      dnd->Include(0, 3, 2, 3);
-      dnd->Include(8, 3, 2, 3);
-      dnd->Include(0, 7, 2, 1);
-      dnd->Include(8, 7, 2, 1);
-      dnd->Include(11, 6, 4, 1);
-      dnd->Include(11, 7);
-      dnd->Include(14, 7);
-      dnd->Include(0, 9, 18, 3);
-
-	// Hardcoded loadout for now
-      if(troop != 2) dnd->AddItem(gun_icon, 8, 3, 2, 3);
-      if(troop != 1) dnd->AddItem(gren_icon, 11, 7);
-
-      wid = new SG_Panel(equip_bg);
-      dnd->SetBackground(wid);
-
-      dnds.push_back(dnd);
-      }
-
-    wid = new SG_MultiTab(troops, dnds, 9,
-	but_normal, but_disabled, but_pressed, but_activated);
-    main->AddWidget(wid, 0, 0, 12, 9);
-
-    name = new SG_TextArea(troops[0], drkred);
-    main->AddWidget(name, 12, 1, 4, 1);
-    }
-
-  Screen::Start(gui);
-  return SCREEN_SAME;
-  }
-
-ScreenNum Screen_Equip::Handle(SimpleGUI *gui, SDL_Event &event) {
-  if(event.type == SDL_SG_EVENT) {
-    if(event.user.code == SG_EVENT_SELECT) {	//Sound already played!
-      const Unit *u = cur_game->PlayerUnit(0, 0, *((int*)(event.user.data2)));
-      if(u) name->SetText(u->name);
-      }
-    else if(event.user.code == SG_EVENT_BUTTONCLICK) {
-      if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
-      else if(event.user.data1 == (void*)doneb) return SCREEN_PLAY;
-      }
-    }
-  return SCREEN_SAME;
-  }
-
-
 Screen_Title::Screen_Title() {
   main = new SG_Table(3, 7, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("LDO", drkred), 0, 0, 2, 4);
@@ -518,7 +410,7 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SDL_Event &event) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
       else if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
       else if(event.user.data1 == (void*)loadb) return POPUP_LOADMAP;
-      else if(event.user.data1 == (void*)gob) return SCREEN_EQUIP;
+      else if(event.user.data1 == (void*)gob) return SCREEN_PLAY;
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
       if(cur_game) gob->Enable();
@@ -555,7 +447,7 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
       else if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
       else if(event.user.data1 == (void*)loadb) return POPUP_LOADMAP;
-      else if(event.user.data1 == (void*)gob) return SCREEN_EQUIP;
+      else if(event.user.data1 == (void*)gob) return SCREEN_PLAY;
       }
     else if(event.user.code == SG_EVENT_STICKYON) {
       if(cur_game) gob->Enable();
@@ -594,7 +486,7 @@ ScreenNum Screen_Replay::Handle(SimpleGUI *gui, SDL_Event &event) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
       else if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
       else if(event.user.data1 == (void*)loadb) return POPUP_LOADMAP;
-      else if(event.user.data1 == (void*)gob) return SCREEN_EQUIP;
+      else if(event.user.data1 == (void*)gob) return SCREEN_PLAY;
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
       if(cur_game) gob->Enable();

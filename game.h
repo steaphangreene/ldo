@@ -31,6 +31,7 @@ using namespace std;
 
 #include "unit.h"
 #include "percept.h"
+#include "orders.h"
 #include "player.h"
 
 enum PlayResult {
@@ -55,10 +56,12 @@ public:
   static int Save(const vector< vector<int> > &vec, FILE *fl);
 
   const Unit *PlayerUnit(int pl, int sq, int un);	//Temporary!
+  const Unit *UnitRef(int id);				//Temporary!
 
   const string &MapName() { return mapname; };
   const string &MapDesc() { return mapdesc; };
 
+  void SetOrders(int plnum, Orders *ord);
   void SetPercept(int plnum, Percept *prcpt);
   void UpdatePercept(int plnum, int rnd);
 
@@ -81,6 +84,7 @@ private:
 
   vector<Percept> master;		// Master game percepts (for each turn)
   map<int, Percept *> percept;		// Percept for each player
+  map<int, Orders *> orders;		// Orders from each player
 
   vector<Player *> player;		//Current ordered list of players
   };

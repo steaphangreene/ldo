@@ -20,53 +20,29 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-#ifndef SCREENS_H
-#define	SCREENS_H
+#include "orders.h"
+#include "unit.h"
+#include "defs.h"
 
-#include <map>
-#include <vector>
-using namespace std;
+Orders::Orders() {
+  }
 
-#include "../simplegui/simplegui.h"
+Orders::~Orders() {
+  Clear();
+  }
 
-enum ScreenNum {
-  POPUP_MIN,
-  POPUP_LOADMAP,
-  POPUP_MAX,
-  POPUP_CLEAR,
-  SCREEN_BACK,
-  SCREEN_SAME,
-  SCREEN_NONE,
-  SCREEN_MIN,
-  SCREEN_TITLE,
-  SCREEN_CONFIG,
-  SCREEN_SINGLE,
-  SCREEN_MULTI,
-  SCREEN_REPLAY,
-  SCREEN_PLAY,    //Actually not handled here but in the player object
-//  SCREEN_EQUIP,   //Not really going to be handled within Screens class
-//  SCREEN_DECLARE, //Not really going to be handled within Screens class
-//  SCREEN_WATCH,   //Not really going to be handled within Screens class
-  SCREEN_RESULTS,
-  SCREEN_MAX
-  };
+//static char buf[BUF_LEN];
 
-class Screen;
+int Orders::Load(FILE *fl, unsigned int ver) {
+  //FIXME: Implement this!
+  return 1;
+  }
 
-class Screens {
-public:
-  Screens();
-  ~Screens();
-  int Handle();
+int Orders::Save(FILE *fl, unsigned int ver) {
+  //FIXME: Implement this!
+  return 1;
+  }
 
-private:
-  void Set(ScreenNum s);
-  ScreenNum screen, last_screen, popup;
-  SimpleGUI *gui;
-
-  map<ScreenNum, Screen *> sscr;		//Map of ScreenNums to Screens
-  int click;				//Button Click Sound
-  int music;				//Background Music (Temporary)
-  };
-
-#endif // SCREENS_H
+void Orders::Clear() {
+  orders.clear();
+  }
