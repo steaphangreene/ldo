@@ -28,6 +28,10 @@
 SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
 SDL_Surface *equip_bg;
 
+#include "cursor.h"
+
+SDL_Surface *mouse_cursor;
+
 #include "m41.h"
 #include "mark2.h"
 
@@ -60,6 +64,9 @@ Screens::Screens() {
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
   gui->LoadFont("fonts/Denmark Regular.ttf", 100);
+
+  mouse_cursor = SDL_CreateRGBSurfaceFrom(cursor, 256, 256, 32, 256*4, TGA_COLFIELDS);
+  gui->SetMouseCursor(mouse_cursor, 0.125, 0.125);
 
   but_normal = SDL_LoadBMP("buttontex_normal.bmp");
   but_pressed = SDL_LoadBMP("buttontex_pressed.bmp");
