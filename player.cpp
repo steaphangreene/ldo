@@ -72,6 +72,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   cur_music = NULL;
 
   phase = PHASE_NONE;
+  popphase = POPPHASE_NONE;
 
   drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
@@ -105,7 +106,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[PHASE_DECLARE] = new SG_Table(6, 7, 0.0625, 0.125);
   doptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 6);
-  ddoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
+  ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
   wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 6);
   wind[PHASE_DECLARE]->AddWidget(new SG_TextArea("Define Next Turn", drkred), 1, 3, 4, 1);
   }
@@ -152,10 +153,12 @@ bool Player_Local::Run() {
 	    phase = PHASE_DECLARE; //Move on to declaring orders for next turn
 	    gui->MasterWidget()->AddWidget(wind[phase]);
 	    }
-	  else if(event.user.data1 == (void*)ddoneb) {
+	  }
+	if(event.user.code == SG_EVENT_STICKYON) {
+	  if(event.user.data1 == (void*)ddoneb) {
 	    //FIXME: Actually submit the orders and wait for new percept
-
 	    gui->MasterWidget()->RemoveWidget(wind[phase]);
+	    ddoneb->TurnOff();	// Make sure "Ready" isn't checked next time
 	    UpdateEquipIDs();	// See if we need to do the Equip thing again
 	    gui->MasterWidget()->AddWidget(wind[phase]);
 	    }

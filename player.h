@@ -68,17 +68,17 @@ protected:
 class Sound;
 
 enum Phase {
-  PHASE_NONE,
+  PHASE_NONE = -1,
   PHASE_EQUIP,
   PHASE_REPLAY,
   PHASE_DECLARE,
   PHASE_MAX,
-  PHASE_OPTION_EQUIP,
-  PHASE_OPTION_REPLAY,
-  PHASE_OPTION_DECLARE,
-  PHASE_OPTION_MAX
   };
-#define PHASE_OPTION (PHASE_OPTION_MAX - PHASE_MAX)
+enum PopPhase {
+  POPPHASE_NONE = -1,
+  POPPHASE_OPTIONS,
+  POPPHASE_MAX
+  };
 
 class Player_Local : public Player {
 public:
@@ -89,7 +89,8 @@ public:
 protected:
   void UpdateEquipIDs();
 
-  Phase phase;
+  Phase phase;		//Current phase of main window GUI
+  PopPhase popphase;	//Current phase of popup
 
   SimpleGUI *gui;
 
@@ -109,7 +110,8 @@ protected:
 
   SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
 
-  SG_Button *doptb, *ddoneb;	//Widgets for Declare phase
+  SG_Button *doptb;		//Widgets for Declare phase
+  SG_StickyButton *ddoneb;
 
   int music;			//Background Music (Temporary)
   Sound *cur_music;		//Currently Playing Music (Temporary)
