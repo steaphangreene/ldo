@@ -74,8 +74,15 @@ protected:
 
 
   SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
-  SG_TextArea *rtext;
+  SG_TextArea *rtext, *rstamp;
   SG_Tabs *rcontrols;
+
+  Uint32 last_time;		//Data for Replay phase
+  Uint32 offset, last_offset;
+  int playback_speed;
+  SDL_mutex *off_mut;		//MutEx to protect offsets
+
+  void CalcOffset(Uint32);
 
   SG_Button *doptb;		//Widgets for Declare phase
   SG_StickyButton *ddoneb;

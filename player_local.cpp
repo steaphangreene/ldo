@@ -29,8 +29,6 @@
 #include "mark2.h"
 #define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
-extern Game *cur_game;
-
 Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 	: Player(gm, tp, num) {
   gui = SimpleGUI::CurrentGUI(); //Yes, this is ok, it's static!
@@ -70,10 +68,12 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[PHASE_REPLAY] = new SG_Table(6, 7, 0.0625, 0.125);
   roptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   wind[PHASE_REPLAY]->AddWidget(roptb, 0, 6);
-  rdoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
+  rdoneb = new SG_Button("Ok", but_normal, but_disabled, but_pressed);
   wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 6);
   rtext = new SG_TextArea("Play/Replay Turn", drkred);
   wind[PHASE_REPLAY]->AddWidget(rtext, 1, 3, 4, 1);
+  rstamp = new SG_TextArea("<Time Offset>", drkred);
+  wind[PHASE_REPLAY]->AddWidget(rstamp, 2, 4, 2, 1);
   vector<string> conts;			//Temporary - until textures
   conts.push_back("<<");
   conts.push_back("<");
@@ -84,7 +84,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   conts.push_back(">>");
   rcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
   rcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
-  rcontrols->Set(5);
+  playback_speed = 5; //Default is play
+  rcontrols->Set(playback_speed);
   wind[PHASE_REPLAY]->AddWidget(rcontrols, 2, 6, 2, 1);
 
   //Define base GUI for Declare phase
@@ -97,9 +98,11 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[PHASE_DECLARE]->AddWidget(dtext, 1, 3, 4, 1);
 
   gui_mut = SDL_CreateMutex();
+  off_mut = SDL_CreateMutex();
   }
 
 Player_Local::~Player_Local() {
+  SDL_DestroyMutex(off_mut);
   SDL_DestroyMutex(gui_mut);
   }
 
@@ -134,7 +137,15 @@ int Player_Local::EventHandler() {
 		//FIXME: Could ALLOC in this thread (Could be BAD in Windows!)!
 	      orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
 	      }
+	    SDL_mutexP(off_mut);
 	    nextphase = PHASE_REPLAY;
+	    last_time = SDL_GetTicks();
+	    last_offset = 0;
+	    playback_speed = 5; //Default is play
+	    SDL_mutexP(gui_mut);
+	    rcontrols->Set(playback_speed);
+	    SDL_mutexV(gui_mut);
+	    SDL_mutexV(off_mut);
 	    }
 	  else if(event.user.data1 == (void*)rdoneb) {
 	    nextphase = PHASE_DECLARE; //Move on to declaring orders for next turn
@@ -166,8 +177,19 @@ int Player_Local::EventHandler() {
 	    }
 	  }
 	else if(event.user.code == SG_EVENT_SELECT) {
-	  const Unit *u = cur_game->UnitRef(eqid[*((int*)(event.user.data2))]);
-	  if(u) estats->SetText(u->name);
+	  if(event.user.data1 == (void*)(ednd)) {
+	    const Unit *u = game->UnitRef(eqid[*((int*)(event.user.data2))]);
+	    if(u) estats->SetText(u->name);
+	    }
+	  else if(event.user.data1 == (void*)(rcontrols)) {
+	    SDL_mutexP(off_mut);
+	    Uint32 cur_time = SDL_GetTicks();
+	    CalcOffset(cur_time);
+	    playback_speed = *((int*)(event.user.data2));
+	    last_time = cur_time;
+	    last_offset = offset;
+	    SDL_mutexV(off_mut);
+	    }
 	  }
 	}
       }
@@ -219,6 +241,14 @@ bool Player_Local::Run() {
       SDL_mutexV(gui_mut);
       }
     Uint32 cur_time = SDL_GetTicks();
+
+    if(phase == PHASE_REPLAY) {
+      SDL_mutexP(off_mut);
+      CalcOffset(cur_time);
+      sprintf(buf, "%d.%.3d seconds%c", offset / 1000, offset % 1000, 0);
+      SDL_mutexV(off_mut);
+      rstamp->SetText(buf);
+      }
 
     SDL_PumpEvents();
     start_scene();
@@ -323,7 +353,50 @@ void Player_Local::UpdateEquipIDs() {	//GUI MUST BE LOCKED BEFORE CALLING!
       delete ednd;
       ednd = NULL;
       }
-    nextphase = PHASE_REPLAY;
     if(game->CurrentRound() == 1) nextphase = PHASE_DECLARE;
+    else {
+      SDL_mutexP(off_mut);
+      nextphase = PHASE_REPLAY;
+      last_time = SDL_GetTicks();
+      last_offset = 0;
+      playback_speed = 5; //Default is play
+      SDL_mutexP(gui_mut);
+      rcontrols->Set(playback_speed);
+      SDL_mutexV(gui_mut);
+      SDL_mutexV(off_mut);
+      }
     }
+  }
+
+void Player_Local::CalcOffset(Uint32 cur_time) {
+  switch(playback_speed) {
+    case(0): {	// Rewind
+      offset = last_offset - (cur_time - last_time) * 4;
+      }break;
+    case(1): {	// Backward
+      offset = last_offset - (cur_time - last_time);
+      }break;
+    case(2): {	// SlowBack
+      offset = last_offset - (cur_time - last_time) / 4;
+      }break;
+    case(3): {	// Pause
+      //Do nothing.
+      }break;
+    case(4): {	// Slow
+      offset = last_offset + (cur_time - last_time) / 4;
+      }break;
+    case(5): {	// Play
+      offset = last_offset + (cur_time - last_time);
+      }break;
+    case(6): {	// Forward
+      offset = last_offset + (cur_time - last_time) * 4;
+      }break;
+    default: {
+      fprintf(stderr, "Warning, unknown control setting %d\n",
+	playback_speed);	// Should never happen
+      }break;
+    }
+  if(offset > 2147483647U) offset = 0;
+  else if(offset > 3000) offset = 3000;
+  SDL_mutexV(off_mut);
   }
