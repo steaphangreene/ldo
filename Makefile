@@ -83,7 +83,7 @@ ldo:	$(OBJS)
 win32:	$(WOBJS)
 
 ldo.exe:	$(WOBJS)
-	$(CXX) $(CXXFLAGS) -o ldo.exe $(WOBJS) $(SG_WOBJS) $(LIBS)
+	$(WCXX) $(WCXXFLAGS) -o ldo.exe $(WOBJS) $(SG_WOBJS) $(WLIBS)
 
 TSTR:=	$(shell date -u +"%Y%m%d%H%M")
 backup:	tar
