@@ -39,6 +39,8 @@ public:
   int Save(const string &filename);
   int Load(FILE *fl);
   int Save(FILE *fl);
+  static int Load(vector< vector<int> > &vec, FILE *fl);
+  static int Save(const vector< vector<int> > &vec, FILE *fl);
 
   const Unit *PlayerUnit(int pl, int sq, int un);
 

@@ -57,6 +57,35 @@ int Map::Save(const string &filename) {
   return ret;
   }
 
+int Map::Save(const vector< vector<int> > &vec, FILE *fl) {
+  if(fprintf(fl, "%d\n", vec.size()) < 2) return 0;
+  for(unsigned int side = 0; side < vec.size(); ++side) {
+    if(fprintf(fl, "%d\n", vec[side].size()) < 2) return 0;
+    for(unsigned int pl = 0; pl < vec[side].size(); ++pl) {
+      if(fprintf(fl, "%d;", vec[side][pl]) < 2) return 0;
+      }
+    if(fprintf(fl, "\n") < 1) return 0;
+    }
+  return 1;
+  }
+
+int Map::Load(vector< vector<int> > &vec, FILE *fl) {
+  vec.clear();
+  unsigned int num;
+  if(fscanf(fl, "%d\n", &num) < 1) return 0;
+  vec.resize(num);
+  for(unsigned int pl=0; pl < vec.size(); ++pl) {
+    if(fscanf(fl, "%d\n", &num) < 1) return 0;
+    vec[pl].resize(num);
+    for(unsigned int squad=0; squad < vec[pl].size(); ++squad) {
+      if(fscanf(fl, "%d;", &num) < 1) return 0;
+      vec[pl][squad] = num;
+      }
+    fscanf(fl, "\n");
+    }
+  return 1;
+  }
+
 int Map::Load(FILE *fl) {
   unsigned int num, ver;
 
@@ -75,41 +104,9 @@ int Map::Load(FILE *fl) {
   if(fscanf(fl, "%[^\n;];\n", buf) < 1) return 0;
   mapdesc = buf;
 
-  if(fscanf(fl, "%d\n", &num) < 1) return 0;
-  if(num < 3) return 0;	//Must be at least Neutral, Enemy, and one Player Side
-  sides.resize(num);
-  for(unsigned int side=0; side < sides.size(); ++side) {
-    if(fscanf(fl, "%d\n", &num) < 1) return 0;
-    sides[side].resize(num);
-    for(unsigned int pl=0; pl < sides[side].size(); ++pl) {
-      if(fscanf(fl, "%d;", &(sides[side][pl])) < 1) return 0;
-      }
-    fscanf(fl, "\n");
-    }
-
-  if(fscanf(fl, "%d\n", &num) < 1) return 0;
-  plsquads.resize(num);
-  for(unsigned int pl=0; pl < plsquads.size(); ++pl) {
-    if(fscanf(fl, "%d\n", &num) < 1) return 0;
-    plsquads[pl].resize(num);
-    for(unsigned int squad=0; squad < plsquads[pl].size(); ++squad) {
-      if(fscanf(fl, "%d;", &num) < 1) return 0;
-      plsquads[pl][squad] = num;
-      }
-    fscanf(fl, "\n");
-    }
-
-  if(fscanf(fl, "%d\n", &num) < 1) return 0;
-  squnits.resize(num);
-  for(unsigned int sq=0; sq < squnits.size(); ++sq) {
-    if(fscanf(fl, "%d\n", &num) < 1) return 0;
-    squnits[sq].resize(num);
-    for(unsigned int unit=0; unit < squnits[sq].size(); ++unit) {
-      if(fscanf(fl, "%d;", &num) < 1) return 0;
-      squnits[sq][unit] = num;
-      }
-    fscanf(fl, "\n");
-    }
+  if(!Load(sides, fl)) return 0;
+  if(!Load(plsquads, fl)) return 0;
+  if(!Load(squnits, fl)) return 0;
 
   Unit *unit_ptr;
   if(fscanf(fl, "%d\n", &num) < 1) return 0;
@@ -136,32 +133,9 @@ int Map::Save(FILE *fl) {
 
   if(fprintf(fl, "%s;\n", mapdesc.c_str()) < (int)(mapdesc.length())) return 0;
 
-  if(fprintf(fl, "%d\n", sides.size()) < 2) return 0;
-  for(unsigned int side = 0; side < sides.size(); ++side) {
-    if(fprintf(fl, "%d\n", sides[side].size()) < 2) return 0;
-    for(unsigned int pl = 0; pl < sides[side].size(); ++pl) {
-      if(fprintf(fl, "%d;", sides[side][pl]) < 2) return 0;
-      }
-    if(fprintf(fl, "\n") < 1) return 0;
-    }
-
-  if(fprintf(fl, "%d\n", plsquads.size()) < 2) return 0;
-  for(unsigned int pl=0; pl < plsquads.size(); ++pl) {
-    if(fprintf(fl, "%d\n", plsquads[pl].size()) < 2) return 0;
-    for(unsigned int squad=0; squad < plsquads[pl].size(); ++squad) {
-      if(fprintf(fl, "%d;", plsquads[pl][squad]) < 2) return 0;
-      }
-    if(fprintf(fl, "\n") < 1) return 0;
-    }
-
-  if(fprintf(fl, "%d\n", squnits.size()) < 2) return 0;
-  for(unsigned int sq=0; sq < squnits.size(); ++sq) {
-    if(fprintf(fl, "%d\n", squnits[sq].size()) < 2) return 0;
-    for(unsigned int unit=0; unit < squnits[sq].size(); ++unit) {
-      if(fprintf(fl, "%d;", squnits[sq][unit]) < 2) return 0;
-      }
-    if(fprintf(fl, "\n") < 1) return 0;
-    }
+  if(!Save(sides, fl)) return 0;
+  if(!Save(plsquads, fl)) return 0;
+  if(!Save(squnits, fl)) return 0;
 
   if(fprintf(fl, "%d\n", (int)(units.size())) < 2) return 0;
   map<int, Unit *>::iterator itrm = units.begin();
