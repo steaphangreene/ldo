@@ -51,12 +51,14 @@ map<ScreenNum, SG_Widget *> saymap;	//Map of go buttons per screen
 int music;				//Background music
 					//Temporary, just for testing
 
+int click;				//Button click
+					//Temporary, just for testing
+
 Game *cur_map = NULL;			//Temporary, just for testing
 
 #define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
 static int drkred = 0;	//Global colordef
-
 
 Screens::Screens() {
   screen = SCREEN_NONE;
@@ -84,7 +86,6 @@ Screens::Screens() {
 
   SG_Table *tab;	// For temporary storage;
   SG_Widget *wid;	// For temporary storage;
-  SG_Alignment *align;	// For temporary storage;
 
   drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
@@ -113,40 +114,41 @@ Screens::Screens() {
   smap[wid] = SCREEN_NONE;
 
 
-  //Setup SCREEN_CONFIG
-  tab = new SG_Table(6, 7, 0.0625, 0.125);
-  swidget[SCREEN_CONFIG] = tab;
-
-  vector<string> cfg_tab;
-  vector<SG_Alignment *> cfg_scr;
-
-  cfg_tab.push_back("Video");
-  align = new SG_Table(3, 7, 0.0625, 0.125);
-  cfg_scr.push_back(align);
-
-  cfg_tab.push_back("Audio");
-  align = new SG_Table(3, 7, 0.0625, 0.125);
-  cfg_scr.push_back(align);
-
-  cfg_tab.push_back("Mouse");
-  align = new SG_Table(3, 7, 0.0625, 0.125);
-  cfg_scr.push_back(align);
-
-  cfg_tab.push_back("Keyboard");
-  align = new SG_Table(3, 7, 0.0625, 0.125);
-  cfg_scr.push_back(align);
-
-  cfg_tab.push_back("Game");
-  align = new SG_Table(3, 7, 0.0625, 0.125);
-  cfg_scr.push_back(align);
-
-  tab->AddWidget(new SG_MultiTab(cfg_tab, cfg_scr, 12,
-	but_normal, but_disabled, but_pressed, but_activated),
-	0, 0, 5, 7);
-
-  wid = new SG_Button("Back", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 5, 0);
-  smap[wid] = SCREEN_BACK;
+  sscr[SCREEN_CONFIG] = new Screen_Config;
+//  //Setup SCREEN_CONFIG
+//  tab = new SG_Table(6, 7, 0.0625, 0.125);
+//  swidget[SCREEN_CONFIG] = tab;
+//
+//  vector<string> cfg_tab;
+//  vector<SG_Alignment *> cfg_scr;
+//
+//  cfg_tab.push_back("Video");
+//  align = new SG_Table(3, 7, 0.0625, 0.125);
+//  cfg_scr.push_back(align);
+//
+//  cfg_tab.push_back("Audio");
+//  align = new SG_Table(3, 7, 0.0625, 0.125);
+//  cfg_scr.push_back(align);
+//
+//  cfg_tab.push_back("Mouse");
+//  align = new SG_Table(3, 7, 0.0625, 0.125);
+//  cfg_scr.push_back(align);
+//
+//  cfg_tab.push_back("Keyboard");
+//  align = new SG_Table(3, 7, 0.0625, 0.125);
+//  cfg_scr.push_back(align);
+//
+//  cfg_tab.push_back("Game");
+//  align = new SG_Table(3, 7, 0.0625, 0.125);
+//  cfg_scr.push_back(align);
+//
+//  tab->AddWidget(new SG_MultiTab(cfg_tab, cfg_scr, 12,
+//	but_normal, but_disabled, but_pressed, but_activated),
+//	0, 0, 5, 7);
+//
+//  wid = new SG_Button("Back", but_normal, but_disabled, but_pressed);
+//  tab->AddWidget(wid, 5, 0);
+//  smap[wid] = SCREEN_BACK;
 
 
   //Setup SCREEN_SINGLE
@@ -255,13 +257,19 @@ Screens::~Screens() {
   }
 
 void Screens::Set(ScreenNum s) {
-  if(screen != SCREEN_NONE) gui->MasterWidget()->RemoveWidget(swidget[screen]);
+  if(sscr.count(screen)) {
+    sscr[screen]->Finish(gui);
+    }
+  else if(screen != SCREEN_NONE) {
+    gui->MasterWidget()->RemoveWidget(swidget[screen]);
+    }
   if(gomap.count(s)) {
     if(cur_map && (readymap.count(s) == 0 || readymap[s]->IsOn())) {
       gomap[s]->Enable();
       }
     else gomap[s]->Disable();
     }
+
   if(screen != s && readymap.count(screen)) readymap[screen]->TurnOff();
   gui->UnsetPopupWidget();
   if(s == SCREEN_BACK) {
@@ -339,7 +347,12 @@ void Screens::Set(ScreenNum s) {
     saymap[SCREEN_EQUIP] = wid;
     }
 
-  if(screen != SCREEN_NONE) gui->MasterWidget()->AddWidget(swidget[screen]);
+  if(sscr.count(screen)) {
+    sscr[screen]->Start(gui);
+    }
+  else if(screen != SCREEN_NONE) {
+    gui->MasterWidget()->AddWidget(swidget[screen]);
+    }
   }
 
 int Screens::Handle() {
@@ -351,6 +364,27 @@ int Screens::Handle() {
     do { // while(screen != SCREEN_NONE && SDL_PollEvent(&event));
       if(!gui->ProcessEvent(&event)) continue;
 
+      //These events are for ALL screens!
+      if(event.type == SDL_KEYDOWN) {
+        if(event.key.keysym.sym == SDLK_ESCAPE) {
+          if(screen != SCREEN_TITLE) Set(SCREEN_TITLE);
+	  else Set(SCREEN_NONE);
+          }
+	continue;
+        }
+      else if(event.type == SDL_QUIT) {
+	Set(SCREEN_NONE);
+	continue;
+        }
+
+      //This calls the individual screen(s)
+      if(sscr.count(screen)) {
+	ScreenNum next = sscr[screen]->Handle(gui, event);
+	if(next != SCREEN_NONE) Set(next);
+	continue;
+	}
+
+      //This is obsolete
       if(event.type == SDL_SG_EVENT) {
         if(event.user.code == SG_EVENT_BUTTONPRESS) {
           audio_play(click, 8, 8);
@@ -399,15 +433,6 @@ int Screens::Handle() {
 	    }
           }
         }
-      else if(event.type == SDL_KEYDOWN) {
-        if(event.key.keysym.sym == SDLK_ESCAPE) {
-          if(screen != SCREEN_TITLE) Set(SCREEN_TITLE);
-	  else Set(SCREEN_NONE);
-          }
-        }
-      else if(event.type == SDL_QUIT) {
-	Set(SCREEN_NONE);
-        }
       } while(screen != SCREEN_NONE && SDL_PollEvent(&event));
     start_scene();
     gui->RenderStart(SDL_GetTicks());
@@ -416,4 +441,78 @@ int Screens::Handle() {
     }
 
   return 0;
+  }
+
+
+void Screen::Start(SimpleGUI *gui) {
+  gui->MasterWidget()->AddWidget(main);
+  }
+
+void Screen::Finish(SimpleGUI *gui) {
+  gui->MasterWidget()->RemoveWidget(main);
+  }
+
+ScreenNum Screen::Handle(SimpleGUI *gui, SDL_Event &event) {
+  return SCREEN_NONE;
+  }
+
+Screen_Config::Screen_Config() {
+  //Setup SCREEN_CONFIG
+  SG_Alignment *align;	// For temporary storage;
+
+  main = new SG_Table(6, 7, 0.0625, 0.125);
+//  swidget[SCREEN_CONFIG] = main;
+
+  vector<string> cfg_tab;
+  vector<SG_Alignment *> cfg_scr;
+
+  cfg_tab.push_back("Video");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  cfg_tab.push_back("Audio");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  cfg_tab.push_back("Mouse");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  cfg_tab.push_back("Keyboard");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  cfg_tab.push_back("Game");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  main->AddWidget(new SG_MultiTab(cfg_tab, cfg_scr, 12,
+	but_normal, but_disabled, but_pressed, but_activated),
+	0, 0, 5, 7);
+
+  backb = new SG_Button("Back", but_normal, but_disabled, but_pressed);
+  main->AddWidget(backb, 5, 0);
+//  smap[wid] = SCREEN_BACK;
+  }
+
+Screen_Config::~Screen_Config() {
+  }
+
+void Screen_Config::Start(SimpleGUI *gui) {
+  gui->MasterWidget()->AddWidget(main);
+  }
+
+ScreenNum Screen_Config::Handle(SimpleGUI *gui, SDL_Event &event) {
+  if(event.type == SDL_SG_EVENT) {
+    if(event.user.code == SG_EVENT_BUTTONPRESS) {
+      audio_play(click, 8, 8);
+      }
+    else if(event.user.code == SG_EVENT_BUTTONCLICK) {
+      if(event.user.data1 == (void*)backb) return SCREEN_BACK;
+      }
+    else if(event.user.code == SG_EVENT_SELECT) {
+      audio_play(click, 8, 8);
+      }
+    }
+  return SCREEN_NONE;
   }

@@ -44,6 +44,9 @@ public:
 
   const Unit *PlayerUnit(int pl, int sq, int un);
 
+  const string &MapName() { return mapname; };
+  const string &MapDesc() { return mapdesc; };
+
 private:
   void Clear();
 

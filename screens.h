@@ -44,6 +44,91 @@ enum ScreenNum {
   SCREEN_MAX
   };
 
+class Screen {
+public:
+  Screen() { main = NULL; };
+  virtual ~Screen() {};
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual void Finish(SimpleGUI *gui);
+protected:
+  SG_Table *main;
+  };
+
+class Screen_LoadMap : public Screen {
+public:
+  Screen_LoadMap();
+  virtual ~Screen_LoadMap();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual void Finish(SimpleGUI *gui);
+  };
+
+class Screen_Title : public Screen {
+public:
+  Screen_Title();
+  virtual ~Screen_Title();
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  };
+
+class Screen_Config : public Screen {
+public:
+  Screen_Config();
+  virtual ~Screen_Config();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+protected:
+  SG_Button *backb;
+  };
+
+class Screen_Multi : public Screen {
+public:
+  Screen_Multi();
+  virtual ~Screen_Multi();
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  };
+
+class Screen_Single : public Screen {
+public:
+  Screen_Single();
+  virtual ~Screen_Single();
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  };
+
+class Screen_Replay : public Screen {
+public:
+  Screen_Replay();
+  virtual ~Screen_Replay();
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  };
+
+class Screen_Equip : public Screen {
+public:
+  Screen_Equip();
+  virtual ~Screen_Equip();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+protected:
+  SG_TextArea *name;
+  };
+
+class Screen_Play : public Screen {
+public:
+  Screen_Play();
+  virtual ~Screen_Play();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual void Finish(SimpleGUI *gui);
+  };
+
+class Screen_Results : public Screen {
+public:
+  Screen_Results();
+  virtual ~Screen_Results();
+  virtual void Start(SimpleGUI *gui);
+  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  };
+
 class Screens {
 public:
   Screens();
@@ -54,10 +139,10 @@ private:
   void Set(ScreenNum s);
   ScreenNum screen, last_screen;
   SimpleGUI *gui;
-  int click;
-  map<int, SG_Alignment *> swidget;	//Map of ScreenNums to Screen Widgets
+  map<int, SG_Alignment *> swidget;//Map of ScreenNums to Screen Widgets (TEMP)
   map<SG_Widget *, ScreenNum> smap;	//Map of buttons->resulting screens
+
+  map<int, Screen *> sscr;		//Map of ScreenNums to Screens
   };
 
 #endif // SCREENS_H
-
