@@ -25,7 +25,7 @@
 #include "defs.h"
 
 #define HEADER_STRING "LDO_GAMESAVE_FILE"
-#define SAVEFILE_VERSION	0x00000002 // 0.0.0-r2
+#define SAVEFILE_VERSION	0x00000003 // 0.0.0-r3
 
 Map::Map() {
   }
@@ -47,35 +47,6 @@ int Map::Load(const string &filename) {
   return ret;
   }
 
-int Map::Load(FILE *fl) {
-  unsigned int num;
-
-  memset(buf, 0, BUF_LEN);
-  if(fscanf(fl, "%s\n", buf) < 1) return 0;
-  if(strcmp(buf, HEADER_STRING)) return 0;
-
-  if(fscanf(fl, "0x%X\n", &num) < 1) return 0;
-  if(num != SAVEFILE_VERSION) return 0;
-
-  if(fscanf(fl, "%d\n", &num) < 1) return 0;
-
-  plunits.resize(1);	//Temporary!  One player!
-
-  Unit *unit;
-  for(int n = 0; n < (int)(num); ++n) {
-    unit = new Unit;
-    if(!unit->Load(fl)) return 0;
-    if(units.count(unit->id)) { // Duplicate unit id
-      delete unit;
-      return 0;
-      }
-    units[unit->id] = unit;
-    plunits[0].push_back(unit->id);
-    }
-
-  return 1;
-  }
-
 int Map::Save(const string &filename) {
   FILE *fl = fopen(filename.c_str(), "w");
   if(!fl) return 0;
@@ -86,14 +57,113 @@ int Map::Save(const string &filename) {
   return ret;
   }
 
+int Map::Load(FILE *fl) {
+  unsigned int num, ver;
+
+  memset(buf, 0, BUF_LEN);
+  if(fscanf(fl, "%s\n", buf) < 1) return 0;
+  if(strcmp(buf, HEADER_STRING)) return 0;
+
+  if(fscanf(fl, "0x%X\n", &ver) < 1) return 0;
+  if(ver != SAVEFILE_VERSION) return 0;
+
+  memset(buf, 0, BUF_LEN);
+  if(fscanf(fl, "%[^\n;];\n", buf) < 1) return 0;
+  mapname = buf;
+
+  memset(buf, 0, BUF_LEN);
+  if(fscanf(fl, "%[^\n;];\n", buf) < 1) return 0;
+  mapdesc = buf;
+
+  if(fscanf(fl, "%d\n", &num) < 1) return 0;
+  if(num < 3) return 0;	//Must be at least Neutral, Enemy, and one Player Side
+  sides.resize(num);
+  for(unsigned int side=0; side < sides.size(); ++side) {
+    if(fscanf(fl, "%d\n", &num) < 1) return 0;
+    sides[side].resize(num);
+    for(unsigned int pl=0; pl < sides[side].size(); ++pl) {
+      if(fscanf(fl, "%d;", &(sides[side][pl])) < 1) return 0;
+      }
+    fscanf(fl, "\n");
+    }
+
+  if(fscanf(fl, "%d\n", &num) < 1) return 0;
+  plsquads.resize(num);
+  for(unsigned int pl=0; pl < plsquads.size(); ++pl) {
+    if(fscanf(fl, "%d\n", &num) < 1) return 0;
+    plsquads[pl].resize(num);
+    for(unsigned int squad=0; squad < plsquads[pl].size(); ++squad) {
+      if(fscanf(fl, "%d;", &num) < 1) return 0;
+      plsquads[pl][squad] = num;
+      }
+    fscanf(fl, "\n");
+    }
+
+  if(fscanf(fl, "%d\n", &num) < 1) return 0;
+  squnits.resize(num);
+  for(unsigned int sq=0; sq < squnits.size(); ++sq) {
+    if(fscanf(fl, "%d\n", &num) < 1) return 0;
+    squnits[sq].resize(num);
+    for(unsigned int unit=0; unit < squnits[sq].size(); ++unit) {
+      if(fscanf(fl, "%d;", &num) < 1) return 0;
+      squnits[sq][unit] = num;
+      }
+    fscanf(fl, "\n");
+    }
+
+  Unit *unit_ptr;
+  if(fscanf(fl, "%d\n", &num) < 1) return 0;
+  for(unsigned int unit = 0; unit < num; ++unit) {
+    unit_ptr = new Unit;
+    if(!unit_ptr->Load(fl, ver)) return 0;
+    if(units.count(unit_ptr->id)) { // Duplicate unit id
+      delete unit_ptr;
+      return 0;
+      }
+    units[unit_ptr->id] = unit_ptr;
+    }
+
+  return 1;
+  }
+
 int Map::Save(FILE *fl) {
   if(fprintf(fl, "%s\n", HEADER_STRING) < (int)(strlen(HEADER_STRING))+1)
     return 0;
 
   if(fprintf(fl, "0x%.8X\n", SAVEFILE_VERSION) < 11) return 0;
 
-  if(fprintf(fl, "%d\n", (int)(units.size())) < 2) return 0;
+  if(fprintf(fl, "%s;\n", mapname.c_str()) < (int)(mapname.length())) return 0;
 
+  if(fprintf(fl, "%s;\n", mapdesc.c_str()) < (int)(mapdesc.length())) return 0;
+
+  if(fprintf(fl, "%d\n", sides.size()) < 2) return 0;
+  for(unsigned int side = 0; side < sides.size(); ++side) {
+    if(fprintf(fl, "%d\n", sides[side].size()) < 2) return 0;
+    for(unsigned int pl = 0; pl < sides[side].size(); ++pl) {
+      if(fprintf(fl, "%d;", sides[side][pl]) < 2) return 0;
+      }
+    if(fprintf(fl, "\n") < 1) return 0;
+    }
+
+  if(fprintf(fl, "%d\n", plsquads.size()) < 2) return 0;
+  for(unsigned int pl=0; pl < plsquads.size(); ++pl) {
+    if(fprintf(fl, "%d\n", plsquads[pl].size()) < 2) return 0;
+    for(unsigned int squad=0; squad < plsquads[pl].size(); ++squad) {
+      if(fprintf(fl, "%d;", plsquads[pl][squad]) < 2) return 0;
+      }
+    if(fprintf(fl, "\n") < 1) return 0;
+    }
+
+  if(fprintf(fl, "%d\n", squnits.size()) < 2) return 0;
+  for(unsigned int sq=0; sq < squnits.size(); ++sq) {
+    if(fprintf(fl, "%d\n", squnits[sq].size()) < 2) return 0;
+    for(unsigned int unit=0; unit < squnits[sq].size(); ++unit) {
+      if(fprintf(fl, "%d;", squnits[sq][unit]) < 2) return 0;
+      }
+    if(fprintf(fl, "\n") < 1) return 0;
+    }
+
+  if(fprintf(fl, "%d\n", (int)(units.size())) < 2) return 0;
   map<int, Unit *>::iterator itrm = units.begin();
   for(; itrm != units.end(); ++itrm) {
     if(!itrm->second->Save(fl)) return 0;
@@ -102,12 +172,14 @@ int Map::Save(FILE *fl) {
   return 1;
   }
 
-const Unit *Map::PlayerUnit(int pl, int un) {
-  if(pl >= (int)(plunits.size())) return NULL;
-  if(un >= (int)(plunits[pl].size())) return NULL;
-  if(units.count(plunits[pl][un]) == 0) return NULL;
+const Unit *Map::PlayerUnit(int pl, int sq, int un) {
+  if(pl >= (int)(plsquads.size())) return NULL;
+  if(sq >= (int)(plsquads[pl].size())) return NULL;
+  if(un >= (int)(squnits[plsquads[pl][sq]].size())) return NULL;
 
-  return units[plunits[pl][un]];
+  if(units.count(squnits[plsquads[pl][sq]][un]) == 0) return NULL;
+
+  return units[squnits[plsquads[pl][sq]][un]];
   }
 
 void Map::Clear() {
@@ -116,5 +188,6 @@ void Map::Clear() {
     if(itrm->second) delete itrm->second;
     }
   units.clear();
-  plunits.clear();
+  plsquads.clear();
+  squnits.clear();
   }

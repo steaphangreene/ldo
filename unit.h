@@ -89,7 +89,7 @@ using namespace std;
 class Unit {
 public:
   Unit();
-  int Load(FILE *f);
+  int Load(FILE *f, unsigned int ver);
   int Save(FILE *f);
 
   int id;

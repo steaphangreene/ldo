@@ -1,5 +1,20 @@
 LDO_GAMESAVE_FILE
-0x00000002
+0x00000003
+Temporary Test Map;
+This map is all about a temporary test.;
+3
+0
+
+0
+
+1
+0;
+1
+1
+0;
+1
+4
+1;2;3;4;
 4
 1;Clark, John;
 2;Chaves, Ding;

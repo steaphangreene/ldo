@@ -24,6 +24,7 @@
 #define MAP_H
 
 #include <map>
+#include <string>
 #include <vector>
 #include <cstdio>
 using namespace std;
@@ -39,12 +40,22 @@ public:
   int Load(FILE *fl);
   int Save(FILE *fl);
 
-  const Unit *PlayerUnit(int pl, int un);
+  const Unit *PlayerUnit(int pl, int sq, int un);
 
 private:
   void Clear();
-  map<int, Unit *> units;
-  vector< vector<int> > plunits;	// List of unit ids per player
+
+  int mapxs, mapys;
+  string mapname, mapdesc;
+
+  vector< vector<int> > sides;		// List of all player ids per side
+
+  vector< vector<int> > plsquads;	// List of squad ids per player
+
+  vector< vector<int> > squnits;	// List of unit ids per squad
+
+  map<int, Unit *> units;		// Actual unit container
   };
 
 #endif // UNIT_H
+

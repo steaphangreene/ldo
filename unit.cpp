@@ -32,7 +32,7 @@ Unit::Unit() {
 
 static char buf[BUF_LEN];
 
-int Unit::Load(FILE *f) {
+int Unit::Load(FILE *f, unsigned int ver) {
   memset(buf, 0, BUF_LEN);
   if(fscanf(f, "%d;%[^\n;];\n", &id, buf) < 2) return 0;
   name = buf;

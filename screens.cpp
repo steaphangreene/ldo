@@ -282,8 +282,8 @@ void Screens::Set(ScreenNum s) {
       }
 
     vector<string> troops;  //Just for example
-    for(int n = 0; cur_map->PlayerUnit(0, n) != NULL; ++n) {
-      troops.push_back(cur_map->PlayerUnit(0, n)->name);
+    for(int n = 0; cur_map->PlayerUnit(0, 0, n) != NULL; ++n) {
+      troops.push_back(cur_map->PlayerUnit(0, 0, n)->name);
       }
 
     if(troops.size() < 1) {
@@ -376,7 +376,7 @@ int Screens::Handle() {
         else if(event.user.code == SG_EVENT_SELECT) {
           audio_play(click, 8, 8);
 	  if(screen == SCREEN_EQUIP) {
-	    const Unit *u = cur_map->PlayerUnit(0, *((int*)(event.user.data2)));
+	    const Unit *u = cur_map->PlayerUnit(0, 0, *((int*)(event.user.data2)));
 	    if(u) ((SG_TextArea*)(saymap[screen]))->SetText(u->name);
 	    }
           }
@@ -391,7 +391,7 @@ int Screens::Handle() {
 		filename.c_str());
 	    }
 	  else {
-	    //cur_map->Save(filename); // For auto-upgrade of mapfile
+	    cur_map->Save(filename); // For auto-upgrade of mapfile
 	    gui->UnsetPopupWidget();
 	    if(readymap.count(screen) == 0 || readymap[screen]->IsOn()) {
 	      gomap[screen]->Enable();
