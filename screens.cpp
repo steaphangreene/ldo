@@ -27,6 +27,8 @@
 
 SDL_Surface *but_normal, *but_pressed, *but_disabled;
 
+map<ScreenNum, SG_Widget *> gomap;	//Map of go buttons per screen
+					//Temporary, just for testing
 Screens::Screens() {
   screen = SCREEN_NONE;
   swidget.resize(SCREEN_MAX, NULL);
@@ -55,13 +57,13 @@ Screens::Screens() {
   wid = new SG_Button("Multiplayer", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 3);
   smap[wid] = SCREEN_MULTI;
-  wid = new SG_Button("Single Player");
+  wid = new SG_Button("Single Player", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 4);
   smap[wid] = SCREEN_SINGLE;
-  wid = new SG_Button("View Replay");
+  wid = new SG_Button("View Replay", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 5);
   smap[wid] = SCREEN_REPLAY;
-  wid = new SG_Button("Quit Game");
+  wid = new SG_Button("Quit Game", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 6);
   smap[wid] = SCREEN_NONE;
 
@@ -72,15 +74,16 @@ Screens::Screens() {
   tab->AddWidget(new SG_TextArea("Define Teams",
 	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
 	0, 0, 2, 2);
-  wid = new SG_Button("Cancel");
+  wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 0);
   smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Load Scenario");
+  wid = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 2);
 //  smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Go");
+  wid = new SG_Button("Go", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 6);
   smap[wid] = SCREEN_EQUIP;
+  gomap[SCREEN_SINGLE] = wid;
 
 
   //Setup SCREEN_MULTI
@@ -89,21 +92,23 @@ Screens::Screens() {
   tab->AddWidget(new SG_TextArea("Gather Players",
 	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
 	0, 0, 2, 2);
-  wid = new SG_Button("Cancel");
+  wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 0);
   smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Load Scenario");
+  wid = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 2);
 //  smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Connect to Game");
+  wid = new SG_Button("Connect to Game", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 3);
 //  smap[wid] = SCREEN_TITLE;
-  wid = new SG_StickyButton("Ready to Play");
+  wid = new SG_StickyButton("Ready to Play", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 5);
 //  smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Go");
+  wid = new SG_Button("Go", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 6);
   smap[wid] = SCREEN_EQUIP;
+  gomap[SCREEN_MULTI] = wid;
+  wid->Disable();
 
 
   //Setup SCREEN_REPLAY
@@ -112,15 +117,16 @@ Screens::Screens() {
   tab->AddWidget(new SG_TextArea("Load Replay",
 	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
 	0, 0, 2, 2);
-  wid = new SG_Button("Cancel");
+  wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 0);
   smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Load Replay");
+  wid = new SG_Button("Load Replay", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 2);
 //  smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Go");
+  wid = new SG_Button("Go", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 6);
   smap[wid] = SCREEN_PLAY;
+  gomap[SCREEN_REPLAY] = wid;
 
 
   //Setup SCREEN_EQUIP
@@ -129,10 +135,10 @@ Screens::Screens() {
   tab->AddWidget(new SG_TextArea("Equip Your Team",
 	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
 	0, 0, 4, 2);
-  wid = new SG_Button("Cancel");
+  wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 4, 0);
   smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Done");
+  wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 5, 0);
   smap[wid] = SCREEN_PLAY;
 
@@ -143,7 +149,7 @@ Screens::Screens() {
   tab->AddWidget(new SG_TextArea("Playing/Replaying LDO....",
 	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
 	0, 0, 4, 2);
-  wid = new SG_Button("Done");
+  wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 5, 6);
   smap[wid] = SCREEN_RESULTS;
 
@@ -154,16 +160,16 @@ Screens::Screens() {
   tab->AddWidget(new SG_TextArea("Game Results",
 	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
 	0, 0, 2, 2);
-  wid = new SG_Button("Replay");
+  wid = new SG_Button("Replay", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 5, 0);
   smap[wid] = SCREEN_PLAY;
-  wid = new SG_Button("Save");
+  wid = new SG_Button("Save", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 5, 1);
 //  smap[wid] = SCREEN_RESULTS;
-  wid = new SG_Button("Done");
+  wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 5, 2);
   smap[wid] = SCREEN_TITLE;
-  wid = new SG_Button("Quit");
+  wid = new SG_Button("Quit", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 5, 6);
   smap[wid] = SCREEN_NONE;
   }
@@ -174,6 +180,7 @@ Screens::~Screens() {
 
 void Screens::Set(ScreenNum s) {
   if(screen != SCREEN_NONE) gui->MasterWidget()->RemoveWidget(swidget[screen]);
+  if(gomap.count(screen)) gomap[screen]->Disable();
   screen = s;
   if(screen != SCREEN_NONE) gui->MasterWidget()->AddWidget(swidget[screen]);
   }
@@ -198,9 +205,15 @@ int Screens::Handle() {
           }
         else if(event.user.code == SG_EVENT_STICKYON) {
           audio_play(click, 8, 8);
+	  if(((SG_TextArea *)(event.user.data1))->Text() == "Ready to Play") {
+	    gomap[screen]->Enable();
+	    }
           }
         else if(event.user.code == SG_EVENT_STICKYOFF) {
           audio_play(click, 8, 8);
+	  if(((SG_TextArea *)(event.user.data1))->Text() == "Ready to Play") {
+	    gomap[screen]->Disable();
+	    }
           }
         }
       else if(event.type == SDL_KEYDOWN) {
