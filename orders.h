@@ -23,7 +23,7 @@
 #ifndef ORDERS_H
 #define ORDERS_H
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 
 #include <set>
 #include <vector>

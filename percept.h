@@ -23,7 +23,7 @@
 #ifndef PERCEPT_H
 #define PERCEPT_H
 
-#include <SDL/SDL.h>
+#include "SDL.h"
 
 #include <set>
 #include <vector>

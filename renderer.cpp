@@ -23,8 +23,8 @@
 #define SDL_DEBUG	0
 #endif	//SDL_DEBUG
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_opengl.h>
+#include "SDL.h"
+#include "SDL_opengl.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>

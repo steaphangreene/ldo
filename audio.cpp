@@ -29,7 +29,7 @@
 
 using namespace std;
 
-#include <SDL.h>
+#include "SDL.h"
 
 SDL_AudioSpec audio;
 
