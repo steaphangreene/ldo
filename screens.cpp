@@ -173,29 +173,39 @@ Screens::Screens() {
   wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 14, 0, 2, 1);
   smap[wid] = SCREEN_PLAY;
-  SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
-  tab->AddWidget(dnd, 0, 1, 12, 8);
-  dnd->Include(1, 1, 2, 1);
-  dnd->Include(7, 1, 2, 1);
-  dnd->Include(11, 2, 3, 3);
-  dnd->Include(0, 3, 2, 3);
-  dnd->Include(8, 3, 2, 3);
-  dnd->Include(0, 7, 2, 1);
-  dnd->Include(8, 7, 2, 1);
-  dnd->Include(11, 6, 4, 1);
-  dnd->Include(11, 7);
-  dnd->Include(14, 7);
-  dnd->Include(0, 9, 18, 3);
 
-  dnd->AddItem(gun_icon, 8, 3, 2, 3);
-  dnd->AddItem(gren_icon, 11, 7);
+  vector<SG_Alignment *> dnds;
+  for(int troop = 0; troop < (int)(troops.size()); ++troop) {
+    SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
+    dnd->Include(1, 1, 2, 1);
+    dnd->Include(7, 1, 2, 1);
+    dnd->Include(11, 2, 3, 3);
+    dnd->Include(0, 3, 2, 3);
+    dnd->Include(8, 3, 2, 3);
+    dnd->Include(0, 7, 2, 1);
+    dnd->Include(8, 7, 2, 1);
+    dnd->Include(11, 6, 4, 1);
+    dnd->Include(11, 7);
+    dnd->Include(14, 7);
+    dnd->Include(0, 9, 18, 3);
 
-  wid = new SG_Panel(equip_bg);
-  dnd->SetBackground(wid);
+    if(troop != 2) dnd->AddItem(gun_icon, 8, 3, 2, 3);
+    if(troop != 1) dnd->AddItem(gren_icon, 11, 7);
 
-  chars = new SG_Tabs(troops, SG_AUTOSIZE, 1,
+    wid = new SG_Panel(equip_bg);
+    dnd->SetBackground(wid);
+
+    dnds.push_back(dnd);
+    }
+
+  wid = new SG_MultiTab(troops, dnds, 9,
 	but_normal, but_disabled, but_pressed, but_activated);
-  tab->AddWidget(chars, 0, 0, 12, 1);
+  tab->AddWidget(wid, 0, 0, 12, 9);
+
+//  chars = new SG_Tabs(troops, SG_AUTOSIZE, 1,
+//	but_normal, but_disabled, but_pressed, but_activated);
+//  tab->AddWidget(chars, 0, 0, 12, 1);
+
   wid = new SG_TextArea(troops[0], drkred);
   tab->AddWidget(wid, 12, 1, 4, 1);
   saymap[SCREEN_EQUIP] = wid;
