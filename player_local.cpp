@@ -20,6 +20,8 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
+double cur_zoom = 4.0;
+
 #include "player_local.h"
 #include "renderer.h"
 
@@ -68,13 +70,15 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 
   //Define base GUI for Replay phase
   wind[PHASE_REPLAY] = new SG_Table(6, 7, 0.0625, 0.125);
+  wind[PHASE_REPLAY]->SetBackground(
+	new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU));
   roptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   wind[PHASE_REPLAY]->AddWidget(roptb, 0, 6);
   rdoneb = new SG_Button("Ok", but_normal, but_disabled, but_pressed);
   wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 6);
-  rtext = new SG_TextArea("Play/Replay Turn", drkred);
+  rtext = new SG_TransLabel("Play/Replay Turn", drkred);
   wind[PHASE_REPLAY]->AddWidget(rtext, 1, 3, 4, 1);
-  rstamp = new SG_TextArea("<Time Offset>", drkred);
+  rstamp = new SG_TransLabel("<Time Offset>", drkred);
   wind[PHASE_REPLAY]->AddWidget(rstamp, 2, 4, 2, 1);
   vector<string> conts;			//Temporary - until textures
   conts.push_back("<<");
@@ -90,11 +94,13 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 
   //Define base GUI for Declare phase
   wind[PHASE_DECLARE] = new SG_Table(6, 7, 0.0625, 0.125);
+  wind[PHASE_DECLARE]->SetBackground(
+	new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU));
   doptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 6);
   ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
   wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 6);
-  dtext = new SG_TextArea("Declare Next Turn (#1)", drkred);
+  dtext = new SG_TransLabel("Declare Next Turn (#1)", drkred);
   wind[PHASE_DECLARE]->AddWidget(dtext, 1, 3, 4, 1);
 
   gui_mut = SDL_CreateMutex();
@@ -156,7 +162,7 @@ int Player_Local::EventHandler() {
 	    }
 	  }
 
-	if(event.user.code == SG_EVENT_STICKYON) {
+	else if(event.user.code == SG_EVENT_STICKYON) {
 	  if(event.user.data1 == (void*)ddoneb) {
 	    if(!game->SetReady(id, true)) {
 	      SDL_mutexP(gui_mut);
@@ -168,7 +174,7 @@ int Player_Local::EventHandler() {
 	    exiting = 1;  //Return
 	    }
 	  }
-	if(event.user.code == SG_EVENT_STICKYOFF) {
+	else if(event.user.code == SG_EVENT_STICKYOFF) {
 	  if(event.user.data1 == (void*)ddoneb) {
 	    if(game->SetReady(id, false)) {
 	      SDL_mutexP(gui_mut);
@@ -198,6 +204,14 @@ int Player_Local::EventHandler() {
 	    last_offset = offset;
 	    SDL_mutexV(off_mut);
 	    }
+	  }
+	else if(event.user.code == SG_EVENT_SCROLLUP) {
+	  cur_zoom -= 0.0625;
+	  if(cur_zoom < 1.0) cur_zoom = 1.0;
+	  }
+	else if(event.user.code == SG_EVENT_SCROLLDOWN) {
+	  cur_zoom += 0.0625;
+	  if(cur_zoom > 4.0) cur_zoom = 4.0;
 	  }
 	}
       }
@@ -259,7 +273,7 @@ bool Player_Local::Run() {
       }
 
     SDL_PumpEvents();
-    start_scene();
+    start_scene(cur_zoom);
 
     SDL_mutexP(gui_mut);
     gui->RenderStart(cur_time);

@@ -42,23 +42,8 @@ static int hgap=0, vgap=0;
 
 int fullscreen_mode = 0;
 
-typedef struct _viewport {
-  double xoff, yoff;
-  double xtarg, ytarg;
-  int movet, move;
-  long long data;
-  double spread;
-  } viewport;
-
-viewport cview = {0.0, 0.0, 0.0, 0.0, 0, 0, 0, 1.0};
-
-int phase = 0;
-
 void load_textures(void) {
   }
-
-// For use internally by renderer only!
-void load_xpm_texture(unsigned int tex, char *xpm[]);
 
 int init_renderer(int xs, int ys) {
   const SDL_VideoInfo *videoInfo;
@@ -76,7 +61,7 @@ int init_renderer(int xs, int ys) {
   videoInfo = SDL_GetVideoInfo();
 
   videoFlags = SDL_OPENGL;
-//  videoFlags |= SDL_GL_DOUBLEBUFFER;
+  videoFlags |= SDL_GL_DOUBLEBUFFER;
   videoFlags |= SDL_HWPALETTE;
   videoFlags |= SDL_RESIZABLE;
   if(fullscreen_mode)
@@ -118,7 +103,7 @@ int init_renderer(int xs, int ys) {
 
   // Enable depth testing for hidden line removal
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_NORMALIZE);
+//  glEnable(GL_NORMALIZE);
 
   glCullFace(GL_BACK);
   glEnable(GL_CULL_FACE);
@@ -165,16 +150,21 @@ int init_renderer(int xs, int ys) {
   return 1;
   }
 
-int start_scene() {
+int start_scene(double zoom) {
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
   //This is the actual perspective setup
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glFrustum(-0.5, -0.5+((GLdouble)xsize)/((GLdouble)ysize), -0.5, 0.5, 1.5, 6.0);
+//  glFrustum(-0.5, -0.5+((GLdouble)xsize)/((GLdouble)ysize), -0.5, 0.5, 1.5, 6.0);
 //  glFrustum(-0.8, 0.8, 0.6, -0.6, 5.0, 20.0);
+//  glTranslatef(0.0, 0.0, -4.0);
+//  glFrustum(1.0, -1.0, -1.0, 1.0, 1.0, 8.0);
+  gluPerspective(45.0, 16.0/9.0, 1.0, 16.0);
   glMatrixMode(GL_MODELVIEW);
-
+  glLoadIdentity();
+  gluLookAt(zoom, zoom, zoom*2, 0.0, 0.0, 0.0, -zoom, -zoom, 0.0);
+  glTranslatef(-32.0, -32.0, 0.0);	// Temporary - CENTER
   return 1;
   }
 
@@ -264,53 +254,4 @@ void pixels_to_location(double *x, double *y) {
     (*x) *= 2.0;  (*x) -= 1.0;
     (*y) *= 2.0;  (*y) -= 1.0;
     }
-  }
-
-void load_xpm_texture(unsigned int tex, char *xpm[]) {
-  int width, height, ncol, x, y;
-  unsigned char *tmp;
-
-  sscanf(xpm[0], "%d %d %d", &width, &height, &ncol);
-  tmp = (unsigned char *)malloc(width*height*4);
-//  memset(tmp, 0, width*height*4);
-  for(y=0; y<height; ++y) {
-    for(x=0; x<width; ++x) {
-      if(xpm[1+ncol+y][x] == xpm[1][0]) {
-	tmp[(y*width+x)*4+0] = 0;
-	tmp[(y*width+x)*4+1] = 0;
-	tmp[(y*width+x)*4+2] = 0;
-	tmp[(y*width+x)*4+3] = 0;
-	}
-      else {
-	tmp[(y*width+x)*4+0] = 255;
-	tmp[(y*width+x)*4+1] = 255;
-	tmp[(y*width+x)*4+2] = 255;
-	tmp[(y*width+x)*4+3] = 255;
-	}
-      }
-    }
-
-  glBindTexture(GL_TEXTURE_2D, tex);
-
-/////////
-  glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-  // when texture area is small, bilinear filter the closest mipmap
-  glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                 GL_LINEAR_MIPMAP_NEAREST );
-  // when texture area is large, bilinear filter the original
-  glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-  // the texture wraps over at the edges (repeat)
-  glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-  glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-/////////
-
-  gluBuild2DMipmaps(GL_TEXTURE_2D, 4, width, height,
-	GL_RGBA, GL_UNSIGNED_BYTE, tmp);
-//  gluBuild2DMipmaps(GL_TEXTURE_2D, 4, width, height,
-//	GL_COLOR_INDEX, GL_BITMAP, tmp);
-//  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-
-  free(tmp);
   }

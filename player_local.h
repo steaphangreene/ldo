@@ -76,7 +76,7 @@ protected:
 
 
   SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
-  SG_TextArea *rtext, *rstamp;
+  SG_TransLabel *rtext, *rstamp;
   SG_Tabs *rcontrols;
 
   Uint32 last_time;		//Data for Replay phase
@@ -88,7 +88,7 @@ protected:
 
   SG_Button *doptb;		//Widgets for Declare phase
   SG_StickyButton *ddoneb;
-  SG_TextArea *dtext;
+  SG_TransLabel *dtext;
 
   int music;			//Background Music (Temporary)
   Sound *cur_music;		//Currently Playing Music (Temporary)

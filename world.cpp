@@ -20,6 +20,9 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
+#include <cmath>
+using namespace std;
+
 #include "world.h"
 
 World::World(Percept *per, Orders *ord) {
@@ -43,7 +46,39 @@ void World::SetViewAngle(int ang) {
   }
 
 void World::DrawMap() {
-  //FIXME: Implement This!
+  GLfloat shininess[] = { 128.0 * 0.75 };
+  GLfloat specular[] = { 0.75, 0.75, 0.75, 1.0 };
+  GLfloat ambient[] = { 0.5, 0.5, 0.5, 1.0 };
+  GLfloat diffuse[] = { 0.5 ,0.5 ,0.5, 1.0 };
+
+  glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+  glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+  glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
+  glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+
+  glBegin(GL_QUADS);	//Temporary test world
+
+  glNormal3d(0.0, 0.0, 1.0);
+  for(float x = 0.0; x < 64.0; x += 1.0) {
+    for(float y = 0.0; y < 64.0; y += 1.0) {
+      glColor3f(x/63.0, 0.5, y/63.0);
+      glVertex3f(x,     y,     0.0);
+      glVertex3f(x+1.0, y,     0.0);
+      glVertex3f(x+1.0, y+1.0, 0.0);
+      glVertex3f(x,     y+1.0, 0.0);
+      }
+    }
+  glEnd();
+
+  glColor3f(0.0, 0.0, 0.0);
+  glBegin(GL_LINES);
+  for(float part = 0.0; part <= 64.0; part += 1.0) {
+    glVertex3f(part, 0.0,  0.0625);
+    glVertex3f(part, 64.0, 0.0625);
+    glVertex3f(0.0,  part, 0.0625);
+    glVertex3f(64.0, part, 0.0625);
+    }
+  glEnd();
   }
 
 void World::DrawModels(Uint32 offset) {
@@ -51,10 +86,12 @@ void World::DrawModels(Uint32 offset) {
   }
 
 void World::Render() {			// Render for declaration
-  //FIXME: Implement This!
+  DrawMap();
+  DrawModels(3000);
   }
 
 void World::Render(Uint32 offset) {	// Render for playback
-  //FIXME: Implement This!
+  DrawMap();
+  DrawModels(offset);
   }
 
