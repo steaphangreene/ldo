@@ -31,10 +31,10 @@ using namespace std;
 
 #include "unit.h"
 
-class Map {
+class Game {
 public:
-  Map();
-  ~Map();
+  Game();
+  ~Game();
   int Load(const string &filename);
   int Save(const string &filename);
   int Load(FILE *fl);

@@ -20,23 +20,23 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-#include "map.h"
+#include "game.h"
 #include "unit.h"
 #include "defs.h"
 
 #define HEADER_STRING "LDO_GAMESAVE_FILE"
 #define SAVEFILE_VERSION	0x00000003 // 0.0.0-r3
 
-Map::Map() {
+Game::Map() {
   }
 
-Map::~Map() {
+Game::~Map() {
   Clear();
   }
 
 static char buf[BUF_LEN];
 
-int Map::Load(const string &filename) {
+int Game::Load(const string &filename) {
   FILE *fl = fopen(filename.c_str(), "r");
   if(!fl) return 0;
 
@@ -47,7 +47,7 @@ int Map::Load(const string &filename) {
   return ret;
   }
 
-int Map::Save(const string &filename) {
+int Game::Save(const string &filename) {
   FILE *fl = fopen(filename.c_str(), "w");
   if(!fl) return 0;
 
@@ -57,7 +57,7 @@ int Map::Save(const string &filename) {
   return ret;
   }
 
-int Map::Save(const vector< vector<int> > &vec, FILE *fl) {
+int Game::Save(const vector< vector<int> > &vec, FILE *fl) {
   if(fprintf(fl, "%d\n", vec.size()) < 2) return 0;
   for(unsigned int side = 0; side < vec.size(); ++side) {
     if(fprintf(fl, "%d\n", vec[side].size()) < 2) return 0;
@@ -69,7 +69,7 @@ int Map::Save(const vector< vector<int> > &vec, FILE *fl) {
   return 1;
   }
 
-int Map::Load(vector< vector<int> > &vec, FILE *fl) {
+int Game::Load(vector< vector<int> > &vec, FILE *fl) {
   vec.clear();
   unsigned int num;
   if(fscanf(fl, "%d\n", &num) < 1) return 0;
@@ -86,7 +86,7 @@ int Map::Load(vector< vector<int> > &vec, FILE *fl) {
   return 1;
   }
 
-int Map::Load(FILE *fl) {
+int Game::Load(FILE *fl) {
   unsigned int num, ver;
 
   memset(buf, 0, BUF_LEN);
@@ -123,7 +123,7 @@ int Map::Load(FILE *fl) {
   return 1;
   }
 
-int Map::Save(FILE *fl) {
+int Game::Save(FILE *fl) {
   if(fprintf(fl, "%s\n", HEADER_STRING) < (int)(strlen(HEADER_STRING))+1)
     return 0;
 
@@ -146,7 +146,7 @@ int Map::Save(FILE *fl) {
   return 1;
   }
 
-const Unit *Map::PlayerUnit(int pl, int sq, int un) {
+const Unit *Game::PlayerUnit(int pl, int sq, int un) {
   if(pl >= (int)(plsquads.size())) return NULL;
   if(sq >= (int)(plsquads[pl].size())) return NULL;
   if(un >= (int)(squnits[plsquads[pl][sq]].size())) return NULL;
@@ -156,7 +156,7 @@ const Unit *Map::PlayerUnit(int pl, int sq, int un) {
   return units[squnits[plsquads[pl][sq]][un]];
   }
 
-void Map::Clear() {
+void Game::Clear() {
   map<int, Unit *>::iterator itrm = units.begin();
   for(; itrm != units.end(); ++itrm) {
     if(itrm->second) delete itrm->second;
