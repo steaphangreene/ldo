@@ -72,7 +72,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[PHASE_REPLAY]->AddWidget(roptb, 0, 6);
   rdoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 6);
-  wind[PHASE_REPLAY]->AddWidget(new SG_TextArea("Play/Replay Turn", drkred), 1, 3, 4, 1);
+  rtext = new SG_TextArea("Play/Replay Turn", drkred);
+  wind[PHASE_REPLAY]->AddWidget(rtext, 1, 3, 4, 1);
 
   //Define base GUI for Declare phase
   wind[PHASE_DECLARE] = new SG_Table(6, 7, 0.0625, 0.125);
@@ -80,7 +81,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 6);
   ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
   wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 6);
-  wind[PHASE_DECLARE]->AddWidget(new SG_TextArea("Define Next Turn", drkred), 1, 3, 4, 1);
+  dtext = new SG_TextArea("Declare Next Turn (#1)", drkred);
+  wind[PHASE_DECLARE]->AddWidget(dtext, 1, 3, 4, 1);
 
   gui_mut = SDL_CreateMutex();
   }
@@ -158,6 +160,8 @@ int Player_Local::EventHandler() {
   return exiting;
   }
 
+static char buf[256];
+
 bool Player_Local::Run() {
   Player::Run();	// Start with the basics
 
@@ -174,9 +178,18 @@ bool Player_Local::Run() {
     if(pround != game->CurrentRound() - 1) {
       pround = game->CurrentRound() - 1;
       game->UpdatePercept(id, pround);
+
       SDL_mutexP(gui_mut);
+
       ddoneb->TurnOff(); // Make sure "Ready" isn't checked next time
+
       UpdateEquipIDs();	 // See if we need to do the Equip thing again
+
+      sprintf(buf, "Declare Next Turn (#%d)%c", game->CurrentRound(), 0);
+      dtext->SetText(buf);
+      sprintf(buf, "Play/Replay Turn (#%d)%c", game->CurrentRound()-1, 0);
+      rtext->SetText(buf);
+
       SDL_mutexV(gui_mut);
       }
 
@@ -288,5 +301,6 @@ void Player_Local::UpdateEquipIDs() {	//GUI MUST BE LOCKED BEFORE CALLING!
       ednd = NULL;
       }
     nextphase = PHASE_REPLAY;
+    if(game->CurrentRound() == 1) nextphase = PHASE_DECLARE;
     }
   }
