@@ -51,7 +51,7 @@ SG_OBJS:=	../simplegui/sg.o ../simplegui/sg_widget.o \
 	../simplegui/sg_compound.o ../simplegui/sg_filebrowser.o \
 	../simplegui/sg_multitab.o ../simplegui/sg_sliderbar.o \
 	../simplegui/sg_passthrough.o ../simplegui/sg_translabel.o \
-	../simplegui/sg_dndboxes.o
+	../simplegui/sg_dndboxes.o ../simplegui/sg_tabs.o
 
 #PRODUCTION OPTIONS (CROSS-COMPILED FOR WINDOWS)
 WCXX=	i586-mingw32msvc-g++
@@ -68,7 +68,7 @@ SG_WOBJS:=	../simplegui/sg.win32_o ../simplegui/sg_widget.win32_o \
 	../simplegui/sg_compound.win32_o ../simplegui/sg_filebrowser.win32_o \
 	../simplegui/sg_multitab.win32_o ../simplegui/sg_sliderbar.win32_o \
 	../simplegui/sg_passthrough.win32_o ../simplegui/sg_translabel.win32_o \
-	../simplegui/sg_dndboxes.win32_o
+	../simplegui/sg_dndboxes.win32_o ../simplegui/sg_tabs.win32_o
 
 all: $(OBJS)
 

@@ -31,6 +31,12 @@ SDL_Surface *equip_bg;
 map<ScreenNum, SG_Widget *> gomap;	//Map of go buttons per screen
 					//Temporary, just for testing
 
+map<ScreenNum, SG_Widget *> saymap;	//Map of go buttons per screen
+					//Temporary, just for testing
+
+vector<string> troops;			//Just for example
+SG_Tabs *chars;				//Just for example
+
 int music;				//Background music
 					//Temporary, just for testing
 
@@ -133,7 +139,7 @@ Screens::Screens() {
   wid->Disable();
 
 
-  vector<string> troops;  //Just for example
+//  vector<string> troops;  //Just for example
   troops.push_back("Clark, John");
   troops.push_back("Chaves, Ding");
   troops.push_back("Johnston, Homer");
@@ -166,16 +172,21 @@ Screens::Screens() {
   wid = new SG_Panel(equip_bg);
   dnd->SetBackground(wid);
 
-  SG_Table *chars = new SG_Table(troops.size(), 1);
-  for(int n=0; n < int(troops.size()); ++n) {
-    wid = new SG_StickyButton(troops[n], but_normal,
-		but_disabled, but_pressed, but_activated);
-    chars->AddWidget(wid);
-    if(n == 0) wid->TurnOn();
-    }
+//  SG_Table *chars = new SG_Table(troops.size(), 1);
+//  for(int n=0; n < int(troops.size()); ++n) {
+//    wid = new SG_StickyButton(troops[n], but_normal,
+//		but_disabled, but_pressed, but_activated);
+//    chars->AddWidget(wid);
+//    if(n == 0) wid->TurnOn();
+//    }
+//  SG_Tabs *chars = new SG_Tabs(troops, SG_AUTOSIZE, 1,
+//	but_normal, but_disabled, but_pressed, but_activated);
+  chars = new SG_Tabs(troops, SG_AUTOSIZE, 1,
+	but_normal, but_disabled, but_pressed, but_activated);
   tab->AddWidget(chars, 0, 0, 12, 1);
   wid = new SG_TextArea(troops[0], drkred);
   tab->AddWidget(wid, 12, 1, 4, 1);
+  saymap[SCREEN_EQUIP] = wid;
 
   //Setup SCREEN_PLAY
   tab = new SG_Table(6, 7, 0.0625, 0.125);
@@ -246,11 +257,28 @@ int Screens::Handle() {
 	    gomap[screen]->Disable();
 	    }
           }
+        else if(event.user.code == SG_EVENT_SELECT) {
+          audio_play(click, 8, 8);
+	  ((SG_TextArea*)(saymap[screen]))->
+		SetText(troops[(int)(event.user.data2)]);
+          }
         }
       else if(event.type == SDL_KEYDOWN) {
         if(event.key.keysym.sym == SDLK_ESCAPE) {
           if(screen != SCREEN_TITLE) Set(SCREEN_TITLE);
 	  else Set(SCREEN_NONE);
+          }
+        else if(screen == SCREEN_EQUIP && event.key.keysym.sym == SDLK_LEFT) {
+	  chars->Left();
+          }
+        else if(screen == SCREEN_EQUIP && event.key.keysym.sym == SDLK_RIGHT) {
+	  chars->Right();
+          }
+        else if(screen == SCREEN_EQUIP && event.key.keysym.sym == SDLK_UP) {
+	  chars->Up();
+          }
+        else if(screen == SCREEN_EQUIP && event.key.keysym.sym == SDLK_DOWN) {
+	  chars->Down();
           }
         }
       else if(event.type == SDL_QUIT) {
