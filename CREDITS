@@ -9,7 +9,7 @@ Main Game Music: Architect / Iconoclasm
         Tim Bailey <?@?>
 
 Graphics and Models:
-	STiG <STiG@wasteland.plus.net>
+        STiG <STiG@wasteland.plus.net>
         Steaphan Greene <stea@cs.binghamton.edu>
 
 Graphics Software:
@@ -18,8 +18,8 @@ Graphics Software:
 Coding Software:
         GNU Compiler Collection: http://gcc.gnu.org/
         GNU Nano: http://www.nano-editor.org/
-	Various GNU Utils: http://www.gnu.org/
+        Various GNU Utils: http://www.gnu.org/
 
 Interface Libraries:
         libSDL: http://www.libsdl.org/
-	libSDL_ttf: http://www.libsdl.org/projects/SDL_ttf/
+        libSDL_ttf: http://www.libsdl.org/projects/SDL_ttf/

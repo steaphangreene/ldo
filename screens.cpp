@@ -151,7 +151,6 @@ Screens::Screens() {
   cur_music = audio_loop(music, 16, 0);
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
-//  gui->LoadFont("fonts/Denmark Regular.ttf", 100);
   gui->LoadFont("fonts/Denmark Regular.ttf", 50);
 
   mouse_cursor = SDL_CreateRGBSurfaceFrom(cursor, 256, 256, 32, 256*4, TGA_COLFIELDS);
@@ -363,7 +362,6 @@ ScreenNum Screen_Config::Handle(SimpleGUI *gui, SDL_Event &event) {
 
 Screen_Title::Screen_Title() {
   main = new SG_Table(3, 7, 0.0625, 0.125);
-  main->AddWidget(new SG_TextArea("LDO", drkred), 0, 0, 2, 4);
   optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   main->AddWidget(optb, 2, 1);
   multb = new SG_Button("Multiplayer", but_normal, but_disabled, but_pressed);
@@ -374,6 +372,24 @@ Screen_Title::Screen_Title() {
   main->AddWidget(replb, 2, 5);
   quitb = new SG_Button("Quit Game", but_normal, but_disabled, but_pressed);
   main->AddWidget(quitb, 2, 6);
+
+  SG_TextArea *title = new SG_TextArea("LDO", drkred);
+  title->SetMargins(0.125, 0.0);
+  main->AddWidget(title, 0, 0, 2, 2);
+
+  FILE *credfl = fopen("CREDITS", "r");
+  if(credfl) {
+    fseek(credfl, 0, SEEK_END);
+    int size = ftell(credfl);
+    fseek(credfl, 0, SEEK_SET);
+    char *data = new char[size+1];
+    fread(data, 1, size, credfl); 
+    data[size] = 0;
+    SG_TextArea *credits = new SG_TextArea(data, drkred);
+    main->AddWidget(credits, 0, 2, 2, 5);
+    delete data;
+    fclose(credfl);
+    }
   }
 
 Screen_Title::~Screen_Title() {
