@@ -85,6 +85,7 @@ Screens::Screens() {
   tab->AddWidget(wid, 2, 6);
   smap[wid] = SCREEN_EQUIP;
   gomap[SCREEN_SINGLE] = wid;
+  wid->Disable();
 
 
   //Setup SCREEN_MULTI
@@ -128,6 +129,7 @@ Screens::Screens() {
   tab->AddWidget(wid, 2, 6);
   smap[wid] = SCREEN_PLAY;
   gomap[SCREEN_REPLAY] = wid;
+  wid->Disable();
 
 
   //Setup SCREEN_EQUIP
