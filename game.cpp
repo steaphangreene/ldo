@@ -191,17 +191,17 @@ void Game::SetPercept(int plnum, Percept *prcpt) {
   }
 
 void Game::UpdatePercept(int plnum, int rnd) {
-  if(rnd < 1 || rnd > (int)(percept.size())) {
+  if(rnd < 0 || rnd >= (int)(percept.size())) {
     fprintf(stderr, "ERROR: Percept requested in future or pre-start!\n");
     exit(1);
     }
   if(rnd == (int)(percept.size())) {
     // Current (Unresolved) Round
-    *(percept[plnum]) = master[rnd-1];	//Temporary!
+    *(percept[plnum]) = master[rnd];	//Temporary!
     }
   else {
     // Old (Resolved) Round
-    *(percept[plnum]) = master[rnd-1];	//Temporary!
+    *(percept[plnum]) = master[rnd];	//Temporary!
     }
   }
 

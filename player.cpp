@@ -33,7 +33,7 @@ Player::Player(Game *gm, PlayerType tp, int num) {
   id = num;
 
   ready = false;
-  pround = 0;
+  pround = -1;
   cur_game->SetPercept(num, &percept);
 //  gui = gui->CurrentGUI(); //Yes, this is ok, it's static!
 //  if(!gui) {
@@ -49,8 +49,8 @@ bool Player::Ready() {
   }
 
 bool Player::Run() {
-  if(game->CurrentRound() != pround) {
-    pround = game->CurrentRound();
+  if(game->CurrentRound() - 1 != pround) {
+    pround = game->CurrentRound() - 1;
     game->UpdatePercept(id, pround);
     ready = false;
     }
