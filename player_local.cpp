@@ -77,8 +77,10 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   rdoneb = new SG_Button("Ok", but_normal, but_disabled, but_pressed);
   wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 6);
   rtext = new SG_TransLabel("Play/Replay Turn", drkred);
+  rtext->SetFontSize(30);
   wind[PHASE_REPLAY]->AddWidget(rtext, 1, 3, 4, 1);
   rstamp = new SG_TransLabel("<Time Offset>", drkred);
+  rstamp->SetFontSize(20);
   wind[PHASE_REPLAY]->AddWidget(rstamp, 2, 4, 2, 1);
   vector<string> conts;			//Temporary - until textures
   conts.push_back("<<");
@@ -101,6 +103,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
   wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 6);
   dtext = new SG_TransLabel("Declare Next Turn (#1)", drkred);
+  dtext->SetFontSize(30);
   wind[PHASE_DECLARE]->AddWidget(dtext, 1, 3, 4, 1);
 
   gui_mut = SDL_CreateMutex();
