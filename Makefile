@@ -20,33 +20,34 @@
 # *************************************************************************
 
 all:	ldo
+win32:	ldo.exe
 
 #PRODUCTION OPTIONS (STANDARD)
 #CXX=	gcc
 #CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags`
-#LIBS=	`sdl-config --libs` ../simplegui/libsimplegui.a -lSDL_ttf -lGL -lGLU
+#LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -lGL -lGLU
 
 #PRODUCTION OPTIONS (WORKAROUND FOR CYGWIN)
 #CXX=	gcc
 #CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags`
-#LIBS=	`sdl-config --libs` ../simplegui/libsimplegui.a -lSDL_ttf -L/usr/X11R6/bin -lopengl32 -lglu32
+#LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -L/usr/X11R6/bin -lopengl32 -lglu32
 
 #DEGUGGING OPTIONS (NO EFENCE)
 CXX=	gcc
 CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `sdl-config --cflags`
-LIBS=	`sdl-config --libs` ../simplegui/libsimplegui.a -lSDL_ttf -lGL -lGLU
+LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -lGL -lGLU
 
 #DEGUGGING OPTIONS (WITH EFENCE)
 #CXX=	gcc
 #CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `sdl-config --cflags`
-#LIBS=	`sdl-config --libs` ../simplegui/libsimplegui.a -lefence -lSDL_ttf -lGL -lGLU
+#LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lefence -lSDL_ttf -lGL -lGLU
 
 OBJS:=	screens.o main.o renderer.o audio.o
 
 #PRODUCTION OPTIONS (CROSS-COMPILED FOR WINDOWS)
 WCXX=	i586-mingw32msvc-g++
 WCXXFLAGS=	-s -O2 -Wall `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --cflags`
-WLIBS=	`/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` ../simplegui/libsimplegui.win32_a -lSDL_ttf -lopengl32 -lglu32
+WLIBS=	../simplegui/libsimplegui.win32_a `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` -lSDL_ttf -lopengl32 -lglu32
 
 WOBJS:=	screens.win32_o main.win32_o renderer.win32_o audio.win32_o
 

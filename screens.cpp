@@ -153,7 +153,8 @@ Screens::Screens() {
   troops.push_back("Johnston, Homer");
 
   //Setup SCREEN_EQUIP
-  tab = new SG_Table(16, 9, 0.0625, 0.125);
+//  tab = new SG_Table(16, 9, 0.0625, 0.125);
+  tab = new SG_Table(16, 9, 0.0, 0.0);
   swidget[SCREEN_EQUIP] = tab;
 //  wid = new SG_TextArea("Equip Your Team", drkred);
 //  tab->AddWidget(wid, 12, 3, 4, 1);
@@ -261,7 +262,7 @@ int Screens::Handle() {
         else if(event.user.code == SG_EVENT_SELECT) {
           audio_play(click, 8, 8);
 	  ((SG_TextArea*)(saymap[screen]))->
-		SetText(troops[(int)(event.user.data2)]);
+		SetText(troops[*((int*)(event.user.data2))]);
           }
         }
       else if(event.type == SDL_KEYDOWN) {
