@@ -201,7 +201,17 @@ int Player_Local::EventHandler() {
 	  else if(event.user.data1 == (void*)(rcontrols)) {
 	    SDL_mutexP(off_mut);
 	    Uint32 cur_time = SDL_GetTicks();
-	    CalcOffset(cur_time);
+	    if(offset == 3000 && playback_speed == 3	//Re-play
+		&& *((int*)(event.user.data2)) > 3) {
+	      offset = 0;
+	      }
+	    else if(offset == 0 && playback_speed == 3	//Re-reverse
+		&& *((int*)(event.user.data2)) < 3) {
+	      offset = 3000;
+	      }
+	    else {
+	      CalcOffset(cur_time);
+	      }
 	    playback_speed = *((int*)(event.user.data2));
 	    last_time = cur_time;
 	    last_offset = offset;
