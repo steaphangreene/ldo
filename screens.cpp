@@ -47,14 +47,17 @@ Screens::Screens() {
 	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
 	0, 0, 2, 4);
   wid = new SG_Button("Multiplayer");
-  tab->AddWidget(wid, 2, 4);
+  tab->AddWidget(wid, 2, 3);
   smap[wid] = SCREEN_MULTI;
   wid = new SG_Button("Single Player");
-  tab->AddWidget(wid, 2, 5);
+  tab->AddWidget(wid, 2, 4);
   smap[wid] = SCREEN_SINGLE;
   wid = new SG_Button("View Replay");
-  tab->AddWidget(wid, 2, 6);
+  tab->AddWidget(wid, 2, 5);
   smap[wid] = SCREEN_REPLAY;
+  wid = new SG_Button("Quit Game");
+  tab->AddWidget(wid, 2, 6);
+  smap[wid] = SCREEN_NONE;
 
 
   //Setup SCREEN_SINGLE
@@ -71,7 +74,7 @@ Screens::Screens() {
 //  smap[wid] = SCREEN_TITLE;
   wid = new SG_Button("Go");
   tab->AddWidget(wid, 2, 6);
-//  smap[wid] = SCREEN_TITLE;
+  smap[wid] = SCREEN_EQUIP;
 
 
   //Setup SCREEN_MULTI
@@ -94,7 +97,7 @@ Screens::Screens() {
 //  smap[wid] = SCREEN_TITLE;
   wid = new SG_Button("Go");
   tab->AddWidget(wid, 2, 6);
-//  smap[wid] = SCREEN_TITLE;
+  smap[wid] = SCREEN_EQUIP;
 
 
   //Setup SCREEN_REPLAY
@@ -111,7 +114,52 @@ Screens::Screens() {
 //  smap[wid] = SCREEN_TITLE;
   wid = new SG_Button("Go");
   tab->AddWidget(wid, 2, 6);
-//  smap[wid] = SCREEN_TITLE;
+  smap[wid] = SCREEN_PLAY;
+
+
+  //Setup SCREEN_EQUIP
+  tab = new SG_Table(6, 7, 0.0625, 0.125);
+  swidget[SCREEN_EQUIP] = tab;
+  tab->AddWidget(new SG_TextArea("Equip Your Team",
+	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
+	0, 0, 4, 2);
+  wid = new SG_Button("Cancel");
+  tab->AddWidget(wid, 4, 0);
+  smap[wid] = SCREEN_TITLE;
+  wid = new SG_Button("Done");
+  tab->AddWidget(wid, 5, 0);
+  smap[wid] = SCREEN_PLAY;
+
+
+  //Setup SCREEN_PLAY
+  tab = new SG_Table(6, 7, 0.0625, 0.125);
+  swidget[SCREEN_PLAY] = tab;
+  tab->AddWidget(new SG_TextArea("Playing/Replaying LDO....",
+	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
+	0, 0, 4, 2);
+  wid = new SG_Button("Done");
+  tab->AddWidget(wid, 5, 6);
+  smap[wid] = SCREEN_RESULTS;
+
+
+  //Setup SCREEN_RESULTS
+  tab = new SG_Table(6, 7, 0.0625, 0.125);
+  swidget[SCREEN_RESULTS] = tab;
+  tab->AddWidget(new SG_TextArea("Game Results",
+	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
+	0, 0, 2, 2);
+  wid = new SG_Button("Replay");
+  tab->AddWidget(wid, 5, 0);
+  smap[wid] = SCREEN_PLAY;
+  wid = new SG_Button("Save");
+  tab->AddWidget(wid, 5, 1);
+//  smap[wid] = SCREEN_RESULTS;
+  wid = new SG_Button("Done");
+  tab->AddWidget(wid, 5, 2);
+  smap[wid] = SCREEN_TITLE;
+  wid = new SG_Button("Quit");
+  tab->AddWidget(wid, 5, 6);
+  smap[wid] = SCREEN_NONE;
   }
 
 Screens::~Screens() {
@@ -129,35 +177,41 @@ int Screens::Handle() {
 
   SDL_Event event;
 
-  int user_quit = 0;
-  while(!user_quit && SDL_WaitEvent(&event)) {
-    do { // while(!user_quit && SDL_PollEvent(&event));
+  while(screen != SCREEN_NONE && SDL_WaitEvent(&event)) {
+    do { // while(screen != SCREEN_NONE && SDL_PollEvent(&event));
       if(!gui->ProcessEvent(&event)) continue;
 
       if(event.type == SDL_SG_EVENT) {
         if(event.user.code == SG_EVENT_BUTTONPRESS) {
           audio_play(click, 8, 8);
+	  }
+        else if(event.user.code == SG_EVENT_BUTTONCLICK) {
 	  if(smap.count((SG_Widget*)event.user.data1)) {
 	    Set(smap[(SG_Widget*)event.user.data1]);
 	    }
+          }
+        else if(event.user.code == SG_EVENT_STICKYON) {
+          audio_play(click, 8, 8);
+          }
+        else if(event.user.code == SG_EVENT_STICKYOFF) {
+          audio_play(click, 8, 8);
           }
         }
       else if(event.type == SDL_KEYDOWN) {
         if(event.key.keysym.sym == SDLK_ESCAPE) {
           if(screen != SCREEN_TITLE) Set(SCREEN_TITLE);
-	  else user_quit = 1;
+	  else Set(SCREEN_NONE);
           }
         }
       else if(event.type == SDL_QUIT) {
-        user_quit = 1;
+	Set(SCREEN_NONE);
         }
-      } while(!user_quit && SDL_PollEvent(&event));
+      } while(screen != SCREEN_NONE && SDL_PollEvent(&event));
     start_scene();
     gui->RenderStart(SDL_GetTicks());
     gui->RenderFinish(SDL_GetTicks());
     finish_scene();
     }
 
-  Set(SCREEN_NONE);
   return 0;
   }
