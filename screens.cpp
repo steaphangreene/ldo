@@ -162,26 +162,26 @@ Screens::Screens() {
   wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 14, 0, 2, 1);
   smap[wid] = SCREEN_PLAY;
-  SG_DNDBoxes *dnd = new SG_DNDBoxes(24, 12);
-  tab->AddWidget(dnd, 0, 1, 16, 8);
+  SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
+  tab->AddWidget(dnd, 0, 1, 12, 8);
   dnd->Include(1, 1, 2, 1);
   dnd->Include(7, 1, 2, 1);
-  dnd->Include(11, 1, 3, 3);
-  dnd->Include(0, 3, 2, 2);
-  dnd->Include(8, 3, 2, 2);
-  dnd->Include(0, 6, 2, 1);
-  dnd->Include(8, 6, 2, 1);
-  dnd->Include(11, 5, 4, 1);
-  dnd->Include(11, 6);
-  dnd->Include(14, 6);
-  dnd->Include(0, 8, 24, 4);
+  dnd->Include(11, 2, 3, 3);
+  dnd->Include(0, 3, 2, 3);
+  dnd->Include(8, 3, 2, 3);
+  dnd->Include(0, 7, 2, 1);
+  dnd->Include(8, 7, 2, 1);
+  dnd->Include(11, 6, 4, 1);
+  dnd->Include(11, 7);
+  dnd->Include(14, 7);
+  dnd->Include(0, 9, 18, 3);
 
   pan = new SG_Panel(gun_icon);
   pan->SetTransparent();
-  dnd->AddItem(pan, 11, 1, 1, 2);
+  dnd->AddItem(pan, 11, 2, 1, 2);
 
-  wid = new SG_Panel(equip_bg);
-  dnd->SetBackground(wid);
+  pan = new SG_Panel(equip_bg);
+  dnd->SetBackground(pan);
 
   chars = new SG_Tabs(troops, SG_AUTOSIZE, 1,
 	but_normal, but_disabled, but_pressed, but_activated);
