@@ -42,7 +42,7 @@ LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -lGL -lGLU
 #CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `sdl-config --cflags`
 #LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lefence -lSDL_ttf -lGL -lGLU
 
-OBJS:=	screens.o map.o unit.o player.o main.o renderer.o audio.o
+OBJS:=	screens.o game.o unit.o player.o main.o renderer.o audio.o
 
 #PRODUCTION OPTIONS (CROSS-COMPILED FOR WINDOWS)
 WCXX=	i586-mingw32msvc-g++
