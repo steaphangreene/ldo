@@ -42,6 +42,9 @@ enum PlayResult {
   PLAY_MAX
   };
 
+class SDL_Thread;
+class SDL_mutex;
+
 class Game {
 public:
   Game();
@@ -67,7 +70,10 @@ public:
   int CurrentRound() { return master.size(); }
   PlayResult Play();
 
-  int ThreadHandler();		// NOT FOR EXTERNAL USE!
+  bool Ready(int plnum);		// Returns ready state for player
+  bool SetReady(int plnum, bool rdy);	// Returns new ready state
+
+  int ThreadHandler();				// NOT FOR EXTERNAL USE!
 
 private:
 
@@ -88,7 +94,12 @@ private:
   map<int, Percept *> percept;		// Percept for each player
   map<int, Orders *> orders;		// Orders from each player
 
-  vector<Player *> player;		//Current ordered list of players
+  vector<Player *> player;		// Current ordered list of players
+
+  vector<SDL_Thread *> thread;		// Player (and Handler) Thread List
+  SDL_mutex *status_mut;		// Status Protector MutEx
+  vector<bool> status_ready;		// Ready states of each player
+  int status_locked;			// Are Ready states allowed to change?
   };
 
 #endif // UNIT_H

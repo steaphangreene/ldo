@@ -31,6 +31,8 @@
 #define SAVEFILE_VERSION	0x00000004 // 0.0.0-r4
 
 Game::Game() {
+  status_mut = NULL;
+  status_locked = false;
   }
 
 Game::~Game() {
@@ -41,6 +43,28 @@ void Game::AttachPlayer(Player *pl) {
   //FIXME: Protect against duplicates!
   player.resize(pl->ID() + 1);
   player[pl->ID()] = pl;
+
+  status_ready.resize(pl->ID() + 1);
+  }
+
+bool Game::Ready(int plnum) {
+  return status_ready[plnum];
+  }
+
+bool Game::SetReady(int plnum, bool rdy) {
+  bool ret = false;
+  if(status_mut) SDL_mutexP(status_mut);
+
+  if(status_locked) {
+    ret = status_ready[plnum];
+    }
+  else {
+    status_ready[plnum] = rdy;
+    ret = rdy;
+    }
+
+  if(status_mut) SDL_mutexV(status_mut);
+  return ret;
   }
 
 static char buf[BUF_LEN];
@@ -231,12 +255,11 @@ static int game_thread_func(void *arg) {
   return ((Game*)(arg))->ThreadHandler();
   }
 
-static vector<SDL_Thread *> thread;
-
 PlayResult Game::Play() {
   Player *localp = NULL;
+  status_mut = SDL_CreateMutex();
 
-  int n = 1;		//Reserve a place for ThreadHandler thread
+  unsigned int n = 1;		//Reserve a place for ThreadHandler thread
   thread.resize(player.size());
   vector<Player *>::const_iterator itrp = player.begin();
   for(; itrp != player.end(); ++itrp) {
@@ -259,6 +282,12 @@ PlayResult Game::Play() {
   //I have to be the local player due to SDL/OpenGL limitations
   localp->Run();
 
+  for(n=0; n < thread.size(); ++n) {
+    SDL_WaitThread(thread[n], NULL);
+    }
+  SDL_DestroyMutex(status_mut);
+  status_mut = NULL;
+
   return PLAY_FINISHED;
   }
 
@@ -266,15 +295,16 @@ int Game::ThreadHandler() {
   bool ret = false;
 
   while(!ret) {
+    SDL_Delay(250);	// Check for done 4 times per second (Temporary)
+
     ret = true;	//Initialize it to "ready"
 
-    vector<Player *>::const_iterator itrp = player.begin();
-    for(; itrp != player.end(); ++itrp) {
-      ret = (ret && (*itrp)->Ready());
+    for(unsigned int n = 0; n < status_ready.size(); ++n) {
+      ret = (ret && Ready(n));
       }
-
-    SDL_Delay(250);	// Check for done 4 times per second (Temporary)
     }
+
+  fprintf(stderr, "Exiting ThreadHandler!\n");
 
   return 0;
   }

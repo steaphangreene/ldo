@@ -45,7 +45,6 @@ public:
   Player(Game *gm, PlayerType tp, int num);
   virtual ~Player();
 
-  bool Ready();
   PlayerType Type() { return type; };
   int ID() { return id; };
 
@@ -54,7 +53,6 @@ public:
 protected:
   int id;
   PlayerType type;
-  bool ready;
   Percept percept;
   Orders orders;
   int pround;

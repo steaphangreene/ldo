@@ -30,7 +30,6 @@ Player::Player(Game *gm, PlayerType tp, int num) {
   type = tp;
   id = num;
 
-  ready = false;
   pround = -1;
 
   cur_game->SetPercept(num, &percept);
@@ -40,15 +39,10 @@ Player::Player(Game *gm, PlayerType tp, int num) {
 Player::~Player() {
   }
 
-bool Player::Ready() {
-  return ready;
-  }
-
 bool Player::Run() {
   if(game->CurrentRound() - 1 != pround) {
     pround = game->CurrentRound() - 1;
     game->UpdatePercept(id, pround);
-    ready = false;
     }
   return true;
   }

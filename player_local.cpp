@@ -128,7 +128,7 @@ bool Player_Local::Run() {
 	  if(event.user.data1 == (void*)ddoneb) {
 	    //FIXME: Actually submit the orders and wait for new percept
 
-	    ready = true;
+	    game->SetReady(id, true);
 
 	    gui->MasterWidget()->RemoveWidget(wind[phase]);
 	    ddoneb->TurnOff();	// Make sure "Ready" isn't checked next time
