@@ -30,6 +30,7 @@
 using namespace std;
 
 #include "unit.h"
+#include "percept.h"
 
 class Game {
 public:
@@ -60,6 +61,8 @@ private:
   vector< vector<int> > squnits;	// List of unit ids per squad
 
   map<int, Unit *> units;		// Actual unit container
+
+  vector<Percept> master;		// Master game percepts (for each turn)
   };
 
 #endif // UNIT_H
