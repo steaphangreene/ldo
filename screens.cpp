@@ -63,7 +63,7 @@ Screens::Screens() {
   last_screen = SCREEN_NONE;
 
   init_renderer(640, 360);
-  audio_init(256);
+  audio_init(4096);
   click = audio_buildsound(click_data, sizeof(click_data));
   music = audio_loadmusic("music/cantus.wav");
   audio_loop(music, 8, 0);
