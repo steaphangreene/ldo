@@ -131,18 +131,29 @@ Screens::Screens() {
 
 
   //Setup SCREEN_EQUIP
-  tab = new SG_Table(6, 7, 0.0625, 0.125);
+  tab = new SG_Table(16, 9, 0.0625, 0.125);
   swidget[SCREEN_EQUIP] = tab;
   tab->AddWidget(new SG_TextArea("Equip Your Team",
 	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
-	0, 0, 4, 2);
+	0, 0, 4, 1);
   wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 4, 0);
+  tab->AddWidget(wid, 12, 0, 2, 1);
   smap[wid] = SCREEN_TITLE;
   wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
-  tab->AddWidget(wid, 5, 0);
+  tab->AddWidget(wid, 14, 0, 2, 1);
   smap[wid] = SCREEN_PLAY;
-
+  SG_DNDBoxes *dnd = new SG_DNDBoxes(16, 8);
+  tab->AddWidget(dnd, 0, 1, 16, 8);
+  dnd->Include(1, 1, 2, 1);
+  dnd->Include(7, 1, 2, 1);
+  dnd->Include(11, 1, 3, 3);
+  dnd->Include(0, 3, 2, 2);
+  dnd->Include(8, 3, 2, 2);
+  dnd->Include(0, 6, 2, 1);
+  dnd->Include(8, 6, 2, 1);
+  dnd->Include(11, 5, 4, 1);
+  dnd->Include(11, 6);
+  dnd->Include(14, 6);
 
   //Setup SCREEN_PLAY
   tab = new SG_Table(6, 7, 0.0625, 0.125);
