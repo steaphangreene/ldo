@@ -36,6 +36,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
     //FIXME: Initialize GUI myself if it's not already done for me!
     }
 
+  world = new World(&percept, &orders);
+
   music = audio_loadmusic("music/iconoclasm.wav");
   cur_music = NULL;
 
@@ -104,6 +106,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 Player_Local::~Player_Local() {
   SDL_DestroyMutex(off_mut);
   SDL_DestroyMutex(gui_mut);
+  delete world;
   }
 
 int Player_Local::event_thread_func(void *arg) {
@@ -258,7 +261,12 @@ bool Player_Local::Run() {
     SDL_mutexV(gui_mut);
 
     SDL_PumpEvents();
-    //FIXME: Render game itself here!
+    if(phase == PHASE_DECLARE) {
+      world->Render();
+      }
+    else if(phase == PHASE_REPLAY) {
+      world->Render(cur_time);
+      }
 
     SDL_PumpEvents();
     SDL_mutexP(gui_mut);
@@ -396,7 +404,7 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
 	playback_speed);	// Should never happen
       }break;
     }
-  if(offset > 2147483647U) offset = 0;
+  if(offset > 2147483647U) offset = 0;	//Compare to INT_MAX, since is unsigned
   else if(offset > 3000) offset = 3000;
   SDL_mutexV(off_mut);
   }

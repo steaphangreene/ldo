@@ -47,7 +47,7 @@ LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -lGL -lGLU
 #CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `sdl-config --cflags`
 #LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lefence -lSDL_ttf -lGL -lGLU
 
-OBJS:=	screens.o percept.o orders.o \
+OBJS:=	screens.o percept.o orders.o world.o \
 	game.o unit.o player.o player_local.o \
 	main.o renderer.o audio.o
 
@@ -56,7 +56,7 @@ WCXX=	i586-mingw32msvc-g++
 WCXXFLAGS=	-s -O2 -Wall `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --cflags`
 WLIBS=	../simplegui/libsimplegui.win32_a `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` -lSDL_ttf -lopengl32 -lglu32
 
-WOBJS:=	screens.win32_o percept.win32_o orders.win32_o \
+WOBJS:=	screens.win32_o percept.win32_o orders.win32_o world.win32_o \
 	game.win32_o unit.win32_o player.win32_o player_local.win32_o \
 	main.win32_o renderer.win32_o audio.win32_o
 

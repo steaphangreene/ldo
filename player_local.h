@@ -24,6 +24,7 @@
 #define PLAYER_LOCAL_H
 
 #include "player.h"
+#include "world.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_thread.h>
@@ -58,6 +59,7 @@ protected:
   PopPhase nextpopphase;	//Current phase of popup
 
   SimpleGUI *gui;
+  World *world;
 
   SG_Table *wind[PHASE_MAX];	//Screens for each phase
   int drkred;			//Colors
