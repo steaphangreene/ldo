@@ -11,6 +11,7 @@ using namespace std;
 class Map {
 public:
   Map();
+  ~Map();
   int Load(const string &filename);
   int Save(const string &filename);
   int Load(FILE *fl);
@@ -19,6 +20,7 @@ public:
   const Unit *PlayerUnit(int pl, int un);
 
 private:
+  void Clear();
   map<int, Unit *> units;
   vector< vector<int> > plunits;	// List of unit ids per player
   };

@@ -7,13 +7,17 @@
 Map::Map() {
   }
 
+Map::~Map() {
+  Clear();
+  }
+
 //static char buf[BUF_LEN];
 
 int Map::Load(const string &filename) {
   FILE *fl = fopen(filename.c_str(), "r");
   if(!fl) return 0;
 
-  plunits.clear();
+  Clear();
   int ret = Load(fl);
 
   fclose(fl);
@@ -35,6 +39,10 @@ int Map::Load(FILE *fl) {
   for(int n = 0; n < (int)(num); ++n) {
     unit = new Unit;
     if(!unit->Load(fl)) return 0;
+    if(units.count(unit->id)) { // Duplicate unit id
+      delete unit;
+      return 0;
+      }
     units[unit->id] = unit;
     plunits[0].push_back(unit->id);
     }
@@ -71,4 +79,13 @@ const Unit *Map::PlayerUnit(int pl, int un) {
   if(units.count(plunits[pl][un]) == 0) return NULL;
 
   return units[plunits[pl][un]];
+  }
+
+void Map::Clear() {
+  map<int, Unit *>::iterator itrm = units.begin();
+  for(; itrm != units.end(); ++itrm) {
+    if(itrm->second) delete itrm->second;
+    }
+  units.clear();
+  plunits.clear();
   }
