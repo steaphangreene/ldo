@@ -29,6 +29,7 @@ SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
 SDL_Surface *equip_bg;
 
 #include "m41.h"
+
 SDL_Surface *gun_icon;
 
 map<ScreenNum, SG_Widget *> gomap;	//Map of go buttons per screen
@@ -182,15 +183,6 @@ Screens::Screens() {
   wid = new SG_Panel(equip_bg);
   dnd->SetBackground(wid);
 
-//  SG_Table *chars = new SG_Table(troops.size(), 1);
-//  for(int n=0; n < int(troops.size()); ++n) {
-//    wid = new SG_StickyButton(troops[n], but_normal,
-//		but_disabled, but_pressed, but_activated);
-//    chars->AddWidget(wid);
-//    if(n == 0) wid->TurnOn();
-//    }
-//  SG_Tabs *chars = new SG_Tabs(troops, SG_AUTOSIZE, 1,
-//	but_normal, but_disabled, but_pressed, but_activated);
   chars = new SG_Tabs(troops, SG_AUTOSIZE, 1,
 	but_normal, but_disabled, but_pressed, but_activated);
   tab->AddWidget(chars, 0, 0, 12, 1);
