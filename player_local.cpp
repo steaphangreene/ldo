@@ -122,7 +122,10 @@ int Player_Local::EventHandler() {
 	continue;
 	}
 
-      if(event.type == SDL_KEYDOWN) {
+      if(event.type == SDL_QUIT) {
+	exiting = 1;
+	}
+      else if(event.type == SDL_KEYDOWN) {
 	if(event.key.keysym.sym == SDLK_ESCAPE) {
 	  exiting = 1;
 	  }
