@@ -386,6 +386,7 @@ Screen_Title::Screen_Title() {
     fread(data, 1, size, credfl); 
     data[size] = 0;
     SG_TextArea *credits = new SG_TextArea(data, drkred);
+    credits->SetMargins(0.125, 0.03125);
     main->AddWidget(credits, 0, 2, 2, 5);
     delete data;
     fclose(credfl);

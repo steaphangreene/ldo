@@ -86,8 +86,6 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   conts.push_back(">>");
   rcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
   rcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
-  playback_speed = 5; //Default is play
-  rcontrols->Set(playback_speed);
   wind[PHASE_REPLAY]->AddWidget(rcontrols, 2, 6, 2, 1);
 
   //Define base GUI for Declare phase
@@ -182,7 +180,11 @@ int Player_Local::EventHandler() {
 	else if(event.user.code == SG_EVENT_SELECT) {
 	  if(event.user.data1 == (void*)(ednd)) {
 	    const Unit *u = game->UnitRef(eqid[*((int*)(event.user.data2))]);
-	    if(u) estats->SetText(u->name);
+	    if(u != NULL) {
+	      SDL_mutexP(gui_mut);
+	      estats->SetText(u->name);
+	      SDL_mutexV(gui_mut);
+	      }
 	    }
 	  else if(event.user.data1 == (void*)(rcontrols)) {
 	    SDL_mutexP(off_mut);
