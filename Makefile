@@ -27,8 +27,13 @@ win32:	ldo.exe
 #CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags`
 #LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -lGL -lGLU
 
+#PRODUCTION OPTIONS (WORKAROUND FOR MacOS-X)
+#CXX=	g++
+#CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags`
+#LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -framework OpenGL
+
 #PRODUCTION OPTIONS (WORKAROUND FOR CYGWIN)
-#CXX=	gcc
+#CXX=	g++
 #CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags`
 #LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -L/usr/X11R6/bin -lopengl32 -lglu32
 
