@@ -265,7 +265,7 @@ bool Player_Local::Run() {
       world->Render();
       }
     else if(phase == PHASE_REPLAY) {
-      world->Render(cur_time);
+      world->Render(offset);
       }
 
     SDL_PumpEvents();
@@ -289,7 +289,8 @@ bool Player_Local::Run() {
   return exiting;
   }
 
-void Player_Local::UpdateEquipIDs() {	//GUI MUST BE LOCKED BEFORE CALLING!
+	//Note: gui_mut must be locked before calling this function!
+void Player_Local::UpdateEquipIDs() {
   set<int> eqtmp;	//Temporary set of ids for eq
   eqid.clear();
 
@@ -376,7 +377,8 @@ void Player_Local::UpdateEquipIDs() {	//GUI MUST BE LOCKED BEFORE CALLING!
     }
   }
 
-void Player_Local::CalcOffset(Uint32 cur_time) {
+	//Note: off_mut must be locked before calling this function!
+void Player_Local::CalcOffset(Uint32 cur_time) { // off_mut must
   switch(playback_speed) {
     case(0): {	// Rewind
       offset = last_offset - (cur_time - last_time) * 4;
