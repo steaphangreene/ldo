@@ -274,12 +274,6 @@ int Screens::Handle() {
         else if(screen == SCREEN_EQUIP && event.key.keysym.sym == SDLK_RIGHT) {
 	  chars->Right();
           }
-        else if(screen == SCREEN_EQUIP && event.key.keysym.sym == SDLK_UP) {
-	  chars->Up();
-          }
-        else if(screen == SCREEN_EQUIP && event.key.keysym.sym == SDLK_DOWN) {
-	  chars->Down();
-          }
         }
       else if(event.type == SDL_QUIT) {
 	Set(SCREEN_NONE);
