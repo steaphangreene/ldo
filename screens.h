@@ -30,10 +30,14 @@ using namespace std;
 #include "../simplegui/simplegui.h"
 
 enum ScreenNum {
-  POPUP_LOADMAP=-4,
-  SCREEN_BACK=-3,
-  SCREEN_SAME=-2,
-  SCREEN_NONE=-1,
+  POPUP_MIN,
+  POPUP_LOADMAP,
+  POPUP_MAX,
+  POPUP_CLEAR,
+  SCREEN_BACK,
+  SCREEN_SAME,
+  SCREEN_NONE,
+  SCREEN_MIN,
   SCREEN_TITLE,
   SCREEN_CONFIG,
   SCREEN_SINGLE,
@@ -55,13 +59,12 @@ public:
 
 private:
   void Set(ScreenNum s);
-  ScreenNum screen, last_screen;
+  ScreenNum screen, last_screen, popup;
   SimpleGUI *gui;
-  map<int, SG_Alignment *> swidget;//Map of ScreenNums to Screen Widgets (TEMP)
-  map<SG_Widget *, ScreenNum> smap;	//Map of buttons->resulting screens
 
   map<int, Screen *> sscr;		//Map of ScreenNums to Screens
   int click;				//Button Click Sound
+  int music;				//Background Music (Temporary)
   };
 
 #endif // SCREENS_H
