@@ -27,10 +27,10 @@
 #define HEADER_STRING "LDO_GAMESAVE_FILE"
 #define SAVEFILE_VERSION	0x00000003 // 0.0.0-r3
 
-Game::Map() {
+Game::Game() {
   }
 
-Game::~Map() {
+Game::~Game() {
   Clear();
   }
 

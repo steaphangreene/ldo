@@ -25,7 +25,7 @@
 #include "audio.h"
 #include "click.h"
 
-#include "map.h"
+#include "game.h"
 
 SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
 SDL_Surface *equip_bg;
@@ -51,7 +51,7 @@ map<ScreenNum, SG_Widget *> saymap;	//Map of go buttons per screen
 int music;				//Background music
 					//Temporary, just for testing
 
-Map *cur_map = NULL;			//Temporary, just for testing
+Game *cur_map = NULL;			//Temporary, just for testing
 
 #define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
@@ -383,7 +383,7 @@ int Screens::Handle() {
         else if(event.user.code == SG_EVENT_FILEOPEN) {
           audio_play(click, 8, 8);
 	  string filename = ((SG_FileBrowser*)(event.user.data1))->FileName();
-	  if(!cur_map) cur_map = new Map;
+	  if(!cur_map) cur_map = new Game;
 	  if(!cur_map->Load(filename)) {
 	    delete cur_map;
 	    cur_map = NULL;
