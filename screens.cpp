@@ -194,6 +194,15 @@ Screens::Screens() {
   }
 
 Screens::~Screens() {
+  if(cur_map) delete cur_map;
+  cur_map = NULL;
+
+  map<ScreenNum, Screen *>::iterator itrs = sscr.begin();
+  for(; itrs != sscr.end(); ++itrs) {
+    delete itrs->second;
+    }
+  sscr.clear();
+
   delete gui;
   }
 
@@ -252,7 +261,7 @@ int Screens::Handle() {
 	Set(SCREEN_NONE);
 	continue;
         }
-      if(event.type == SDL_SG_EVENT) {	//Handle all sound effect here.
+      if(event.type == SDL_SG_EVENT) {	//Handle all sound effects here.
 	switch(event.user.code) {
 	  case(SG_EVENT_FILEOPEN):
 	  case(SG_EVENT_STICKYOFF):

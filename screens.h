@@ -62,7 +62,7 @@ private:
   ScreenNum screen, last_screen, popup;
   SimpleGUI *gui;
 
-  map<int, Screen *> sscr;		//Map of ScreenNums to Screens
+  map<ScreenNum, Screen *> sscr;		//Map of ScreenNums to Screens
   int click;				//Button Click Sound
   int music;				//Background Music (Temporary)
   };
