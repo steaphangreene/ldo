@@ -39,7 +39,7 @@ SDL_Surface *mouse_cursor;
 
 SDL_Surface *gun_icon, *gren_icon;
 
-Game *cur_map = NULL;			//Temporary, just for testing
+Game *cur_game = NULL;			//Temporary, just for testing
 
 #define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
@@ -194,8 +194,8 @@ Screens::Screens() {
   }
 
 Screens::~Screens() {
-  if(cur_map) delete cur_map;
-  cur_map = NULL;
+  if(cur_game) delete cur_game;
+  cur_game = NULL;
 
   map<ScreenNum, Screen *>::iterator itrs = sscr.begin();
   for(; itrs != sscr.end(); ++itrs) {
@@ -381,14 +381,14 @@ Screen_Equip::~Screen_Equip() {
 
 void Screen_Equip::Start(SimpleGUI *gui) {
   if(main == NULL) {
-    if(!cur_map) {
+    if(!cur_game) {
       fprintf(stderr, "ERROR: SCREEN_EQUIP requires loaded map!\n");
       exit(1);
       }
 
     vector<string> troops;
-    for(int n = 0; cur_map->PlayerUnit(0, 0, n) != NULL; ++n) {
-      troops.push_back(cur_map->PlayerUnit(0, 0, n)->name);
+    for(int n = 0; cur_game->PlayerUnit(0, 0, n) != NULL; ++n) {
+      troops.push_back(cur_game->PlayerUnit(0, 0, n)->name);
       }
 
     if(troops.size() < 1) {
@@ -444,7 +444,7 @@ void Screen_Equip::Start(SimpleGUI *gui) {
 ScreenNum Screen_Equip::Handle(SimpleGUI *gui, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_SELECT) {	//Sound already played!
-      const Unit *u = cur_map->PlayerUnit(0, 0, *((int*)(event.user.data2)));
+      const Unit *u = cur_game->PlayerUnit(0, 0, *((int*)(event.user.data2)));
       if(u) name->SetText(u->name);
       }
     else if(event.user.code == SG_EVENT_BUTTONCLICK) {
@@ -516,7 +516,7 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SDL_Event &event) {
       else if(event.user.data1 == (void*)gob) return SCREEN_EQUIP;
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
-      if(cur_map) gob->Enable();
+      if(cur_game) gob->Enable();
       }
     }
   return SCREEN_SAME;
@@ -553,13 +553,13 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
       else if(event.user.data1 == (void*)gob) return SCREEN_EQUIP;
       }
     else if(event.user.code == SG_EVENT_STICKYON) {
-      if(cur_map) gob->Enable();
+      if(cur_game) gob->Enable();
       }
     else if(event.user.code == SG_EVENT_STICKYOFF) {
       gob->Disable();
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
-      if(cur_map && readyb->IsOn()) gob->Enable();
+      if(cur_game && readyb->IsOn()) gob->Enable();
       }
     }
   return SCREEN_SAME;
@@ -592,7 +592,7 @@ ScreenNum Screen_Replay::Handle(SimpleGUI *gui, SDL_Event &event) {
       else if(event.user.data1 == (void*)gob) return SCREEN_EQUIP;
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
-      if(cur_map) gob->Enable();
+      if(cur_game) gob->Enable();
       }
     }
   return SCREEN_SAME;
@@ -635,7 +635,7 @@ ScreenNum Screen_Results::Handle(SimpleGUI *gui, SDL_Event &event) {
 Screen_Play::Screen_Play() {
   //Setup SCREEN_PLAY (Temporary - will be handled by Game, not Screens)
   main = new SG_Table(6, 7, 0.0625, 0.125);
-  main->AddWidget(new SG_TextArea("Playing/Replaying LDO....", drkred),
+  main->AddWidget(new SG_TextArea("Playing LDO", drkred),
 	0, 0, 4, 2);
   optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   main->AddWidget(optb, 0, 6);
@@ -649,6 +649,7 @@ Screen_Play::~Screen_Play() {
 
 void Screen_Play::Start(SimpleGUI *gui) {
   Screen::Start(gui);
+  cur_game->Play();
   }
 
 void Screen_Play::Finish(SimpleGUI *gui) {
@@ -677,14 +678,19 @@ ScreenNum Popup_LoadMap::Handle(SimpleGUI *gui, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_FILEOPEN) {
       string fn = ((SG_FileBrowser *)(main))->FileName();
-      if(!cur_map) cur_map = new Game;
-      if(!cur_map->Load(fn)) {
-	delete cur_map;
-	cur_map = NULL;
+      if(!cur_game) cur_game = new Game;
+      if(!cur_game->Load(fn)) {
+	delete cur_game;
+	cur_game = NULL;
 	fprintf(stderr, "WARNING: Could not load map file '%s'\n", fn.c_str());
 	}
       else {
-	//cur_map->Save(fn); // For auto-upgrade of mapfile
+	//cur_game->Save(fn); // Uncomment for auto-upgrade of mapfile
+
+	cur_game->AttachPlayer( // temporary!
+		new Player_Local(cur_game, PLAYER_LOCAL, 0)
+		);
+
 	return POPUP_CLEAR;
 	}
       }

@@ -31,11 +31,22 @@ using namespace std;
 
 #include "unit.h"
 #include "percept.h"
+#include "player.h"
+
+enum PlayResult {
+  PLAY_ERROR,		//Something broke
+  PLAY_FINISHED,	//Game's over, show results.
+  PLAY_CONFIG,		//Game's not over, run configuration.
+  PLAY_SAVE,		//Game's not over, save and continue game.
+  PLAY_MAX
+  };
 
 class Game {
 public:
   Game();
   ~Game();
+  void AttachPlayer(Player *pl);
+
   int Load(const string &filename);
   int Save(const string &filename);
   int Load(FILE *fl);
@@ -43,13 +54,16 @@ public:
   static int Load(vector< vector<int> > &vec, FILE *fl);
   static int Save(const vector< vector<int> > &vec, FILE *fl);
 
-  const Unit *PlayerUnit(int pl, int sq, int un);
+  const Unit *PlayerUnit(int pl, int sq, int un);	//Temporary!
 
   const string &MapName() { return mapname; };
   const string &MapDesc() { return mapdesc; };
 
   void SetPercept(int plnum, Percept *prcpt);
   void UpdatePercept(int plnum, int rnd);
+
+  int CurrentRound() { return master.size(); }
+  PlayResult Play();
 
 private:
   void Clear();
@@ -67,7 +81,8 @@ private:
 
   vector<Percept> master;		// Master game percepts (for each turn)
   map<int, Percept *> percept;		// Percept for each player
-  int round;				// Current round number
+
+  vector<Player *> player;		//Current ordered list of players
   };
 
 #endif // UNIT_H

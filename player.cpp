@@ -20,5 +20,59 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-#include "player.h"
+#include "../simplegui/simplegui.h"
 
+#include "player.h"
+#include "game.h"
+
+extern Game *cur_game;
+
+Player::Player(Game *gm, PlayerType tp, int num) {
+  game = gm;
+  type = tp;
+  id = num;
+
+  ready = false;
+  pround = 0;
+  cur_game->SetPercept(num, &percept);
+//  gui = gui->CurrentGUI(); //Yes, this is ok, it's static!
+//  if(!gui) {
+//    //FIXME: Initialize GUI myself if it's not already done for me!
+//    }
+  }
+
+Player::~Player() {
+  }
+
+bool Player::Ready() {
+  return ready;
+  }
+
+bool Player::Run() {
+  if(game->CurrentRound() != pround) {
+    pround = game->CurrentRound();
+    game->UpdatePercept(id, pround);
+    ready = false;
+    }
+  return true;
+  }
+
+Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
+	: Player(gm, tp, num) {
+  gui = SimpleGUI::CurrentGUI(); //Yes, this is ok, it's static!
+  if(!gui) {
+    //FIXME: Initialize GUI myself if it's not already done for me!
+    }
+  }
+
+Player_Local::~Player_Local() {
+  }
+
+bool Player_Local::Run() {
+  Player::Run();	//Start with the basics
+
+  //Temporary - for structure testing!
+  fprintf(stderr, "Player_Local Running\n");
+  ready = true;
+  return true;
+  }

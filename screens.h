@@ -43,8 +43,10 @@ enum ScreenNum {
   SCREEN_SINGLE,
   SCREEN_MULTI,
   SCREEN_REPLAY,
-  SCREEN_EQUIP,
-  SCREEN_PLAY, //Not Handled within Screens class
+  SCREEN_PLAY, //Actually not handled here but in the player object
+  SCREEN_EQUIP,  //Not really going to be handled within Screens class
+//  SCREEN_DEFINE, //Not really going to be handled within Screens class
+//  SCREEN_WATCH,  //Not really going to be handled within Screens class
   SCREEN_RESULTS,
   SCREEN_MAX
   };

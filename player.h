@@ -23,8 +23,48 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "percept.h"
+
+class Game;
+class SimpleGUI;
+
+enum PlayerType {
+  PLAYER_GONE,
+  PLAYER_SPECTATOR,
+  PLAYER_LOCAL,
+  PLAYER_AI,
+  PLAYER_REMOTE,
+  PLAYER_MAX
+  };
+
 class Player {
 public:
+  Player(Game *gm, PlayerType tp, int num);
+  virtual ~Player();
+
+  bool Ready();
+  PlayerType Type() { return type; };
+  int ID() { return id; };
+
+  virtual bool Run();
+
+protected:
+  int id;
+  PlayerType type;
+  bool ready;
+  Percept percept;
+  int pround;
+  Game *game;
+  };
+
+class Player_Local : public Player {
+public:
+  Player_Local(Game *gm, PlayerType tp, int num);
+  virtual ~Player_Local();
+  virtual bool Run();
+
+protected:
+  SimpleGUI *gui;
   };
 
 #endif // PLAYER_H

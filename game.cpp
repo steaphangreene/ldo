@@ -28,11 +28,16 @@
 #define SAVEFILE_VERSION	0x00000003 // 0.0.0-r3
 
 Game::Game() {
-  round = 0;
   }
 
 Game::~Game() {
   Clear();
+  }
+
+void Game::AttachPlayer(Player *pl) {
+  //FIXME: Protect against duplicates!
+  player.resize(pl->ID() + 1);
+  player[pl->ID()] = pl;
   }
 
 static char buf[BUF_LEN];
@@ -164,6 +169,13 @@ void Game::Clear() {
     if(itrm->second) delete itrm->second;
     }
   units.clear();
+
+  vector<Player *>::const_iterator itrp = player.begin();
+  for(; itrp != player.end(); ++itrp) {
+    delete (*itrp);
+    }
+  player.clear();
+
   plsquads.clear();
   squnits.clear();
   master.clear();
@@ -179,17 +191,30 @@ void Game::SetPercept(int plnum, Percept *prcpt) {
   }
 
 void Game::UpdatePercept(int plnum, int rnd) {
-  if(rnd < 0 || rnd > round) {
+  if(rnd < 1 || rnd > (int)(percept.size())) {
     fprintf(stderr, "ERROR: Percept requested in future or pre-start!\n");
     exit(1);
     }
-  if(rnd == round) {
+  if(rnd == (int)(percept.size())) {
     // Current (Unresolved) Round
-    *(percept[plnum]) = master[rnd];	//Temporary!
+    *(percept[plnum]) = master[rnd-1];	//Temporary!
     }
   else {
     // Old (Resolved) Round
-    *(percept[plnum]) = master[rnd];	//Temporary!
+    *(percept[plnum]) = master[rnd-1];	//Temporary!
     }
   }
 
+PlayResult Game::Play() {
+  bool ret = false;
+  while(!ret) {
+    ret = true;	//Initialize it to "ready"
+
+    vector<Player *>::const_iterator itrp = player.begin();
+    for(; itrp != player.end(); ++itrp) {
+      (*itrp)->Run();
+      ret = (ret && (*itrp)->Ready());
+      }
+    }
+  return PLAY_FINISHED;
+  }
