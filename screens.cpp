@@ -25,7 +25,7 @@
 #include "audio.h"
 #include "click.h"
 
-SDL_Surface *but_normal, *but_pressed, *but_disabled;
+SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
 
 map<ScreenNum, SG_Widget *> gomap;	//Map of go buttons per screen
 					//Temporary, just for testing
@@ -43,6 +43,7 @@ Screens::Screens() {
   but_normal = SDL_LoadBMP("buttontex_normal.bmp");
   but_pressed = SDL_LoadBMP("buttontex_pressed.bmp");
   but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
+  but_activated = SDL_LoadBMP("buttontex_activated.bmp");
 
   SG_Table *tab;	// For temporary storage;
   SG_Widget *wid;	// For temporary storage;
@@ -101,7 +102,7 @@ Screens::Screens() {
   wid = new SG_Button("Connect to Game", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 3);
 //  smap[wid] = SCREEN_TITLE;
-  wid = new SG_StickyButton("Ready to Play", but_normal, but_disabled, but_pressed);
+  wid = new SG_StickyButton("Ready to Play", but_normal, but_disabled, but_pressed, but_activated);
   tab->AddWidget(wid, 2, 5);
 //  smap[wid] = SCREEN_TITLE;
   wid = new SG_Button("Go", but_normal, but_disabled, but_pressed);
