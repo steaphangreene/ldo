@@ -25,6 +25,8 @@
 #include "audio.h"
 #include "click.h"
 
+SDL_Surface *but_normal, *but_pressed, *but_disabled;
+
 Screens::Screens() {
   screen = SCREEN_NONE;
   swidget.resize(SCREEN_MAX, NULL);
@@ -36,6 +38,10 @@ Screens::Screens() {
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
   gui->LoadFont("fonts/Denmark Regular.ttf", 100);
 
+  but_normal = SDL_LoadBMP("buttontex_normal.bmp");
+  but_pressed = SDL_LoadBMP("buttontex_pressed.bmp");
+  but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
+
   SG_Table *tab;	// For temporary storage;
   SG_Widget *wid;	// For temporary storage;
 
@@ -46,7 +52,7 @@ Screens::Screens() {
   tab->AddWidget(new SG_TextArea("LDO",
 	gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0)),
 	0, 0, 2, 4);
-  wid = new SG_Button("Multiplayer");
+  wid = new SG_Button("Multiplayer", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 3);
   smap[wid] = SCREEN_MULTI;
   wid = new SG_Button("Single Player");
