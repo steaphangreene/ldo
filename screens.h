@@ -30,8 +30,10 @@ using namespace std;
 #include "../simplegui/simplegui.h"
 
 enum ScreenNum {
-  SCREEN_NONE=-1,
+  SCREEN_NONE=-2,
+  SCREEN_BACK=-1,
   SCREEN_TITLE,
+  SCREEN_CONFIG,
   SCREEN_MULTI,
   SCREEN_SINGLE,
   SCREEN_REPLAY,
@@ -49,7 +51,7 @@ public:
 
 private:
   void Set(ScreenNum s);
-  ScreenNum screen;
+  ScreenNum screen, last_screen;
   SimpleGUI *gui;
   int click;
   vector<SG_Widget *> swidget;

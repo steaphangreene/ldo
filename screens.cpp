@@ -54,6 +54,7 @@ int music;				//Background music
 
 Screens::Screens() {
   screen = SCREEN_NONE;
+  last_screen = SCREEN_NONE;
   swidget.resize(SCREEN_MAX, NULL);
 
   init_renderer(640, 360);
@@ -78,6 +79,7 @@ Screens::Screens() {
 
   SG_Table *tab;	// For temporary storage;
   SG_Widget *wid;	// For temporary storage;
+  SG_Alignment *align;	// For temporary storage;
 
   int drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
@@ -85,6 +87,9 @@ Screens::Screens() {
   tab = new SG_Table(3, 7, 0.0625, 0.125);
   swidget[SCREEN_TITLE] = tab;
   tab->AddWidget(new SG_TextArea("LDO", drkred), 0, 0, 2, 4);
+  wid = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  tab->AddWidget(wid, 2, 1);
+  smap[wid] = SCREEN_CONFIG;
   wid = new SG_Button("Multiplayer", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 3);
   smap[wid] = SCREEN_MULTI;
@@ -99,6 +104,42 @@ Screens::Screens() {
   smap[wid] = SCREEN_NONE;
 
 
+  //Setup SCREEN_CONFIG
+  tab = new SG_Table(6, 7, 0.0625, 0.125);
+  swidget[SCREEN_CONFIG] = tab;
+
+  vector<string> cfg_tab;
+  vector<SG_Alignment *> cfg_scr;
+
+  cfg_tab.push_back("Video");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  cfg_tab.push_back("Audio");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  cfg_tab.push_back("Mouse");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  cfg_tab.push_back("Keyboard");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  cfg_tab.push_back("Game");
+  align = new SG_Table(3, 7, 0.0625, 0.125);
+  cfg_scr.push_back(align);
+
+  tab->AddWidget(new SG_MultiTab(cfg_tab, cfg_scr, 12,
+	but_normal, but_disabled, but_pressed, but_activated),
+	0, 0, 5, 7);
+
+  wid = new SG_Button("Back", but_normal, but_disabled, but_pressed);
+  tab->AddWidget(wid, 5, 0);
+  smap[wid] = SCREEN_BACK;
+
+
   //Setup SCREEN_SINGLE
   tab = new SG_Table(3, 7, 0.0625, 0.125);
   swidget[SCREEN_SINGLE] = tab;
@@ -106,6 +147,9 @@ Screens::Screens() {
   wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 0);
   smap[wid] = SCREEN_TITLE;
+  wid = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  tab->AddWidget(wid, 2, 1);
+  smap[wid] = SCREEN_CONFIG;
   wid = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 2);
 //  smap[wid] = SCREEN_TITLE;
@@ -123,6 +167,9 @@ Screens::Screens() {
   wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 0);
   smap[wid] = SCREEN_TITLE;
+  wid = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  tab->AddWidget(wid, 2, 1);
+  smap[wid] = SCREEN_CONFIG;
   wid = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 2);
 //  smap[wid] = SCREEN_TITLE;
@@ -146,6 +193,9 @@ Screens::Screens() {
   wid = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 0);
   smap[wid] = SCREEN_TITLE;
+  wid = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  tab->AddWidget(wid, 2, 1);
+  smap[wid] = SCREEN_CONFIG;
   wid = new SG_Button("Load Replay", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 2, 2);
 //  smap[wid] = SCREEN_TITLE;
@@ -215,6 +265,9 @@ Screens::Screens() {
   swidget[SCREEN_PLAY] = tab;
   tab->AddWidget(new SG_TextArea("Playing/Replaying LDO....", drkred),
 	0, 0, 4, 2);
+  wid = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  tab->AddWidget(wid, 0, 6);
+  smap[wid] = SCREEN_CONFIG;
   wid = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   tab->AddWidget(wid, 5, 6);
   smap[wid] = SCREEN_RESULTS;
@@ -245,7 +298,13 @@ Screens::~Screens() {
 void Screens::Set(ScreenNum s) {
   if(screen != SCREEN_NONE) gui->MasterWidget()->RemoveWidget(swidget[screen]);
   if(gomap.count(screen)) gomap[screen]->Disable();
-  screen = s;
+  if(s == SCREEN_BACK) {
+    screen = last_screen;
+    }
+  else {
+    last_screen = screen;
+    screen = s;
+    }
   if(screen != SCREEN_NONE) gui->MasterWidget()->AddWidget(swidget[screen]);
   }
 
@@ -281,7 +340,7 @@ int Screens::Handle() {
           }
         else if(event.user.code == SG_EVENT_SELECT) {
           audio_play(click, 8, 8);
-	  ((SG_TextArea*)(saymap[screen]))->
+	  if(screen == SCREEN_EQUIP) ((SG_TextArea*)(saymap[screen]))->
 		SetText(troops[*((int*)(event.user.data2))]);
           }
         }
