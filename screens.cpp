@@ -34,7 +34,7 @@ Screens::Screens() {
   click = audio_buildsound(click_data, sizeof(click_data));
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
-  gui->LoadFont("fonts/African.ttf", 100);
+  gui->LoadFont("fonts/Denmark Regular.ttf", 100);
 
   SG_Table *tab;	// For temporary storage;
   SG_Widget *wid;	// For temporary storage;
