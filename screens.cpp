@@ -65,7 +65,7 @@ Screens::Screens() {
   but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
   but_activated = SDL_LoadBMP("buttontex_activated.bmp");
   equip_bg = SDL_LoadBMP("equip_bg.bmp");
-  gun_icon = SDL_CreateRGBSurfaceFrom(m41, 128, 256, 32, 512, TGA_COLFIELDS);
+  gun_icon = SDL_CreateRGBSurfaceFrom(m41, 170, 256, 32, 170*4, TGA_COLFIELDS);
 
   SG_Table *tab;	// For temporary storage;
   SG_Widget *wid;	// For temporary storage;
@@ -177,7 +177,7 @@ Screens::Screens() {
   dnd->Include(14, 7);
   dnd->Include(0, 9, 18, 3);
 
-  dnd->AddItem(gun_icon, 11, 2, 1, 2);
+  dnd->AddItem(gun_icon, 11, 2, 2, 3);
 
   wid = new SG_Panel(equip_bg);
   dnd->SetBackground(wid);
