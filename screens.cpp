@@ -37,6 +37,8 @@ Game *cur_game = NULL;			//Temporary, just for testing
 
 static int drkred = 0;	//Global colordef
 
+int music = 0;			//Background Music (Temporary)
+Sound *cur_music = NULL;	//Currently Playing Music (Temporary)
 
 class Screen {
 public:
@@ -144,10 +146,11 @@ Screens::Screens() {
   audio_init(4096);
   click = audio_buildsound(click_data, sizeof(click_data));
   music = audio_loadmusic("music/cantus.wav");
-  audio_loop(music, 8, 0);
+  cur_music = audio_loop(music, 16, 0);
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
-  gui->LoadFont("fonts/Denmark Regular.ttf", 100);
+//  gui->LoadFont("fonts/Denmark Regular.ttf", 100);
+  gui->LoadFont("fonts/Denmark Regular.ttf", 50);
 
   mouse_cursor = SDL_CreateRGBSurfaceFrom(cursor, 256, 256, 32, 256*4, TGA_COLFIELDS);
   gui->SetMouseCursor(mouse_cursor, 0.125, 0.125);
@@ -173,6 +176,9 @@ Screens::Screens() {
 Screens::~Screens() {
   if(cur_game) delete cur_game;
   cur_game = NULL;
+
+  audio_stop(cur_music);
+  cur_music = NULL;
 
   map<ScreenNum, Screen *>::iterator itrs = sscr.begin();
   for(; itrs != sscr.end(); ++itrs) {
@@ -545,7 +551,13 @@ Screen_Play::~Screen_Play() {
   }
 
 ScreenNum Screen_Play::Start(SimpleGUI *gui) {
+  audio_stop(cur_music);
+  cur_music = NULL;
+
   PlayResult res = cur_game->Play();
+
+  cur_music = audio_loop(music, 8, 0);
+
   if(res == PLAY_FINISHED) return SCREEN_RESULTS;
   else if(res == PLAY_CONFIG) return SCREEN_CONFIG;
   else if(res == PLAY_SAVE) return SCREEN_RESULTS; //For now

@@ -22,6 +22,7 @@
 
 #include "../simplegui/simplegui.h"
 #include "renderer.h"
+#include "audio.h"
 
 #include "player.h"
 #include "game.h"
@@ -66,6 +67,10 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   if(!gui) {
     //FIXME: Initialize GUI myself if it's not already done for me!
     }
+
+  music = audio_loadmusic("music/iconoclasm.wav");
+  cur_music = NULL;
+
   phase = -1;
 
   drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
@@ -94,6 +99,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[1]->AddWidget(roptb, 0, 6);
   rdoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   wind[1]->AddWidget(rdoneb, 5, 6);
+  wind[1]->AddWidget(new SG_TextArea("Play/Replay Turn", drkred), 1, 3, 4, 1);
 
   //Define base GUI for Declare phase
   wind[2] = new SG_Table(6, 7, 0.0625, 0.125);
@@ -101,6 +107,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[2]->AddWidget(doptb, 0, 6);
   ddoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
   wind[2]->AddWidget(ddoneb, 5, 6);
+  wind[2]->AddWidget(new SG_TextArea("Define Next Turn", drkred), 1, 3, 4, 1);
   }
 
 Player_Local::~Player_Local() {
@@ -108,6 +115,8 @@ Player_Local::~Player_Local() {
 
 bool Player_Local::Run() {
   Player::Run();	// Start with the basics
+
+  if(!cur_music) cur_music = audio_loop(music, 16, 0);
 
   UpdateEquipIDs();	// See if we need to do the Equip thing
 
@@ -119,11 +128,15 @@ bool Player_Local::Run() {
     while(SDL_PollEvent(&event)) {
       if(!gui->ProcessEvent(&event)) continue;
       if(event.type == SDL_KEYDOWN) {
-	ret = 1;
+	if(event.key.keysym.sym == SDLK_ESCAPE) {
+	  ret = 1;
+	  }
 	}
       else if(event.type == SDL_SG_EVENT) {
 	if(event.user.code == SG_EVENT_BUTTONCLICK) {
 	  if(event.user.data1 == (void*)edoneb) {
+
+	    //FIXME: Actually get the EQUIP setup from DNDBoxes Widgets
 
 	    vector<int>::iterator id = eqid.begin();
 	    for(; id != eqid.end(); ++id) {
@@ -132,6 +145,18 @@ bool Player_Local::Run() {
 
 	    gui->MasterWidget()->RemoveWidget(wind[phase]);
 	    UpdateEquipIDs();	// See if we still need to do the Equip thing
+	    gui->MasterWidget()->AddWidget(wind[phase]);
+	    }
+	  else if(event.user.data1 == (void*)rdoneb) {
+	    gui->MasterWidget()->RemoveWidget(wind[phase]);
+	    phase = 2;	//Move on to declaring orders for next turn
+	    gui->MasterWidget()->AddWidget(wind[phase]);
+	    }
+	  else if(event.user.data1 == (void*)ddoneb) {
+	    //FIXME: Actually submit the orders and wait for new percept
+
+	    gui->MasterWidget()->RemoveWidget(wind[phase]);
+	    UpdateEquipIDs();	// See if we need to do the Equip thing again
 	    gui->MasterWidget()->AddWidget(wind[phase]);
 	    }
 	  else {
@@ -155,6 +180,10 @@ bool Player_Local::Run() {
   gui->MasterWidget()->RemoveWidget(wind[phase]);
 
   ready = true;
+
+  if(cur_music) audio_stop(cur_music);
+  cur_music = NULL;
+
   return ret;
   }
 

@@ -65,6 +65,8 @@ protected:
   Game *game;
   };
 
+class Sound;
+
 class Player_Local : public Player {
 public:
   Player_Local(Game *gm, PlayerType tp, int num);
@@ -95,6 +97,9 @@ protected:
   SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
 
   SG_Button *doptb, *ddoneb;	//Widgets for Declare phase
+
+  int music;			//Background Music (Temporary)
+  Sound *cur_music;		//Currently Playing Music (Temporary)
   };
 
 #endif // PLAYER_H
