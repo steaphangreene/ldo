@@ -72,9 +72,7 @@ public:
   virtual bool Run();
 
 protected:
-  void HandleEquip();
-  void HandleReplay();
-  void HandleDeclare();
+  void UpdateEquipIDs();
 
   int phase;  // 0: Equiping, 1: Replaying, 2: Defining
 

@@ -107,16 +107,79 @@ Player_Local::~Player_Local() {
   }
 
 bool Player_Local::Run() {
-  Player::Run();	//Start with the basics
+  Player::Run();	// Start with the basics
+
+  UpdateEquipIDs();	// See if we need to do the Equip thing
+
+  gui->MasterWidget()->AddWidget(wind[phase]);
+
+  int ret = 0;
+  SDL_Event event;
+  while(ret == 0) {
+    while(SDL_PollEvent(&event)) {
+      if(!gui->ProcessEvent(&event)) continue;
+      if(event.type == SDL_KEYDOWN) {
+	ret = 1;
+	}
+      else if(event.type == SDL_SG_EVENT) {
+	if(event.user.code == SG_EVENT_BUTTONCLICK) {
+	  if(event.user.data1 == (void*)edoneb) {
+
+	    set<int>::iterator id = eqid.begin();
+	    for(; id != eqid.end(); ++id) {
+	      orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
+	      }
+
+	    gui->MasterWidget()->RemoveWidget(wind[phase]);
+	    UpdateEquipIDs();	// See if we still need to do the Equip thing
+	    gui->MasterWidget()->AddWidget(wind[phase]);
+	    }
+	  else {
+	    ret = 1;  //Return
+	    }
+	  }
+	else if(event.user.code == SG_EVENT_SELECT) {
+	  const Unit *u = cur_game->PlayerUnit(0, 0, *((int*)(event.user.data2)));
+	  if(u) estats->SetText(u->name);
+	  }
+	}
+      }
+
+    start_scene();
+    gui->RenderStart(SDL_GetTicks());
+
+    gui->RenderFinish(SDL_GetTicks());
+    finish_scene();
+    }
+
+  gui->MasterWidget()->RemoveWidget(wind[phase]);
+
+  ready = true;
+  return ret;
+  }
+
+void Player_Local::UpdateEquipIDs() {
+  set<int> eqtmp;	//Temporary set of ids for eq
+  eqid.clear();
 
   vector<UnitAct>::iterator act = percept.my_acts.begin();
   for(; act != percept.my_acts.end(); ++act) {
-    if(act->act == ACT_EQUIP) eqid.insert(act->id);
+    if(act->act == ACT_EQUIP) eqtmp.insert(act->id);
     }
 
   vector<UnitOrder>::iterator order = orders.orders.begin();
   for(; order != orders.orders.end(); ++order) {
-    if(order->order == ORDER_EQUIP) eqid.erase(order->id);
+    if(order->order == ORDER_EQUIP) eqtmp.erase(order->id);
+    }
+
+  int targ = -1;	//Each troop/group equips SEPARATELY!
+  act = percept.my_acts.begin();
+  for(; act != percept.my_acts.end(); ++act) {
+    if(act->act == ACT_EQUIP && eqtmp.count(act->id)
+	&& (targ == -1 || targ == act->targ1)) {
+      targ = act->targ1;
+      eqid.insert(act->id);
+      }
     }
 
   vector<string> troops;
@@ -163,54 +226,11 @@ bool Player_Local::Run() {
       }
     }
   else {
+    if(ednd != NULL) {
+      wind[0]->RemoveWidget(ednd);
+      delete ednd;
+      ednd = NULL;
+      }
     phase = 1;
     }
-
-  gui->MasterWidget()->AddWidget(wind[phase]);
-
-  int ret = 0;
-  SDL_Event event;
-  while(ret == 0) {
-    while(SDL_PollEvent(&event)) {
-      if(!gui->ProcessEvent(&event)) continue;
-      if(event.type == SDL_KEYDOWN) {
-	ret = 1;
-	}
-      else if(event.type == SDL_SG_EVENT) {
-	if(event.user.code == SG_EVENT_BUTTONCLICK) {
-	  if(event.user.data1 == (void*)edoneb) {
-	    set<int>::iterator id = eqid.begin();
-	    for(; id != eqid.end(); ++id) {
-	      orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
-	      }
-	    gui->MasterWidget()->RemoveWidget(wind[phase]);
-	    phase = 1;
-	    gui->MasterWidget()->AddWidget(wind[phase]);
-	    }
-	  else {
-	    ret = 1;  //Return
-	    }
-	  }
-	else if(event.user.code == SG_EVENT_SELECT) {
-	  const Unit *u = cur_game->PlayerUnit(0, 0, *((int*)(event.user.data2)));
-	  if(u) estats->SetText(u->name);
-	  }
-	}
-      }
-
-//    if(phase == 0) HandleEquip();
-//    else if(phase == 1) HandleReplay();
-//    else if(phase == 2) HandleDeclare();
-
-    start_scene();
-    gui->RenderStart(SDL_GetTicks());
-
-    gui->RenderFinish(SDL_GetTicks());
-    finish_scene();
-    }
-
-  gui->MasterWidget()->RemoveWidget(wind[phase]);
-
-  ready = true;
-  return ret;
   }

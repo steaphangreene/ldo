@@ -41,10 +41,13 @@ enum Act {	// For Example
 
 struct UnitAct {
 public:
-  UnitAct(int i, int t, Act a) { id = i; time = t; act = a; };
+  UnitAct(int i, int t, Act a, int t1 = 0, int t2 = 0)
+        { id = i; time = t; act = a; targ1 = t1, targ2 = t2; };
   int id;
   int time;
   Act act;
+  int targ1;    //Depending on action, may be a unit id, or x coord, or unused
+  int targ2;    //Depending on action, may be a unit id, or y coord, or unused
   };
 
 class Percept {

@@ -93,6 +93,7 @@ public:
   int Save(FILE *f);
 
   int id;
+  int troop;
   string name;
 
   char attribs[ATTRIB_MAX];

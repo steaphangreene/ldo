@@ -40,10 +40,13 @@ enum Order {	// For Example
 
 struct UnitOrder {
 public:
-  UnitOrder(int i, int t, Order o) { id = i; time = t; order = o; };
+  UnitOrder(int i, int t, Order o, int t1 = 0, int t2 = 0)
+	{ id = i; time = t; order = o; targ1 = t1, targ2 = t2; };
   int id;
   int time;
   Order order;
+  int targ1;	//Depending on order, may be a unit id, or x coord, or unused
+  int targ2;	//Depending on order, may be a unit id, or y coord, or unused
   };
 
 class Orders {

@@ -1,5 +1,5 @@
 LDO_GAMESAVE_FILE
-0x00000003
+0x00000004
 Temporary Test Map;
 This map is all about a temporary test.;
 3
@@ -10,13 +10,20 @@ This map is all about a temporary test.;
 1
 0;
 1
-1
-0;
-1
-4
-1;2;3;4;
-4
-1;Clark, John;
-2;Chaves, Ding;
-3;Johnston, Homer;
-4;Hart, Cleatus;
+2
+0;1;
+2
+5
+1;2;3;4;5;
+3
+6;7;8;
+8
+1;0;Clark, John;
+2;0;Chavez, Ding;
+3;0;Johnston, Homer;
+4;0;Burke, Andrew
+5;0;Price, Eddie
+6;1;Hart, Cleatus;
+7;1;Early, Joe Bob;
+8;1;Van Damme, Cleatus;
+

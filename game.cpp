@@ -25,7 +25,7 @@
 #include "defs.h"
 
 #define HEADER_STRING "LDO_GAMESAVE_FILE"
-#define SAVEFILE_VERSION	0x00000003 // 0.0.0-r3
+#define SAVEFILE_VERSION	0x00000004 // 0.0.0-r4
 
 Game::Game() {
   }
@@ -116,6 +116,7 @@ int Game::Load(FILE *fl) {
   if(!Load(squnits, fl)) return 0;
 
   Unit *unit_ptr;
+  map<int, int> tr2un;  //Map troop id to unit id for initial ACT_EQUIP
   if(fscanf(fl, "%d\n", &num) < 1) return 0;
   for(unsigned int unit = 0; unit < num; ++unit) {
     unit_ptr = new Unit;
@@ -126,7 +127,13 @@ int Game::Load(FILE *fl) {
       }
     units[unit_ptr->id] = unit_ptr;
     master[0].my_units.insert(unit_ptr->id);
-    master[0].my_acts.push_back(UnitAct(unit_ptr->id, 0, ACT_EQUIP));
+
+    if(tr2un.count(unit_ptr->troop) == 0) {
+      tr2un[unit_ptr->troop] = unit_ptr->id;
+      }
+    int tr = tr2un[unit_ptr->troop];
+
+    master[0].my_acts.push_back(UnitAct(unit_ptr->id, 0, ACT_EQUIP, tr));
     }
   return 1;
   }
