@@ -78,7 +78,7 @@ int init_renderer(int xs, int ys) {
   videoFlags = SDL_OPENGL;
 //  videoFlags |= SDL_GL_DOUBLEBUFFER;
   videoFlags |= SDL_HWPALETTE;
-//  videoFlags |= SDL_RESIZABLE;	// Temporarily Disabled
+  videoFlags |= SDL_RESIZABLE;
   if(fullscreen_mode)
     videoFlags |= SDL_FULLSCREEN;
 

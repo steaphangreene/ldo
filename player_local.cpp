@@ -109,65 +109,69 @@ int Player_Local::event_thread_func(void *arg) {
 
 int Player_Local::EventHandler() {
   SDL_Event event;
-  while(exiting == 0 && SDL_WaitEvent(&event)) {
-    SDL_mutexP(gui_mut);
-    int handle = gui->ProcessEvent(&event);
-    SDL_mutexV(gui_mut);
-    if(!handle) {
-      continue;
-      }
-
-    if(event.type == SDL_KEYDOWN) {
-      if(event.key.keysym.sym == SDLK_ESCAPE) {
-	exiting = 1;
+  while(exiting == 0) {
+    while(exiting == 0 && SDL_WaitEvent(&event)) {
+      SDL_mutexP(gui_mut);
+      int handle = gui->ProcessEvent(&event);
+      SDL_mutexV(gui_mut);
+      if(!handle) {
+	continue;
 	}
-      }
-    else if(event.type == SDL_SG_EVENT) {
-      if(event.user.code == SG_EVENT_BUTTONCLICK) {
-	if(event.user.data1 == (void*)edoneb) {
+
+      if(event.type == SDL_KEYDOWN) {
+	if(event.key.keysym.sym == SDLK_ESCAPE) {
+	  exiting = 1;
+	  }
+	}
+      else if(event.type == SDL_SG_EVENT) {
+	if(event.user.code == SG_EVENT_BUTTONCLICK) {
+	  if(event.user.data1 == (void*)edoneb) {
 
 	  //FIXME: Actually get the EQUIP setup from DNDBoxes Widgets
 
-	  vector<int>::iterator id = eqid.begin();
-	  for(; id != eqid.end(); ++id) {
+	    vector<int>::iterator id = eqid.begin();
+	    for(; id != eqid.end(); ++id) {
 		//FIXME: Could ALLOC in this thread (Could be BAD in Windows!)!
-	    orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
+	      orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
+	      }
+	    nextphase = PHASE_REPLAY;
 	    }
-	  nextphase = PHASE_REPLAY;
-	  }
-	else if(event.user.data1 == (void*)rdoneb) {
-	  nextphase = PHASE_DECLARE; //Move on to declaring orders for next turn
-	  }
-	}
-      if(event.user.code == SG_EVENT_STICKYON) {
-	if(event.user.data1 == (void*)ddoneb) {
-	  if(!game->SetReady(id, true)) {
-	    SDL_mutexP(gui_mut);
-	    ddoneb->TurnOff(); // Reject this attempt
-	    SDL_mutexV(gui_mut);
+	  else if(event.user.data1 == (void*)rdoneb) {
+	    nextphase = PHASE_DECLARE; //Move on to declaring orders for next turn
 	    }
 	  }
-	else {
-	  exiting = 1;  //Return
-	  }
-	}
-      if(event.user.code == SG_EVENT_STICKYOFF) {
-	if(event.user.data1 == (void*)ddoneb) {
-	  if(game->SetReady(id, false)) {
-	    SDL_mutexP(gui_mut);
-	    ddoneb->TurnOn(); // Reject this attempt
-	    SDL_mutexV(gui_mut);
+
+	if(event.user.code == SG_EVENT_STICKYON) {
+	  if(event.user.data1 == (void*)ddoneb) {
+	    if(!game->SetReady(id, true)) {
+	      SDL_mutexP(gui_mut);
+	      ddoneb->TurnOff(); // Reject this attempt
+	      SDL_mutexV(gui_mut);
+	      }
+	    }
+	  else {
+	    exiting = 1;  //Return
 	    }
 	  }
-	else {
-	  exiting = 1;  //Return
+	if(event.user.code == SG_EVENT_STICKYOFF) {
+	  if(event.user.data1 == (void*)ddoneb) {
+	    if(game->SetReady(id, false)) {
+	      SDL_mutexP(gui_mut);
+	      ddoneb->TurnOn(); // Reject this attempt
+	      SDL_mutexV(gui_mut);
+	      }
+	    }
+	  else {
+	    exiting = 1;  //Return
+	    }
 	  }
-	}
-      else if(event.user.code == SG_EVENT_SELECT) {
-	const Unit *u = cur_game->UnitRef(eqid[*((int*)(event.user.data2))]);
-	if(u) estats->SetText(u->name);
+	else if(event.user.code == SG_EVENT_SELECT) {
+	  const Unit *u = cur_game->UnitRef(eqid[*((int*)(event.user.data2))]);
+	  if(u) estats->SetText(u->name);
+	  }
 	}
       }
+    SDL_Delay(10); // Weak, yes, but this is how SDL does it too. :(
     }
   return exiting;
   }
@@ -187,6 +191,7 @@ bool Player_Local::Run() {
   SDL_Thread *th = SDL_CreateThread(event_thread_func, (void*)(this));
 
   while(exiting == 0) {
+    SDL_PumpEvents();
     if(pround != game->CurrentRound() - 1) {
       pround = game->CurrentRound() - 1;
       game->UpdatePercept(id, pround);
@@ -215,16 +220,22 @@ bool Player_Local::Run() {
       }
     Uint32 cur_time = SDL_GetTicks();
 
+    SDL_PumpEvents();
     start_scene();
+
     SDL_mutexP(gui_mut);
     gui->RenderStart(cur_time);
     SDL_mutexV(gui_mut);
 
+    SDL_PumpEvents();
     //FIXME: Render game itself here!
 
+    SDL_PumpEvents();
     SDL_mutexP(gui_mut);
     gui->RenderFinish(cur_time);
     SDL_mutexV(gui_mut);
+
+    SDL_PumpEvents();
     finish_scene();
     }
 
