@@ -71,7 +71,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   music = audio_loadmusic("music/iconoclasm.wav");
   cur_music = NULL;
 
-  phase = -1;
+  phase = PHASE_NONE;
 
   drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
@@ -84,30 +84,30 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   equip_bg = SDL_LoadBMP("equip_bg.bmp");
 
   //Define base GUI for Equip phase
-  wind[0] = new SG_Table(16, 9, 0.0, 0.0);
+  wind[PHASE_EQUIP] = new SG_Table(16, 9, 0.0, 0.0);
   ecancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
-  wind[0]->AddWidget(ecancelb, 12, 0, 2, 1);
+  wind[PHASE_EQUIP]->AddWidget(ecancelb, 12, 0, 2, 1);
   edoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
-  wind[0]->AddWidget(edoneb, 14, 0, 2, 1);
+  wind[PHASE_EQUIP]->AddWidget(edoneb, 14, 0, 2, 1);
   estats = new SG_TextArea("", drkred);
-  wind[0]->AddWidget(estats, 12, 1, 4, 1);
+  wind[PHASE_EQUIP]->AddWidget(estats, 12, 1, 4, 1);
   ednd = NULL;
 
   //Define base GUI for Replay phase
-  wind[1] = new SG_Table(6, 7, 0.0625, 0.125);
+  wind[PHASE_REPLAY] = new SG_Table(6, 7, 0.0625, 0.125);
   roptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  wind[1]->AddWidget(roptb, 0, 6);
+  wind[PHASE_REPLAY]->AddWidget(roptb, 0, 6);
   rdoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
-  wind[1]->AddWidget(rdoneb, 5, 6);
-  wind[1]->AddWidget(new SG_TextArea("Play/Replay Turn", drkred), 1, 3, 4, 1);
+  wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 6);
+  wind[PHASE_REPLAY]->AddWidget(new SG_TextArea("Play/Replay Turn", drkred), 1, 3, 4, 1);
 
   //Define base GUI for Declare phase
-  wind[2] = new SG_Table(6, 7, 0.0625, 0.125);
+  wind[PHASE_DECLARE] = new SG_Table(6, 7, 0.0625, 0.125);
   doptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  wind[2]->AddWidget(doptb, 0, 6);
+  wind[PHASE_DECLARE]->AddWidget(doptb, 0, 6);
   ddoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
-  wind[2]->AddWidget(ddoneb, 5, 6);
-  wind[2]->AddWidget(new SG_TextArea("Define Next Turn", drkred), 1, 3, 4, 1);
+  wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 6);
+  wind[PHASE_DECLARE]->AddWidget(new SG_TextArea("Define Next Turn", drkred), 1, 3, 4, 1);
   }
 
 Player_Local::~Player_Local() {
@@ -149,7 +149,7 @@ bool Player_Local::Run() {
 	    }
 	  else if(event.user.data1 == (void*)rdoneb) {
 	    gui->MasterWidget()->RemoveWidget(wind[phase]);
-	    phase = 2;	//Move on to declaring orders for next turn
+	    phase = PHASE_DECLARE; //Move on to declaring orders for next turn
 	    gui->MasterWidget()->AddWidget(wind[phase]);
 	    }
 	  else if(event.user.data1 == (void*)ddoneb) {
@@ -218,7 +218,7 @@ void Player_Local::UpdateEquipIDs() {
     troops.push_back(game->UnitRef(*id)->name);
 
     if(ednd != NULL) {
-      wind[0]->RemoveWidget(ednd);
+      wind[PHASE_EQUIP]->RemoveWidget(ednd);
       delete ednd;
       ednd = NULL;
       }
@@ -246,20 +246,20 @@ void Player_Local::UpdateEquipIDs() {
     }
 
   if(troops.size() > 0) {
-    phase = 0;	//Equip
+    phase = PHASE_EQUIP;
     if(ednd == NULL) {
       ednd = new SG_MultiTab(troops, dnds, 9,
 	but_normal, but_disabled, but_pressed, but_activated);
-      wind[0]->AddWidget(ednd, 0, 0, 12, 9);
+      wind[PHASE_EQUIP]->AddWidget(ednd, 0, 0, 12, 9);
       estats->SetText(troops[0]);
       }
     }
   else {
     if(ednd != NULL) {
-      wind[0]->RemoveWidget(ednd);
+      wind[PHASE_EQUIP]->RemoveWidget(ednd);
       delete ednd;
       ednd = NULL;
       }
-    phase = 1;
+    phase = PHASE_REPLAY;
     }
   }

@@ -67,6 +67,19 @@ protected:
 
 class Sound;
 
+enum Phase {
+  PHASE_NONE,
+  PHASE_EQUIP,
+  PHASE_REPLAY,
+  PHASE_DECLARE,
+  PHASE_MAX,
+  PHASE_OPTION_EQUIP,
+  PHASE_OPTION_REPLAY,
+  PHASE_OPTION_DECLARE,
+  PHASE_OPTION_MAX
+  };
+#define PHASE_OPTION (PHASE_OPTION_MAX - PHASE_MAX)
+
 class Player_Local : public Player {
 public:
   Player_Local(Game *gm, PlayerType tp, int num);
@@ -76,11 +89,11 @@ public:
 protected:
   void UpdateEquipIDs();
 
-  int phase;  // 0: Equiping, 1: Replaying, 2: Defining
+  Phase phase;
 
   SimpleGUI *gui;
 
-  SG_Table *wind[3];		//Screens for each phase
+  SG_Table *wind[PHASE_MAX];	//Screens for each phase
   int drkred;			//Colors
 
   SG_MultiTab *ednd;		//Widgets for Equip phase
