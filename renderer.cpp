@@ -42,9 +42,6 @@ static int hgap=0, vgap=0;
 
 int fullscreen_mode = 0;
 
-void load_textures(void) {
-  }
-
 int init_renderer(int xs, int ys) {
   const SDL_VideoInfo *videoInfo;
   GLfloat light1_pos[] = { 10.0, -10.0, 10.0, 0.0 };
@@ -138,33 +135,29 @@ int init_renderer(int xs, int ys) {
   glLightfv(GL_LIGHT0, GL_POSITION, light1_pos);
   glLightfv(GL_LIGHT1, GL_POSITION, light2_pos);
   glEnable(GL_LIGHT0);
-  glEnable(GL_LIGHTING);
+//  glEnable(GL_LIGHTING);
 
   // Set the new viewport size
   glViewport(0, 0, (GLint)xsize, (GLint)ysize);
 
   glEnable(GL_TEXTURE_2D);
 
-  load_textures();
-
   return 1;
   }
 
-int start_scene(double zoom) {
+int start_scene(double zoom, double x, double y) {
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
   //This is the actual perspective setup
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-//  glFrustum(-0.5, -0.5+((GLdouble)xsize)/((GLdouble)ysize), -0.5, 0.5, 1.5, 6.0);
-//  glFrustum(-0.8, 0.8, 0.6, -0.6, 5.0, 20.0);
-//  glTranslatef(0.0, 0.0, -4.0);
-//  glFrustum(1.0, -1.0, -1.0, 1.0, 1.0, 8.0);
-  gluPerspective(45.0, 16.0/9.0, 1.0, 16.0);
+//  gluPerspective(45.0, 16.0/9.0, 1.0, 64.0);
+  glOrtho(-16.0/9.0*zoom*4, 16.0/9.0*zoom*4, -1.0*zoom*4, 1.0*zoom*4, 1.0, 64.0);
+  
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  gluLookAt(zoom, zoom, zoom*2, 0.0, 0.0, 0.0, -zoom, -zoom, 0.0);
-  glTranslatef(-32.0, -32.0, 0.0);	// Temporary - CENTER
+
+  gluLookAt(zoom*4*2+x, zoom*4*2+y, zoom*4, x, y, 0.0, -zoom, -zoom, 0.0);
   return 1;
   }
 

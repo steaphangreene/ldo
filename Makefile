@@ -1,20 +1,21 @@
 # *************************************************************************
-#  This file is part of the SimpleGUI Example Module by Steaphan Greene
+#  This file is part of Life, Death, and the Objective ("LDO")
+#  a simple squad-tactics strategy game by Steaphan Greene
 #
 #  Copyright 2005 Steaphan Greene <stea@cs.binghamton.edu>
 #
-#  SimpleGUI is free software; you can redistribute it and/or modify
+#  LDO is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation; either version 2 of the License, or
 #  (at your option) any later version.
 #
-#  SimpleGUI is distributed in the hope that it will be useful,
+#  LDO is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with SimpleGUI (see the file named "COPYING");
+#  along with LDO (see the file named "COPYING");
 #  if not, write to the the Free Software Foundation, Inc.,
 #  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # *************************************************************************
@@ -25,27 +26,27 @@ win32:	ldo.exe
 #PRODUCTION OPTIONS (STANDARD)
 #CXX=	g++
 #CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags`
-#LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -lGL -lGLU
+#LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a `sdl-config --libs` -lSDL_ttf -lSDL_image -lGL -lGLU
 
 #PRODUCTION OPTIONS (WORKAROUND FOR MacOS-X)
 #CXX=	g++
 #CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags`
-#LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -framework OpenGL
+#LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a `sdl-config --libs` -lSDL_ttf -lSDL_image -framework OpenGL
 
 #PRODUCTION OPTIONS (WORKAROUND FOR CYGWIN)
 #CXX=	g++
 #CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags`
-#LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -L/usr/X11R6/bin -lopengl32 -lglu32
+#LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a `sdl-config --libs` -lSDL_ttf -lSDL_image -L/usr/X11R6/bin -lopengl32 -lglu32
 
 #DEGUGGING OPTIONS (NO EFENCE)
 CXX=	g++
 CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `sdl-config --cflags`
-LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lSDL_ttf -lGL -lGLU
+LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a `sdl-config --libs` -lSDL_ttf -lSDL_image -lGL -lGLU
 
 #DEGUGGING OPTIONS (WITH EFENCE)
 #CXX=	g++
 #CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `sdl-config --cflags`
-#LIBS=	../simplegui/libsimplegui.a `sdl-config --libs` -lefence -lSDL_ttf -lGL -lGLU
+#LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a `sdl-config --libs` -lefence -lSDL_ttf -lSDL_image -lGL -lGLU
 
 OBJS:=	screens.o percept.o orders.o world.o \
 	game.o unit.o player.o player_local.o \
@@ -54,7 +55,7 @@ OBJS:=	screens.o percept.o orders.o world.o \
 #PRODUCTION OPTIONS (CROSS-COMPILED FOR WINDOWS)
 WCXX=	i586-mingw32msvc-g++
 WCXXFLAGS=	-s -O2 -Wall `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --cflags`
-WLIBS=	../simplegui/libsimplegui.win32_a `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` -lSDL_ttf -lopengl32 -lglu32
+WLIBS=	../simplegui/libsimplegui.win32_a ../simplegui/libsimplemodel.win32_a `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` -lSDL_ttf -lSDL_image -lopengl32 -lglu32
 
 WOBJS:=	screens.win32_o percept.win32_o orders.win32_o world.win32_o \
 	game.win32_o unit.win32_o player.win32_o player_local.win32_o \

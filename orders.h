@@ -23,6 +23,8 @@
 #ifndef ORDERS_H
 #define ORDERS_H
 
+#include <SDL/SDL.h>
+
 #include <set>
 #include <vector>
 #include <cstdio>
@@ -43,7 +45,7 @@ public:
   UnitOrder(int i, int t, Order o, int t1 = 0, int t2 = 0)
 	{ id = i; time = t; order = o; targ1 = t1, targ2 = t2; };
   int id;
-  int time;
+  Uint32 time;
   Order order;
   int targ1;	//Depending on order, may be a unit id, or x coord, or unused
   int targ2;	//Depending on order, may be a unit id, or y coord, or unused

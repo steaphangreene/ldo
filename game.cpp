@@ -206,7 +206,8 @@ int Game::Load(FILE *fl) {
       }
     int tr = tr2un[unit_ptr->troop];
 
-    master[0].my_acts.push_back(UnitAct(unit_ptr->id, 0, ACT_EQUIP, tr));
+    master[0].my_acts.push_back(UnitAct(unit_ptr->id, 0, 30+unit, 32,
+	ACT_EQUIP, tr));  //Temporary, use REAL starting locations from map
     }
   return 1;
   }

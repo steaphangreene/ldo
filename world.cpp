@@ -31,6 +31,7 @@ World::World(Percept *per, Orders *ord) {
   angle = 45;
   pointx = 0.0;
   pointy = 0.0;
+  models.push_back(SM_LoadModel("models/players/trooper"));
   }
 
 World::~World() {
@@ -56,33 +57,55 @@ void World::DrawMap() {
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 
+  glPushMatrix();
   glBegin(GL_QUADS);	//Temporary test world
 
   glNormal3d(0.0, 0.0, 1.0);
-  for(float x = 0.0; x < 64.0; x += 1.0) {
-    for(float y = 0.0; y < 64.0; y += 1.0) {
-      glColor3f(x/63.0, 0.5, y/63.0);
-      glVertex3f(x,     y,     0.0);
-      glVertex3f(x+1.0, y,     0.0);
+  for(float x = 1.0; x <= 127.0; x += 2.0) {
+    for(float y = 1.0; y <= 127.0; y += 2.0) {
+      glColor3f(x/126.0, 0.5, y/126.0);
+      glVertex3f(x-1.0, y-1.0, 0.0);
+      glVertex3f(x+1.0, y-1.0, 0.0);
       glVertex3f(x+1.0, y+1.0, 0.0);
-      glVertex3f(x,     y+1.0, 0.0);
+      glVertex3f(x-1.0, y+1.0, 0.0);
       }
     }
   glEnd();
 
   glColor3f(0.0, 0.0, 0.0);
   glBegin(GL_LINES);
-  for(float part = 0.0; part <= 64.0; part += 1.0) {
-    glVertex3f(part, 0.0,  0.0625);
-    glVertex3f(part, 64.0, 0.0625);
-    glVertex3f(0.0,  part, 0.0625);
-    glVertex3f(64.0, part, 0.0625);
+  for(float part = 0.0; part <= 128.0; part += 2.0) {
+    glVertex3f(part,  0.0,   0.0625);
+    glVertex3f(part,  128.0, 0.0625);
+    glVertex3f(0.0,   part,  0.0625);
+    glVertex3f(128.0, part,  0.0625);
     }
   glEnd();
+  glPopMatrix();
   }
 
 void World::DrawModels(Uint32 offset) {
-  //FIXME: Implement This!
+  vector<int> anims;
+  vector<Uint32> times;
+
+  anims.push_back(LEGS_IDLE);
+  anims.push_back(TORSO_STAND);
+  times.push_back(0);
+  times.push_back(0);
+
+  vector<UnitAct>::iterator act = percept->my_acts.begin();
+  for(; act != percept->my_acts.end(); ++act) {
+    if(act->time <= offset) {
+      times[0] = act->time;
+      times[1] = act->time;
+      float x = act->x * 2 + 1;
+      float y = act->y * 2 + 1;
+      glPushMatrix();
+      glTranslatef(x, y, 0.0);
+      models[0]->Render(offset, anims, times);
+      glPopMatrix();
+      }
+    }
   }
 
 void World::Render() {			// Render for declaration

@@ -23,7 +23,7 @@
 #define RENDERER_H
 
 int init_renderer(int, int);
-int start_scene(double zoom = 4.0);
+int start_scene(double zoom = 4.0, double x = 0.0, double y = 0.0);
 int finish_scene();
 void toggle_fullscreen(void);
 void resize_display(int, int);

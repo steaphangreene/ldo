@@ -20,7 +20,7 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-double cur_zoom = 4.0;
+double cur_zoom = 2.0, cur_x = 64.0, cur_y = 64.0;
 
 #include "player_local.h"
 #include "renderer.h"
@@ -138,6 +138,22 @@ int Player_Local::EventHandler() {
 	if(event.key.keysym.sym == SDLK_ESCAPE) {
 	  exiting = 1;
 	  }
+	else if(event.key.keysym.sym == SDLK_RIGHT) {
+	  cur_x -= 1.0;
+	  cur_y += 1.0;
+	  }
+	else if(event.key.keysym.sym == SDLK_LEFT) {
+	  cur_x += 1.0;
+	  cur_y -= 1.0;
+	  }
+	else if(event.key.keysym.sym == SDLK_UP) {
+	  cur_x -= 1.0;
+	  cur_y -= 1.0;
+	  }
+	else if(event.key.keysym.sym == SDLK_DOWN) {
+	  cur_x += 1.0;
+	  cur_y += 1.0;
+	  }
 	}
       else if(event.type == SDL_SG_EVENT) {
 	if(event.user.code == SG_EVENT_BUTTONCLICK) {
@@ -224,7 +240,7 @@ int Player_Local::EventHandler() {
 	  }
 	else if(event.user.code == SG_EVENT_SCROLLDOWN) {
 	  cur_zoom += 0.0625;
-	  if(cur_zoom > 4.0) cur_zoom = 4.0;
+	  if(cur_zoom > 2.0) cur_zoom = 2.0;
 	  }
 	}
       }
@@ -286,7 +302,7 @@ bool Player_Local::Run() {
       }
 
     SDL_PumpEvents();
-    start_scene(cur_zoom);
+    start_scene(cur_zoom, cur_x, cur_y);
 
     SDL_mutexP(gui_mut);
     gui->RenderStart(cur_time);

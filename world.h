@@ -26,6 +26,9 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_opengl.h>
 
+#include "../simplemodel/simplemodel.h"
+#include "../simplemodel/sm_q3anim.h"
+
 #include "percept.h"
 #include "orders.h"
 
@@ -49,6 +52,8 @@ protected:
 
   int angle;
   float pointx, pointy;
+
+  vector<SimpleModel *> models;
   };
 
 #endif // WORLD_H

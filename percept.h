@@ -23,6 +23,8 @@
 #ifndef PERCEPT_H
 #define PERCEPT_H
 
+#include <SDL/SDL.h>
+
 #include <set>
 #include <vector>
 #include <cstdio>
@@ -41,10 +43,11 @@ enum Act {	// For Example
 
 struct UnitAct {
 public:
-  UnitAct(int i, int t, Act a, int t1 = 0, int t2 = 0)
-        { id = i; time = t; act = a; targ1 = t1, targ2 = t2; };
+  UnitAct(int i, int t, int xp, int yp, Act a, int t1 = 0, int t2 = 0)
+        { id = i; time = t; x = xp; y = yp; act = a; targ1 = t1, targ2 = t2; };
   int id;
-  int time;
+  Uint32 time;
+  int x, y;	//X/Y position of the unit when it does this
   Act act;
   int targ1;    //Depending on action, may be a unit id, or x coord, or unused
   int targ2;    //Depending on action, may be a unit id, or y coord, or unused
