@@ -157,6 +157,9 @@ bool Player_Local::Run() {
 	if(event.user.code == SG_EVENT_STICKYON) {
 	  if(event.user.data1 == (void*)ddoneb) {
 	    //FIXME: Actually submit the orders and wait for new percept
+
+	    ready = true;
+
 	    gui->MasterWidget()->RemoveWidget(wind[phase]);
 	    ddoneb->TurnOff();	// Make sure "Ready" isn't checked next time
 	    UpdateEquipIDs();	// See if we need to do the Equip thing again
@@ -182,7 +185,7 @@ bool Player_Local::Run() {
 
   gui->MasterWidget()->RemoveWidget(wind[phase]);
 
-  ready = true;
+//  ready = true;
 
   if(cur_music) audio_stop(cur_music);
   cur_music = NULL;

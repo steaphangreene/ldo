@@ -20,6 +20,8 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
+#include <SDL/SDL_thread.h>
+
 #include "game.h"
 #include "unit.h"
 #include "defs.h"
@@ -216,16 +218,62 @@ void Game::UpdatePercept(int plnum, int rnd) {
     }
   }
 
+
+
+
+//Thread Stuff
+static int player_thread_func(void *arg) {
+  return ((Player*)(arg))->Run();
+  }
+
+static int game_thread_func(void *arg) {
+  return ((Game*)(arg))->ThreadHandler();
+  }
+
+static vector<SDL_Thread *> thread;
+
 PlayResult Game::Play() {
+  Player *localp = NULL;
+
+  int n = 1;		//Reserve a place for ThreadHandler thread
+  thread.resize(player.size());
+  vector<Player *>::const_iterator itrp = player.begin();
+  for(; itrp != player.end(); ++itrp) {
+    if((*itrp)->Type() != PLAYER_LOCAL) {
+      thread[n] = SDL_CreateThread(player_thread_func, (void*)(*itrp));
+      ++n;
+      }
+    else {
+      if(localp != NULL) {
+	fprintf(stderr, "ERROR: Multiple local players defined!\n");
+	exit(1);
+	}
+      localp = (*itrp);
+      }
+    }
+
+  //I can't be the ThreadHandler due to SDL/OpenGL limitations
+  thread[0] = SDL_CreateThread(game_thread_func, (void*)(this));
+
+  //I have to be the local player due to SDL/OpenGL limitations
+  localp->Run();
+
+  return PLAY_FINISHED;
+  }
+
+int Game::ThreadHandler() {
   bool ret = false;
+
   while(!ret) {
     ret = true;	//Initialize it to "ready"
 
     vector<Player *>::const_iterator itrp = player.begin();
     for(; itrp != player.end(); ++itrp) {
-      (*itrp)->Run();
       ret = (ret && (*itrp)->Ready());
       }
+
+    SDL_Delay(250);	// Check for done 4 times per second
     }
-  return PLAY_FINISHED;
+
+  return 0;
   }

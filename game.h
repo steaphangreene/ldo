@@ -67,7 +67,10 @@ public:
   int CurrentRound() { return master.size(); }
   PlayResult Play();
 
+  int ThreadHandler();		// NOT FOR EXTERNAL USE!
+
 private:
+
   void Clear();
 
   int mapxs, mapys;
