@@ -30,6 +30,10 @@ SDL_Surface *equip_bg;
 
 map<ScreenNum, SG_Widget *> gomap;	//Map of go buttons per screen
 					//Temporary, just for testing
+
+int music;				//Background music
+					//Temporary, just for testing
+
 Screens::Screens() {
   screen = SCREEN_NONE;
   swidget.resize(SCREEN_MAX, NULL);
@@ -37,6 +41,8 @@ Screens::Screens() {
   init_renderer(640, 360);
   audio_init(256);
   click = audio_buildsound(click_data, sizeof(click_data));
+  music = audio_loadmusic("music/cantus.wav");
+  audio_loop(music, 8, 0);
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
   gui->LoadFont("fonts/Denmark Regular.ttf", 100);
