@@ -72,10 +72,17 @@ public:
 
   bool Ready(int plnum);		// Returns ready state for player
   bool SetReady(int plnum, bool rdy);	// Returns new ready state
+  bool AllReady();			// returns true on all ready
+  bool AllReadyLock();			// Locks and returns true on all ready
+  void ResetReady();			// Unlocks and unreadys all
+
+  void TermThreads();
+  bool ShouldTerm();
 
   int ThreadHandler();				// NOT FOR EXTERNAL USE!
 
 private:
+  void ResolveRound();
 
   void Clear();
 
@@ -100,6 +107,7 @@ private:
   SDL_mutex *status_mut;		// Status Protector MutEx
   vector<bool> status_ready;		// Ready states of each player
   int status_locked;			// Are Ready states allowed to change?
+  bool threads_term;			// Should the game threads terminate?
   };
 
 #endif // UNIT_H

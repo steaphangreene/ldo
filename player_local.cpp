@@ -126,14 +126,19 @@ bool Player_Local::Run() {
 	  }
 	if(event.user.code == SG_EVENT_STICKYON) {
 	  if(event.user.data1 == (void*)ddoneb) {
-	    //FIXME: Actually submit the orders and wait for new percept
-
-	    game->SetReady(id, true);
-
-	    gui->MasterWidget()->RemoveWidget(wind[phase]);
-	    ddoneb->TurnOff();	// Make sure "Ready" isn't checked next time
-	    UpdateEquipIDs();	// See if we need to do the Equip thing again
-	    gui->MasterWidget()->AddWidget(wind[phase]);
+	    if(!game->SetReady(id, true)) {
+	      ddoneb->TurnOff(); // Reject this attempt
+	      }
+	    }
+	  else {
+	    ret = 1;  //Return
+	    }
+	  }
+	if(event.user.code == SG_EVENT_STICKYOFF) {
+	  if(event.user.data1 == (void*)ddoneb) {
+	    if(game->SetReady(id, false)) {
+	      ddoneb->TurnOn(); // Reject this attempt
+	      }
 	    }
 	  else {
 	    ret = 1;  //Return
@@ -144,6 +149,15 @@ bool Player_Local::Run() {
 	  if(u) estats->SetText(u->name);
 	  }
 	}
+      }
+
+    if(game->CurrentRound() - 1 != pround) {
+      gui->MasterWidget()->RemoveWidget(wind[phase]);
+      pround = game->CurrentRound() - 1;
+      game->UpdatePercept(id, pround);
+      ddoneb->TurnOff(); // Make sure "Ready" isn't checked next time
+      UpdateEquipIDs();	 // See if we need to do the Equip thing again
+      gui->MasterWidget()->AddWidget(wind[phase]);
       }
 
     start_scene();
@@ -157,6 +171,8 @@ bool Player_Local::Run() {
 
   if(cur_music) audio_stop(cur_music);
   cur_music = NULL;
+
+  game->TermThreads();	// Tell everyone else to exit too
 
   return ret;
   }

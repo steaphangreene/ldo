@@ -33,6 +33,7 @@
 Game::Game() {
   status_mut = NULL;
   status_locked = false;
+  threads_term = false;
   }
 
 Game::~Game() {
@@ -45,10 +46,6 @@ void Game::AttachPlayer(Player *pl) {
   player[pl->ID()] = pl;
 
   status_ready.resize(pl->ID() + 1);
-  }
-
-bool Game::Ready(int plnum) {
-  return status_ready[plnum];
   }
 
 bool Game::SetReady(int plnum, bool rdy) {
@@ -65,6 +62,55 @@ bool Game::SetReady(int plnum, bool rdy) {
 
   if(status_mut) SDL_mutexV(status_mut);
   return ret;
+  }
+
+bool Game::Ready(int plnum) {
+  return status_ready[plnum];
+  }
+
+bool Game::AllReadyLock() {
+  bool ret = true;
+  if(status_mut) SDL_mutexP(status_mut);
+
+  for(unsigned int plnum=0; plnum < status_ready.size(); ++plnum) {
+    ret = (ret && status_ready[plnum]);
+    }
+  if(ret) status_locked = true;
+
+  if(status_mut) SDL_mutexV(status_mut);
+  return ret;
+  }
+
+bool Game::AllReady() {
+  bool ret = true;
+  if(status_mut) SDL_mutexP(status_mut);
+
+  for(unsigned int plnum=0; plnum < status_ready.size(); ++plnum) {
+    ret = (ret && status_ready[plnum]);
+    }
+
+  if(status_mut) SDL_mutexV(status_mut);
+  return ret;
+  }
+
+void Game::ResetReady() {
+  if(status_mut) SDL_mutexP(status_mut);
+
+  for(unsigned int plnum=0; plnum < status_ready.size(); ++plnum) {
+    status_ready[plnum] = false;
+    }
+  status_locked = false;
+
+  if(status_mut) SDL_mutexV(status_mut);
+  }
+
+void Game::TermThreads() {
+  if(threads_term) return;
+  threads_term = true;
+  }
+
+bool Game::ShouldTerm() {
+  return threads_term;
   }
 
 static char buf[BUF_LEN];
@@ -229,7 +275,7 @@ void Game::SetPercept(int plnum, Percept *prcpt) {
   }
 
 void Game::UpdatePercept(int plnum, int rnd) {
-  if(rnd < 0 || rnd >= (int)(percept.size())) {
+  if(rnd < 0 || rnd >= (int)(master.size())) {
     fprintf(stderr, "ERROR: Percept requested in future or pre-start!\n");
     exit(1);
     }
@@ -248,16 +294,19 @@ void Game::UpdatePercept(int plnum, int rnd) {
 
 //Thread Stuff
 static int player_thread_func(void *arg) {
-  return ((Player*)(arg))->Run();
+  int ret = ((Player*)(arg))->Run();
+  return ret;
   }
 
 static int game_thread_func(void *arg) {
-  return ((Game*)(arg))->ThreadHandler();
+  int ret = ((Game*)(arg))->ThreadHandler();
+  return ret;
   }
 
 PlayResult Game::Play() {
   Player *localp = NULL;
   status_mut = SDL_CreateMutex();
+  threads_term = false;
 
   unsigned int n = 1;		//Reserve a place for ThreadHandler thread
   thread.resize(player.size());
@@ -292,19 +341,32 @@ PlayResult Game::Play() {
   }
 
 int Game::ThreadHandler() {
-  bool ret = false;
+  int ticker = 0;
+  while(1) {
+    while(ticker < 4 || (!AllReadyLock())) {	// One second delay (Temporary)
+      SDL_Delay(250);	// Check for done 4 times per second (Temporary)
 
-  while(!ret) {
-    SDL_Delay(250);	// Check for done 4 times per second (Temporary)
+      if(threads_term) break;
 
-    ret = true;	//Initialize it to "ready"
-
-    for(unsigned int n = 0; n < status_ready.size(); ++n) {
-      ret = (ret && Ready(n));
+      bool ret = AllReady();
+      if(ret) ++ticker;
+      else ticker = 0;
       }
+
+    if(threads_term) break;
+
+    ResolveRound();
+    ResetReady();
+    ticker = 0;
     }
 
-  fprintf(stderr, "Exiting ThreadHandler!\n");
+//  fprintf(stderr, "DEBUG: Exiting ThreadHandler()\n");
+  TermThreads();  // Tell everyone else to exit too
 
   return 0;
+  }
+
+void Game::ResolveRound() {		// FIXME: Implement this
+//  fprintf(stderr, "DEBUG: Resolving Next Round\n");
+  master.push_back(master.back());
   }
