@@ -36,8 +36,8 @@ enum ScreenNum {
   SCREEN_NONE=-1,
   SCREEN_TITLE,
   SCREEN_CONFIG,
-  SCREEN_MULTI,
   SCREEN_SINGLE,
+  SCREEN_MULTI,
   SCREEN_REPLAY,
   SCREEN_EQUIP,
   SCREEN_PLAY, //Not Handled within Screens class
