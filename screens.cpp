@@ -44,6 +44,9 @@ SG_Tabs *chars;				//Just for example
 int music;				//Background music
 					//Temporary, just for testing
 
+#define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
+
+
 Screens::Screens() {
   screen = SCREEN_NONE;
   swidget.resize(SCREEN_MAX, NULL);
@@ -62,8 +65,7 @@ Screens::Screens() {
   but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
   but_activated = SDL_LoadBMP("buttontex_activated.bmp");
   equip_bg = SDL_LoadBMP("equip_bg.bmp");
-  gun_icon = SDL_CreateRGBSurfaceFrom(m41, 128, 256, 32, 512,
-	SG_SDL_RGBA_COLFIELDS);
+  gun_icon = SDL_CreateRGBSurfaceFrom(m41, 128, 256, 32, 512, TGA_COLFIELDS);
 
   SG_Table *tab;	// For temporary storage;
   SG_Widget *wid;	// For temporary storage;

@@ -72,6 +72,10 @@ SG_WOBJS:=	../simplegui/sg.win32_o ../simplegui/sg_widget.win32_o \
 
 all: $(OBJS)
 
+%.h:	%.tga
+	./scripts/tga2raw.csh $*
+	./scripts/raw2header.csh $*
+
 %.o:	%.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
