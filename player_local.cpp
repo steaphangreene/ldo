@@ -43,6 +43,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 
   phase = PHASE_NONE;
   popphase = POPPHASE_NONE;
+  nextphase = PHASE_NONE;
+  nextpopphase = POPPHASE_NONE;
 
   drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
@@ -79,9 +81,81 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
   wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 6);
   wind[PHASE_DECLARE]->AddWidget(new SG_TextArea("Define Next Turn", drkred), 1, 3, 4, 1);
+
+  gui_mut = SDL_CreateMutex();
   }
 
 Player_Local::~Player_Local() {
+  SDL_DestroyMutex(gui_mut);
+  }
+
+int Player_Local::event_thread_func(void *arg) {
+  return ((Player_Local *)(arg))->EventHandler();
+  }
+
+int Player_Local::EventHandler() {
+  SDL_Event event;
+  while(exiting == 0 && SDL_WaitEvent(&event)) {
+    SDL_mutexP(gui_mut);
+    int handle = gui->ProcessEvent(&event);
+    SDL_mutexV(gui_mut);
+    if(!handle) {
+      continue;
+      }
+
+    if(event.type == SDL_KEYDOWN) {
+      if(event.key.keysym.sym == SDLK_ESCAPE) {
+	exiting = 1;
+	}
+      }
+    else if(event.type == SDL_SG_EVENT) {
+      if(event.user.code == SG_EVENT_BUTTONCLICK) {
+	if(event.user.data1 == (void*)edoneb) {
+
+	  //FIXME: Actually get the EQUIP setup from DNDBoxes Widgets
+
+	  vector<int>::iterator id = eqid.begin();
+	  for(; id != eqid.end(); ++id) {
+		//FIXME: Could ALLOC in this thread (Could be BAD in Windows!)!
+	    orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
+	    }
+	  nextphase = PHASE_REPLAY;
+	  }
+	else if(event.user.data1 == (void*)rdoneb) {
+	  nextphase = PHASE_DECLARE; //Move on to declaring orders for next turn
+	  }
+	}
+      if(event.user.code == SG_EVENT_STICKYON) {
+	if(event.user.data1 == (void*)ddoneb) {
+	  if(!game->SetReady(id, true)) {
+	    SDL_mutexP(gui_mut);
+	    ddoneb->TurnOff(); // Reject this attempt
+	    SDL_mutexV(gui_mut);
+	    }
+	  }
+	else {
+	  exiting = 1;  //Return
+	  }
+	}
+      if(event.user.code == SG_EVENT_STICKYOFF) {
+	if(event.user.data1 == (void*)ddoneb) {
+	  if(game->SetReady(id, false)) {
+	    SDL_mutexP(gui_mut);
+	    ddoneb->TurnOn(); // Reject this attempt
+	    SDL_mutexV(gui_mut);
+	    }
+	  }
+	else {
+	  exiting = 1;  //Return
+	  }
+	}
+      else if(event.user.code == SG_EVENT_SELECT) {
+	const Unit *u = cur_game->UnitRef(eqid[*((int*)(event.user.data2))]);
+	if(u) estats->SetText(u->name);
+	}
+      }
+    }
+  return exiting;
   }
 
 bool Player_Local::Run() {
@@ -93,79 +167,43 @@ bool Player_Local::Run() {
 
   gui->MasterWidget()->AddWidget(wind[phase]);
 
-  int ret = 0;
-  SDL_Event event;
-  while(ret == 0) {
-    while(SDL_PollEvent(&event)) {
-      if(!gui->ProcessEvent(&event)) continue;
-      if(event.type == SDL_KEYDOWN) {
-	if(event.key.keysym.sym == SDLK_ESCAPE) {
-	  ret = 1;
-	  }
-	}
-      else if(event.type == SDL_SG_EVENT) {
-	if(event.user.code == SG_EVENT_BUTTONCLICK) {
-	  if(event.user.data1 == (void*)edoneb) {
+  exiting = 0;
+  SDL_Thread *th = SDL_CreateThread(event_thread_func, (void*)(this));
 
-	    //FIXME: Actually get the EQUIP setup from DNDBoxes Widgets
-
-	    vector<int>::iterator id = eqid.begin();
-	    for(; id != eqid.end(); ++id) {
-	      orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
-	      }
-
-	    gui->MasterWidget()->RemoveWidget(wind[phase]);
-	    UpdateEquipIDs();	// See if we still need to do the Equip thing
-	    gui->MasterWidget()->AddWidget(wind[phase]);
-	    }
-	  else if(event.user.data1 == (void*)rdoneb) {
-	    gui->MasterWidget()->RemoveWidget(wind[phase]);
-	    phase = PHASE_DECLARE; //Move on to declaring orders for next turn
-	    gui->MasterWidget()->AddWidget(wind[phase]);
-	    }
-	  }
-	if(event.user.code == SG_EVENT_STICKYON) {
-	  if(event.user.data1 == (void*)ddoneb) {
-	    if(!game->SetReady(id, true)) {
-	      ddoneb->TurnOff(); // Reject this attempt
-	      }
-	    }
-	  else {
-	    ret = 1;  //Return
-	    }
-	  }
-	if(event.user.code == SG_EVENT_STICKYOFF) {
-	  if(event.user.data1 == (void*)ddoneb) {
-	    if(game->SetReady(id, false)) {
-	      ddoneb->TurnOn(); // Reject this attempt
-	      }
-	    }
-	  else {
-	    ret = 1;  //Return
-	    }
-	  }
-	else if(event.user.code == SG_EVENT_SELECT) {
-	  const Unit *u = cur_game->UnitRef(eqid[*((int*)(event.user.data2))]);
-	  if(u) estats->SetText(u->name);
-	  }
-	}
-      }
-
-    if(game->CurrentRound() - 1 != pround) {
-      gui->MasterWidget()->RemoveWidget(wind[phase]);
+  while(exiting == 0) {
+    if(pround != game->CurrentRound() - 1) {
       pround = game->CurrentRound() - 1;
       game->UpdatePercept(id, pround);
+      SDL_mutexP(gui_mut);
       ddoneb->TurnOff(); // Make sure "Ready" isn't checked next time
       UpdateEquipIDs();	 // See if we need to do the Equip thing again
-      gui->MasterWidget()->AddWidget(wind[phase]);
+      SDL_mutexV(gui_mut);
       }
 
-    start_scene();
-    gui->RenderStart(SDL_GetTicks());
+    if(phase != nextphase) {
+      SDL_mutexP(gui_mut);
+      if(nextphase == PHASE_REPLAY) UpdateEquipIDs();
+      gui->MasterWidget()->RemoveWidget(wind[phase]);
+      phase = nextphase;
+      gui->MasterWidget()->AddWidget(wind[phase]);
+      SDL_mutexV(gui_mut);
+      }
+    Uint32 cur_time = SDL_GetTicks();
 
-    gui->RenderFinish(SDL_GetTicks());
+    start_scene();
+    SDL_mutexP(gui_mut);
+    gui->RenderStart(cur_time);
+    SDL_mutexV(gui_mut);
+
+    //FIXME: Render game itself here!
+
+    SDL_mutexP(gui_mut);
+    gui->RenderFinish(cur_time);
+    SDL_mutexV(gui_mut);
     finish_scene();
     }
+
+  SDL_WaitThread(th, NULL);
 
   gui->MasterWidget()->RemoveWidget(wind[phase]);
 
@@ -174,10 +212,10 @@ bool Player_Local::Run() {
 
   game->TermThreads();	// Tell everyone else to exit too
 
-  return ret;
+  return exiting;
   }
 
-void Player_Local::UpdateEquipIDs() {
+void Player_Local::UpdateEquipIDs() {	//GUI MUST BE LOCKED BEFORE CALLING!
   set<int> eqtmp;	//Temporary set of ids for eq
   eqid.clear();
 
@@ -206,7 +244,6 @@ void Player_Local::UpdateEquipIDs() {
   vector<int>::iterator id = eqid.begin();
   for(; id != eqid.end(); ++id) {
     troops.push_back(game->UnitRef(*id)->name);
-
     if(ednd != NULL) {
       wind[PHASE_EQUIP]->RemoveWidget(ednd);
       delete ednd;
@@ -236,7 +273,7 @@ void Player_Local::UpdateEquipIDs() {
     }
 
   if(troops.size() > 0) {
-    phase = PHASE_EQUIP;
+    nextphase = PHASE_EQUIP;
     if(ednd == NULL) {
       ednd = new SG_MultiTab(troops, dnds, 9,
 	but_normal, but_disabled, but_pressed, but_activated);
@@ -250,6 +287,6 @@ void Player_Local::UpdateEquipIDs() {
       delete ednd;
       ednd = NULL;
       }
-    phase = PHASE_REPLAY;
+    nextphase = PHASE_REPLAY;
     }
   }

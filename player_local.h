@@ -26,6 +26,7 @@
 #include "player.h"
 
 #include <SDL/SDL.h>
+#include <SDL/SDL_thread.h>
 #include "../simplegui/simplegui.h"
 #include "audio.h"
 
@@ -51,8 +52,10 @@ public:
 protected:
   void UpdateEquipIDs();
 
-  Phase phase;		//Current phase of main window GUI
-  PopPhase popphase;	//Current phase of popup
+  Phase phase;			//Current phase of main window GUI
+  Phase nextphase;		//Current phase of main window GUI
+  PopPhase popphase;		//Current phase of popup
+  PopPhase nextpopphase;	//Current phase of popup
 
   SimpleGUI *gui;
 
@@ -77,6 +80,12 @@ protected:
 
   int music;			//Background Music (Temporary)
   Sound *cur_music;		//Currently Playing Music (Temporary)
+
+  SDL_mutex *gui_mut;		//MutEx to protect gui
+
+  static int event_thread_func(void *arg);
+  int EventHandler();
+  int exiting;			//Are we exiting?
   };
 
 #endif // PLAYER_LOCAL_H
