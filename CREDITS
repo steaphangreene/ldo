@@ -1,0 +1,25 @@
+Primary Developer:
+        Steaphan Greene <stea@cs.binghamton.edu>
+
+Title Music:  Reverb Project / Cantus Ex Machina
+        Wyatt Peterson <wyatt@binghamton.edu>
+        http://www.reverb-project.com/
+
+Main Game Music: Architect / Iconoclasm
+        Tim Baily <?@?>
+
+Graphics and Models:
+	STiG <STiG@wasteland.plus.net>
+        Steaphan Greene <stea@cs.binghamton.edu>
+
+Graphics Software:
+        Most Images Created by The Gimp: http://www.gimp.org/
+
+Coding Software:
+        GNU Compiler Collection: http://gcc.gnu.org/
+        GNU Nano: http://www.nano-editor.org/
+	Various GNU Utils: http://www.gnu.org/
+
+Interface Libraries:
+        libSDL: http://www.libsdl.org/
+	libSDL_ttf: http://www.libsdl.org/projects/SDL_ttf/
