@@ -28,6 +28,9 @@
 SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
 SDL_Surface *equip_bg;
 
+#include "m41.h"
+SDL_Surface *gun_icon;
+
 map<ScreenNum, SG_Widget *> gomap;	//Map of go buttons per screen
 					//Temporary, just for testing
 
@@ -58,9 +61,12 @@ Screens::Screens() {
   but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
   but_activated = SDL_LoadBMP("buttontex_activated.bmp");
   equip_bg = SDL_LoadBMP("equip_bg.bmp");
+  gun_icon = SDL_CreateRGBSurfaceFrom(m41, 128, 256, 32, 512,
+	SG_SDL_RGBA_COLFIELDS);
 
   SG_Table *tab;	// For temporary storage;
   SG_Widget *wid;	// For temporary storage;
+  SG_Panel *pan;	// For temporary storage;
 
   int drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
@@ -168,6 +174,10 @@ Screens::Screens() {
   dnd->Include(11, 6);
   dnd->Include(14, 6);
   dnd->Include(0, 8, 24, 4);
+
+  pan = new SG_Panel(gun_icon);
+  pan->SetTransparent();
+  dnd->AddItem(pan, 11, 1, 1, 2);
 
   wid = new SG_Panel(equip_bg);
   dnd->SetBackground(wid);

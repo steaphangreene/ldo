@@ -132,6 +132,10 @@ int init_renderer(int xs, int ys) {
 //  glEnable(GL_LINE_SMOOTH);
 
 
+  glBlendFunc(GL_SRC_ALPHA,  GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_BLEND);
+
+//  glBlendFunc(GL_ONE, GL_ZERO);
 //  glBlendFunc(GL_SRC_ALPHA,  GL_ONE_MINUS_SRC_ALPHA);
 //  glBlendFunc(GL_ONE, GL_ONE);
 //  glEnable(GL_BLEND);
