@@ -28,6 +28,7 @@
 #define SAVEFILE_VERSION	0x00000003 // 0.0.0-r3
 
 Game::Game() {
+  round = 0;
   }
 
 Game::~Game() {
@@ -88,6 +89,7 @@ int Game::Load(vector< vector<int> > &vec, FILE *fl) {
 
 int Game::Load(FILE *fl) {
   unsigned int num, ver;
+  master.resize(1);
 
   memset(buf, 0, BUF_LEN);
   if(fscanf(fl, "%s\n", buf) < 1) return 0;
@@ -118,8 +120,8 @@ int Game::Load(FILE *fl) {
       return 0;
       }
     units[unit_ptr->id] = unit_ptr;
+    master[0].my_units.insert(unit_ptr->id);
     }
-
   return 1;
   }
 
@@ -164,4 +166,30 @@ void Game::Clear() {
   units.clear();
   plsquads.clear();
   squnits.clear();
+  master.clear();
+  percept.clear();
   }
+
+void Game::SetPercept(int plnum, Percept *prcpt) {
+  if(percept.count(plnum)) {
+    fprintf(stderr, "ERROR: Multiple percepts requested for one player!\n");
+    exit(1);
+    }
+  percept[plnum] = prcpt;
+  }
+
+void Game::UpdatePercept(int plnum, int rnd) {
+  if(rnd < 0 || rnd > round) {
+    fprintf(stderr, "ERROR: Percept requested in future or pre-start!\n");
+    exit(1);
+    }
+  if(rnd == round) {
+    // Current (Unresolved) Round
+    *(percept[plnum]) = master[rnd];	//Temporary!
+    }
+  else {
+    // Old (Resolved) Round
+    *(percept[plnum]) = master[rnd];	//Temporary!
+    }
+  }
+

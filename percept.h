@@ -32,8 +32,11 @@ using namespace std;
 
 enum Act {	// For Example
   ACT_NONE,
+  ACT_START,	// Unit just arrived, or just became visible
+  ACT_EQUIP,	// Unit needs to be (re)equipped
   ACT_DUCK,
-  ACT_STAND
+  ACT_STAND,
+  ACT_MAX
   };
 
 struct UnitAct {
@@ -51,13 +54,8 @@ public:
   int Load(FILE *fl, unsigned int ver);
   int Save(FILE *fl, unsigned int ver);
 
-//  int MyUnitID(int un);
-//  int OtherUnitID(int un);
-//  int UnitID(int un);
-
   void Clear();
 
-private:
   set<int> my_units;		//List of all of my unit ids (doesn't change)
   vector<UnitAct> my_acts;	//List of unit actions of my own units
   vector<UnitAct> other_acts;	//List of unit actions of others' units

@@ -48,6 +48,9 @@ public:
   const string &MapName() { return mapname; };
   const string &MapDesc() { return mapdesc; };
 
+  void SetPercept(int plnum, Percept *prcpt);
+  void UpdatePercept(int plnum, int rnd);
+
 private:
   void Clear();
 
@@ -63,6 +66,8 @@ private:
   map<int, Unit *> units;		// Actual unit container
 
   vector<Percept> master;		// Master game percepts (for each turn)
+  map<int, Percept *> percept;		// Percept for each player
+  int round;				// Current round number
   };
 
 #endif // UNIT_H
