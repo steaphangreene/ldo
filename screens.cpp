@@ -69,7 +69,6 @@ Screens::Screens() {
 
   SG_Table *tab;	// For temporary storage;
   SG_Widget *wid;	// For temporary storage;
-  SG_Panel *pan;	// For temporary storage;
 
   int drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
@@ -178,12 +177,10 @@ Screens::Screens() {
   dnd->Include(14, 7);
   dnd->Include(0, 9, 18, 3);
 
-  pan = new SG_Panel(gun_icon);
-  pan->SetTransparent();
-  dnd->AddItem(pan, 11, 2, 1, 2);
+  dnd->AddItem(gun_icon, 11, 2, 1, 2);
 
-  pan = new SG_Panel(equip_bg);
-  dnd->SetBackground(pan);
+  wid = new SG_Panel(equip_bg);
+  dnd->SetBackground(wid);
 
   chars = new SG_Tabs(troops, SG_AUTOSIZE, 1,
 	but_normal, but_disabled, but_pressed, but_activated);
