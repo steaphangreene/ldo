@@ -55,8 +55,7 @@ public:
   static int Load(vector< vector<int> > &vec, FILE *fl);
   static int Save(const vector< vector<int> > &vec, FILE *fl);
 
-  const Unit *PlayerUnit(int pl, int sq, int un);	//Temporary!
-  const Unit *UnitRef(int id);				//Temporary!
+  const Unit *UnitRef(int id);	//Temporary!
 
   const string &MapName() { return mapname; };
   const string &MapDesc() { return mapdesc; };

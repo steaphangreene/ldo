@@ -23,7 +23,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <set>
+#include <vector>
 using namespace std;
 
 #include <SDL/SDL.h>
@@ -84,7 +84,7 @@ protected:
   SG_MultiTab *ednd;		//Widgets for Equip phase
   SG_TextArea *estats;
   SG_Button *ecancelb, *edoneb;
-  set<int> eqid;		//Data for Equip phase
+  vector<int> eqid;		//Data for Equip phase
 
 				//Textures for Equip phase
   SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;

@@ -125,7 +125,7 @@ bool Player_Local::Run() {
 	if(event.user.code == SG_EVENT_BUTTONCLICK) {
 	  if(event.user.data1 == (void*)edoneb) {
 
-	    set<int>::iterator id = eqid.begin();
+	    vector<int>::iterator id = eqid.begin();
 	    for(; id != eqid.end(); ++id) {
 	      orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
 	      }
@@ -139,7 +139,7 @@ bool Player_Local::Run() {
 	    }
 	  }
 	else if(event.user.code == SG_EVENT_SELECT) {
-	  const Unit *u = cur_game->PlayerUnit(0, 0, *((int*)(event.user.data2)));
+	  const Unit *u = cur_game->UnitRef(eqid[*((int*)(event.user.data2))]);
 	  if(u) estats->SetText(u->name);
 	  }
 	}
@@ -178,13 +178,13 @@ void Player_Local::UpdateEquipIDs() {
     if(act->act == ACT_EQUIP && eqtmp.count(act->id)
 	&& (targ == -1 || targ == act->targ1)) {
       targ = act->targ1;
-      eqid.insert(act->id);
+      eqid.push_back(act->id);
       }
     }
 
   vector<string> troops;
   vector<SG_Alignment *> dnds;
-  set<int>::iterator id = eqid.begin();
+  vector<int>::iterator id = eqid.begin();
   for(; id != eqid.end(); ++id) {
     troops.push_back(game->UnitRef(*id)->name);
 

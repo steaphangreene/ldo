@@ -165,16 +165,6 @@ const Unit *Game::UnitRef(int id) {
   return units[id];
   }
 
-const Unit *Game::PlayerUnit(int pl, int sq, int un) {
-  if(pl >= (int)(plsquads.size())) return NULL;
-  if(sq >= (int)(plsquads[pl].size())) return NULL;
-  if(un >= (int)(squnits[plsquads[pl][sq]].size())) return NULL;
-
-  if(units.count(squnits[plsquads[pl][sq]][un]) == 0) return NULL;
-
-  return units[squnits[plsquads[pl][sq]][un]];
-  }
-
 void Game::Clear() {
   map<int, Unit *>::iterator itrm = units.begin();
   for(; itrm != units.end(); ++itrm) {
