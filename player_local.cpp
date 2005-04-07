@@ -36,7 +36,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   if(!gui) {
     //FIXME: Initialize GUI myself if it's not already done for me!
     }
-  renderer = SV_Ortho::CurrentVideo(); //Yes, this is ok, it's static!
+  renderer = SimpleVideo::CurrentVideo(); //Yes, this is ok, it's static!
   if(!renderer) {
     //FIXME: Initialize renderer myself if it's not already done for me!
     }

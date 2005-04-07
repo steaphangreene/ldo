@@ -68,7 +68,7 @@ private:
   map<ScreenNum, Screen *> sscr;	//Map of ScreenNums to Screens
   int click;				//Button Click Sound
 
-  SV_Ortho *renderer;
+  SimpleVideo *renderer;
   };
 
 #endif // SCREENS_H

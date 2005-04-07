@@ -60,7 +60,7 @@ protected:
   PopPhase nextpopphase;	//Current phase of popup
 
   SimpleGUI *gui;
-  SV_Ortho *renderer;
+  SimpleVideo *renderer;
   World *world;
 
   SG_Table *wind[PHASE_MAX];	//Screens for each phase
