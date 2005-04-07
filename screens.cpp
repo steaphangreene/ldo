@@ -21,7 +21,6 @@
 // *************************************************************************
 
 #include "screens.h"
-#include "renderer.h"
 #include "audio.h"
 #include "click.h"
 
@@ -144,7 +143,7 @@ Screens::Screens() {
   screen = SCREEN_NONE;
   last_screen = SCREEN_NONE;
 
-  init_renderer(640, 360);
+  renderer = new SV_Ortho(640, 360);
   audio_init(4096);
   click = audio_buildsound(click_data, sizeof(click_data));
   music = audio_loadmusic("music/cantus.wav");
@@ -273,10 +272,10 @@ int Screens::Handle() {
 	}
 
       } while(screen != SCREEN_NONE && SDL_PollEvent(&event));
-    start_scene();
+    renderer->StartScene();
     gui->RenderStart(SDL_GetTicks());
     gui->RenderFinish(SDL_GetTicks());
-    finish_scene();
+    renderer->FinishScene();
     }
 
   return 0;

@@ -23,7 +23,6 @@
 double cur_zoom = 2.0, cur_x = 64.0, cur_y = 64.0;
 
 #include "player_local.h"
-#include "renderer.h"
 
 #include "game.h"
 
@@ -36,6 +35,10 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   gui = SimpleGUI::CurrentGUI(); //Yes, this is ok, it's static!
   if(!gui) {
     //FIXME: Initialize GUI myself if it's not already done for me!
+    }
+  renderer = SV_Ortho::CurrentVideo(); //Yes, this is ok, it's static!
+  if(!renderer) {
+    //FIXME: Initialize renderer myself if it's not already done for me!
     }
 
   world = new World(&percept, &orders);
@@ -302,7 +305,7 @@ bool Player_Local::Run() {
       }
 
     SDL_PumpEvents();
-    start_scene(cur_zoom, cur_x, cur_y);
+    renderer->StartScene(cur_zoom, cur_x, cur_y);
 
     SDL_mutexP(gui_mut);
     gui->RenderStart(cur_time);
@@ -322,7 +325,7 @@ bool Player_Local::Run() {
     SDL_mutexV(gui_mut);
 
     SDL_PumpEvents();
-    finish_scene();
+    renderer->FinishScene();
     }
 
   SDL_WaitThread(th, NULL);
