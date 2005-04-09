@@ -30,6 +30,9 @@ double cur_zoom = 2.0, cur_x = 64.0, cur_y = 64.0;
 #include "mark2.h"
 #define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
+#define POS_DELAY 250
+#define ZOOM_DELAY 250
+
 Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 	: Player(gm, tp, num) {
   gui = SimpleGUI::CurrentGUI(); //Yes, this is ok, it's static!
@@ -142,20 +145,32 @@ int Player_Local::EventHandler() {
 	  exiting = 1;
 	  }
 	else if(event.key.keysym.sym == SDLK_RIGHT) {
+	  SDL_mutexP(gui_mut);
 	  cur_x -= 1.0;
 	  cur_y += 1.0;
+	  renderer->SetPosition(cur_x, cur_y, POS_DELAY);
+	  SDL_mutexV(gui_mut);
 	  }
 	else if(event.key.keysym.sym == SDLK_LEFT) {
+	  SDL_mutexP(gui_mut);
 	  cur_x += 1.0;
 	  cur_y -= 1.0;
+	  renderer->SetPosition(cur_x, cur_y, POS_DELAY);
+	  SDL_mutexV(gui_mut);
 	  }
 	else if(event.key.keysym.sym == SDLK_UP) {
+	  SDL_mutexP(gui_mut);
 	  cur_x -= 1.0;
 	  cur_y -= 1.0;
+	  renderer->SetPosition(cur_x, cur_y, POS_DELAY);
+	  SDL_mutexV(gui_mut);
 	  }
 	else if(event.key.keysym.sym == SDLK_DOWN) {
+	  SDL_mutexP(gui_mut);
 	  cur_x += 1.0;
 	  cur_y += 1.0;
+	  renderer->SetPosition(cur_x, cur_y, POS_DELAY);
+	  SDL_mutexV(gui_mut);
 	  }
 	}
       else if(event.type == SDL_SG_EVENT) {
@@ -238,12 +253,18 @@ int Player_Local::EventHandler() {
 	    }
 	  }
 	else if(event.user.code == SG_EVENT_SCROLLUP) {
+	  SDL_mutexP(gui_mut);
 	  cur_zoom -= 0.0625;
 	  if(cur_zoom < 1.0) cur_zoom = 1.0;
+	  renderer->SetZoom(cur_zoom, ZOOM_DELAY);
+	  SDL_mutexV(gui_mut);
 	  }
 	else if(event.user.code == SG_EVENT_SCROLLDOWN) {
+	  SDL_mutexP(gui_mut);
 	  cur_zoom += 0.0625;
 	  if(cur_zoom > 2.0) cur_zoom = 2.0;
+	  renderer->SetZoom(cur_zoom, ZOOM_DELAY);
+	  SDL_mutexV(gui_mut);
 	  }
 	}
       }
@@ -262,6 +283,9 @@ bool Player_Local::Run() {
   UpdateEquipIDs();	// See if we need to do the Equip thing
 
   gui->MasterWidget()->AddWidget(wind[phase]);
+
+  renderer->SetPosition(cur_x, cur_y, 0);
+  renderer->SetZoom(cur_zoom, 0);
 
   exiting = 0;
   SDL_Thread *th = SDL_CreateThread(event_thread_func, (void*)(this));
@@ -305,9 +329,9 @@ bool Player_Local::Run() {
       }
 
     SDL_PumpEvents();
-    renderer->StartScene(cur_zoom, cur_x, cur_y);
 
     SDL_mutexP(gui_mut);
+    renderer->StartScene();
     gui->RenderStart(cur_time);
     SDL_mutexV(gui_mut);
 
