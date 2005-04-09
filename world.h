@@ -23,8 +23,8 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include <GL/glew.h>
 #include "SDL.h"
+#include "SDL_opengl.h"
 
 #include "../simplemodel/simplemodel.h"
 #include "../simplemodel/sm_q3anim.h"
