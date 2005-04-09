@@ -20,7 +20,7 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-double cur_zoom = 2.0, cur_x = 64.0, cur_y = 64.0;
+double cur_zoom = 2.0, xspd = 0.0, yspd = 0.0;
 
 #include "player_local.h"
 
@@ -31,6 +31,7 @@ double cur_zoom = 2.0, cur_x = 64.0, cur_y = 64.0;
 #define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
 #define POS_DELAY 250
+#define MOVE_SPEED 10.0	//Cells-per-second
 #define ZOOM_DELAY 250
 
 Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
@@ -141,35 +142,65 @@ int Player_Local::EventHandler() {
 	exiting = 1;
 	}
       else if(event.type == SDL_KEYDOWN) {
-	if(event.key.keysym.sym == SDLK_ESCAPE) {
-	  exiting = 1;
-	  }
-	else if(event.key.keysym.sym == SDLK_RIGHT) {
+	if(event.key.keysym.sym == SDLK_RIGHT) {
 	  SDL_mutexP(gui_mut);
-	  cur_x -= 1.0;
-	  cur_y += 1.0;
-	  renderer->SetPosition(cur_x, cur_y, POS_DELAY);
+	  xspd -= MOVE_SPEED;
+	  yspd += MOVE_SPEED;
+	  renderer->SetMove(xspd, yspd);
 	  SDL_mutexV(gui_mut);
 	  }
 	else if(event.key.keysym.sym == SDLK_LEFT) {
 	  SDL_mutexP(gui_mut);
-	  cur_x += 1.0;
-	  cur_y -= 1.0;
-	  renderer->SetPosition(cur_x, cur_y, POS_DELAY);
+	  xspd += MOVE_SPEED;
+	  yspd -= MOVE_SPEED;
+	  renderer->SetMove(xspd, yspd);
 	  SDL_mutexV(gui_mut);
 	  }
 	else if(event.key.keysym.sym == SDLK_UP) {
 	  SDL_mutexP(gui_mut);
-	  cur_x -= 1.0;
-	  cur_y -= 1.0;
-	  renderer->SetPosition(cur_x, cur_y, POS_DELAY);
+	  xspd -= MOVE_SPEED;
+	  yspd -= MOVE_SPEED;
+	  renderer->SetMove(xspd, yspd);
 	  SDL_mutexV(gui_mut);
 	  }
 	else if(event.key.keysym.sym == SDLK_DOWN) {
 	  SDL_mutexP(gui_mut);
-	  cur_x += 1.0;
-	  cur_y += 1.0;
-	  renderer->SetPosition(cur_x, cur_y, POS_DELAY);
+	  xspd += MOVE_SPEED;
+	  yspd += MOVE_SPEED;
+	  renderer->SetMove(xspd, yspd);
+	  SDL_mutexV(gui_mut);
+	  }
+	else if(event.key.keysym.sym == SDLK_ESCAPE) {
+	  exiting = 1;
+	  }
+	}
+      else if(event.type == SDL_KEYUP) {
+	if(event.key.keysym.sym == SDLK_RIGHT) {
+	  SDL_mutexP(gui_mut);
+	  xspd += MOVE_SPEED;
+	  yspd -= MOVE_SPEED;
+	  renderer->SetMove(xspd, yspd);
+	  SDL_mutexV(gui_mut);
+	  }
+	else if(event.key.keysym.sym == SDLK_LEFT) {
+	  SDL_mutexP(gui_mut);
+	  xspd -= MOVE_SPEED;
+	  yspd += MOVE_SPEED;
+	  renderer->SetMove(xspd, yspd);
+	  SDL_mutexV(gui_mut);
+	  }
+	else if(event.key.keysym.sym == SDLK_UP) {
+	  SDL_mutexP(gui_mut);
+	  xspd += MOVE_SPEED;
+	  yspd += MOVE_SPEED;
+	  renderer->SetMove(xspd, yspd);
+	  SDL_mutexV(gui_mut);
+	  }
+	else if(event.key.keysym.sym == SDLK_DOWN) {
+	  SDL_mutexP(gui_mut);
+	  xspd -= MOVE_SPEED;
+	  yspd -= MOVE_SPEED;
+	  renderer->SetMove(xspd, yspd);
 	  SDL_mutexV(gui_mut);
 	  }
 	}
@@ -284,7 +315,7 @@ bool Player_Local::Run() {
 
   gui->MasterWidget()->AddWidget(wind[phase]);
 
-  renderer->SetPosition(cur_x, cur_y, 0);
+  renderer->SetPosition(64.0, 64.0, 0);	//FIXME: Really find start pos
   renderer->SetZoom(cur_zoom, 0);
 
   exiting = 0;
