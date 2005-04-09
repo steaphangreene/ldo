@@ -327,6 +327,9 @@ bool Player_Local::Run() {
 
   gui->MasterWidget()->AddWidget(wind[phase]);
 
+//  renderer->SetOrtho();
+  renderer->SetPerspective(45.0);	//Just for testing
+  renderer->SetZExtents(0.0, 8.0);
   renderer->SetPosition(64.0, 64.0, 0);	//FIXME: Really find start pos
   renderer->SetAngle(cur_ang, 0);
   renderer->SetZoom(cur_zoom, 0);
