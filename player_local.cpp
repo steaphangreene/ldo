@@ -20,7 +20,7 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-double cur_zoom = 2.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
+double cur_zoom = 16.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
 
 #include "player_local.h"
 
@@ -297,15 +297,15 @@ int Player_Local::EventHandler() {
 	  }
 	else if(event.user.code == SG_EVENT_SCROLLUP) {
 	  SDL_mutexP(gui_mut);
-	  cur_zoom -= 0.0625;
-	  if(cur_zoom < 1.0) cur_zoom = 1.0;
+	  cur_zoom -= 0.5;
+	  if(cur_zoom < 8.0) cur_zoom = 8.0;
 	  renderer->SetZoom(cur_zoom, ZOOM_DELAY);
 	  SDL_mutexV(gui_mut);
 	  }
 	else if(event.user.code == SG_EVENT_SCROLLDOWN) {
 	  SDL_mutexP(gui_mut);
-	  cur_zoom += 0.0625;
-	  if(cur_zoom > 2.0) cur_zoom = 2.0;
+	  cur_zoom += 0.5;
+	  if(cur_zoom > 32.0) cur_zoom = 32.0;
 	  renderer->SetZoom(cur_zoom, ZOOM_DELAY);
 	  SDL_mutexV(gui_mut);
 	  }
@@ -327,8 +327,8 @@ bool Player_Local::Run() {
 
   gui->MasterWidget()->AddWidget(wind[phase]);
 
-//  renderer->SetOrtho();
-  renderer->SetPerspective(45.0);	//Just for testing
+  renderer->SetOrtho();
+//  renderer->SetPerspective(45.0);	//Just for testing
   renderer->SetZExtents(0.0, 8.0);
   renderer->SetPosition(64.0, 64.0, 0);	//FIXME: Really find start pos
   renderer->SetAngle(cur_ang, 0);
