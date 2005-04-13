@@ -229,9 +229,8 @@ int Screens::Handle() {
 
   SDL_Event event;
 
-  while(screen != SCREEN_NONE && SDL_WaitEvent(&event)) {
-    do { // while(screen != SCREEN_NONE && SDL_PollEvent(&event));
-      if(!gui->ProcessEvent(&event)) continue;
+  while(screen != SCREEN_NONE && gui->WaitEvent(&event)) {
+    do { // while(screen != SCREEN_NONE && gui->PollEvent(&event));
 
       //These events are for ALL screens!
       if(event.type == SDL_KEYDOWN) {
@@ -245,7 +244,7 @@ int Screens::Handle() {
 	Set(SCREEN_NONE);
 	continue;
         }
-      if(event.type == SDL_SG_EVENT) {	//Handle all sound effects here.
+      if(event.type == SDL_SG_EVENT) {	//Handle all GUI sound effects here.
 	switch(event.user.code) {
 	  case(SG_EVENT_FILEOPEN):
 	  case(SG_EVENT_STICKYOFF):
@@ -271,7 +270,8 @@ int Screens::Handle() {
 	if(next != SCREEN_SAME) Set(next);
 	}
 
-      } while(screen != SCREEN_NONE && SDL_PollEvent(&event));
+      } while(screen != SCREEN_NONE && gui->PollEvent(&event));
+
     renderer->StartScene();
     gui->RenderStart(SDL_GetTicks());
     gui->RenderFinish(SDL_GetTicks());

@@ -95,7 +95,7 @@ protected:
   int music;			//Background Music (Temporary)
   Sound *cur_music;		//Currently Playing Music (Temporary)
 
-  SDL_mutex *gui_mut;		//MutEx to protect gui
+  SDL_mutex *vid_mut;		//MutEx to protect renderer
 
   static int event_thread_func(void *arg);
   int EventHandler();

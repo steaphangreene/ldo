@@ -113,13 +113,13 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   dtext->SetFontSize(30);
   wind[PHASE_DECLARE]->AddWidget(dtext, 1, 3, 4, 1);
 
-  gui_mut = SDL_CreateMutex();
+  vid_mut = SDL_CreateMutex();
   off_mut = SDL_CreateMutex();
   }
 
 Player_Local::~Player_Local() {
+  SDL_DestroyMutex(vid_mut);
   SDL_DestroyMutex(off_mut);
-  SDL_DestroyMutex(gui_mut);
   delete world;
   }
 
@@ -130,188 +130,183 @@ int Player_Local::event_thread_func(void *arg) {
 int Player_Local::EventHandler() {
   SDL_Event event;
   while(exiting == 0) {
-    while(exiting == 0 && SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_ALLEVENTS)) {
-      SDL_mutexP(gui_mut);
-      int handle = gui->ProcessEvent(&event);
-      SDL_mutexV(gui_mut);
-      if(!handle) {
-	continue;
-	}
+    if(!gui->WaitEvent(&event, true)) {
+      fprintf(stderr, "ERROR: Event System Failure!\n");
+      exit(1);
+      }
 
-      if(event.type == SDL_QUIT) {
+    if(event.type == SDL_QUIT) {
+      exiting = 1;
+      }
+    else if(event.type == SDL_KEYDOWN) {
+      if(event.key.keysym.sym == SDLK_ESCAPE) {
 	exiting = 1;
 	}
-      else if(event.type == SDL_KEYDOWN) {
-	if(event.key.keysym.sym == SDLK_ESCAPE) {
-	  exiting = 1;
-	  }
-	else if(event.key.keysym.sym == SDLK_RIGHT) {
-	  SDL_mutexP(gui_mut);
-	  xspd += MOVE_SPEED;
-	  if(xspd > MOVE_SPEED) xspd = MOVE_SPEED;
-	  renderer->SetMove(xspd, yspd);
-	  SDL_mutexV(gui_mut);
-	  }
-	else if(event.key.keysym.sym == SDLK_LEFT) {
-	  SDL_mutexP(gui_mut);
-	  xspd -= MOVE_SPEED;
-	  if(xspd < -MOVE_SPEED) xspd = -MOVE_SPEED;
-	  renderer->SetMove(xspd, yspd);
-	  SDL_mutexV(gui_mut);
-	  }
-	else if(event.key.keysym.sym == SDLK_UP) {
-	  SDL_mutexP(gui_mut);
-	  yspd += MOVE_SPEED;
-	  if(yspd > MOVE_SPEED) yspd = MOVE_SPEED;
-	  renderer->SetMove(xspd, yspd);
-	  SDL_mutexV(gui_mut);
-	  }
-	else if(event.key.keysym.sym == SDLK_DOWN) {
-	  SDL_mutexP(gui_mut);
-	  yspd -= MOVE_SPEED;
-	  if(yspd < -MOVE_SPEED) yspd = -MOVE_SPEED;
-	  renderer->SetMove(xspd, yspd);
-	  SDL_mutexV(gui_mut);
-	  }
-	else if(event.key.keysym.sym == SDLK_PAGEUP) {
-	  SDL_mutexP(gui_mut);
-	  cur_ang += 90.0;
-	  renderer->SetAngle(cur_ang, ROT_DELAY);
-	  SDL_mutexV(gui_mut);
-	  }
-	else if(event.key.keysym.sym == SDLK_PAGEDOWN) {
-	  SDL_mutexP(gui_mut);
-	  cur_ang -= 90.0;
-	  renderer->SetAngle(cur_ang, ROT_DELAY);
-	  SDL_mutexV(gui_mut);
-	  }
+      else if(event.key.keysym.sym == SDLK_RIGHT) {
+	SDL_mutexP(vid_mut);
+	xspd += MOVE_SPEED;
+	if(xspd > MOVE_SPEED) xspd = MOVE_SPEED;
+	renderer->SetMove(xspd, yspd);
+	SDL_mutexV(vid_mut);
 	}
-      else if(event.type == SDL_KEYUP) {
-	if(event.key.keysym.sym == SDLK_RIGHT) {
-	  SDL_mutexP(gui_mut);
-	  xspd -= MOVE_SPEED;
-	  if(xspd < -MOVE_SPEED) xspd = -MOVE_SPEED;
-	  renderer->SetMove(xspd, yspd);
-	  SDL_mutexV(gui_mut);
-	  }
-	else if(event.key.keysym.sym == SDLK_LEFT) {
-	  SDL_mutexP(gui_mut);
-	  xspd += MOVE_SPEED;
-	  if(xspd > MOVE_SPEED) xspd = MOVE_SPEED;
-	  renderer->SetMove(xspd, yspd);
-	  SDL_mutexV(gui_mut);
-	  }
-	else if(event.key.keysym.sym == SDLK_UP) {
-	  SDL_mutexP(gui_mut);
- 	  yspd -= MOVE_SPEED;
-	  if(yspd < -MOVE_SPEED) yspd = -MOVE_SPEED;
-	  renderer->SetMove(xspd, yspd);
-	  SDL_mutexV(gui_mut);
-	  }
-	else if(event.key.keysym.sym == SDLK_DOWN) {
-	  SDL_mutexP(gui_mut);
-	  yspd += MOVE_SPEED;
-	  if(yspd > MOVE_SPEED) yspd = MOVE_SPEED;
-	  renderer->SetMove(xspd, yspd);
-	  SDL_mutexV(gui_mut);
-	  }
+      else if(event.key.keysym.sym == SDLK_LEFT) {
+	SDL_mutexP(vid_mut);
+	xspd -= MOVE_SPEED;
+	if(xspd < -MOVE_SPEED) xspd = -MOVE_SPEED;
+	renderer->SetMove(xspd, yspd);
+	SDL_mutexV(vid_mut);
 	}
-      else if(event.type == SDL_SG_EVENT) {
-	if(event.user.code == SG_EVENT_BUTTONCLICK) {
-	  if(event.user.data1 == (void*)edoneb) {
-
-	  //FIXME: Actually get the EQUIP setup from DNDBoxes Widgets
-
-	    vector<int>::iterator id = eqid.begin();
-	    for(; id != eqid.end(); ++id) {
-		//FIXME: Could ALLOC in this thread (Could be BAD in Windows!)!
-	      orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
-	      }
-	    SDL_mutexP(off_mut);
-	    nextphase = PHASE_REPLAY;
-	    last_time = SDL_GetTicks();
-	    last_offset = 0;
-	    playback_speed = 5; //Default is play
-	    SDL_mutexP(gui_mut);
-	    rcontrols->Set(playback_speed);
-	    SDL_mutexV(gui_mut);
-	    SDL_mutexV(off_mut);
-	    }
-	  else if(event.user.data1 == (void*)rdoneb) {
-	    nextphase = PHASE_DECLARE; //Move on to declaring orders for next turn
-	    }
-	  }
-
-	else if(event.user.code == SG_EVENT_STICKYON) {
-	  if(event.user.data1 == (void*)ddoneb) {
-	    if(!game->SetReady(id, true)) {
-	      SDL_mutexP(gui_mut);
-	      ddoneb->TurnOff(); // Reject this attempt
-	      SDL_mutexV(gui_mut);
-	      }
-	    }
-	  else {
-	    exiting = 1;  //Return
-	    }
-	  }
-	else if(event.user.code == SG_EVENT_STICKYOFF) {
-	  if(event.user.data1 == (void*)ddoneb) {
-	    if(game->SetReady(id, false)) {
-	      SDL_mutexP(gui_mut);
-	      ddoneb->TurnOn(); // Reject this attempt
-	      SDL_mutexV(gui_mut);
-	      }
-	    }
-	  else {
-	    exiting = 1;  //Return
-	    }
-	  }
-	else if(event.user.code == SG_EVENT_SELECT) {
-	  if(event.user.data1 == (void*)(ednd)) {
-	    const Unit *u = game->UnitRef(eqid[*((int*)(event.user.data2))]);
-	    if(u != NULL) {
-	      SDL_mutexP(gui_mut);
-	      estats->SetText(u->name);
-	      SDL_mutexV(gui_mut);
-	      }
-	    }
-	  else if(event.user.data1 == (void*)(rcontrols)) {
-	    SDL_mutexP(off_mut);
-	    Uint32 cur_time = SDL_GetTicks();
-	    if(offset == 3000 && playback_speed == 3	//Re-play
-		&& *((int*)(event.user.data2)) > 3) {
-	      offset = 0;
-	      }
-	    else if(offset == 0 && playback_speed == 3	//Re-reverse
-		&& *((int*)(event.user.data2)) < 3) {
-	      offset = 3000;
-	      }
-	    else {
-	      CalcOffset(cur_time);
-	      }
-	    playback_speed = *((int*)(event.user.data2));
-	    last_time = cur_time;
-	    last_offset = offset;
-	    SDL_mutexV(off_mut);
-	    }
-	  }
-	else if(event.user.code == SG_EVENT_SCROLLUP) {
-	  SDL_mutexP(gui_mut);
-	  cur_zoom -= 0.5;
-	  if(cur_zoom < 8.0) cur_zoom = 8.0;
-	  renderer->SetZoom(cur_zoom, ZOOM_DELAY);
-	  SDL_mutexV(gui_mut);
-	  }
-	else if(event.user.code == SG_EVENT_SCROLLDOWN) {
-	  SDL_mutexP(gui_mut);
-	  cur_zoom += 0.5;
-	  if(cur_zoom > 32.0) cur_zoom = 32.0;
-	  renderer->SetZoom(cur_zoom, ZOOM_DELAY);
-	  SDL_mutexV(gui_mut);
-	  }
+      else if(event.key.keysym.sym == SDLK_UP) {
+	SDL_mutexP(vid_mut);
+	yspd += MOVE_SPEED;
+	if(yspd > MOVE_SPEED) yspd = MOVE_SPEED;
+	renderer->SetMove(xspd, yspd);
+	SDL_mutexV(vid_mut);
+	}
+      else if(event.key.keysym.sym == SDLK_DOWN) {
+	SDL_mutexP(vid_mut);
+	yspd -= MOVE_SPEED;
+	if(yspd < -MOVE_SPEED) yspd = -MOVE_SPEED;
+	renderer->SetMove(xspd, yspd);
+	SDL_mutexV(vid_mut);
+	}
+      else if(event.key.keysym.sym == SDLK_PAGEUP) {
+	SDL_mutexP(vid_mut);
+	cur_ang += 90.0;
+	renderer->SetAngle(cur_ang, ROT_DELAY);
+	SDL_mutexV(vid_mut);
+	}
+      else if(event.key.keysym.sym == SDLK_PAGEDOWN) {
+	SDL_mutexP(vid_mut);
+	cur_ang -= 90.0;
+	renderer->SetAngle(cur_ang, ROT_DELAY);
+	SDL_mutexV(vid_mut);
 	}
       }
-    SDL_Delay(10); // Weak, yes, but this is how SDL does it too. :(
+    else if(event.type == SDL_KEYUP) {
+      if(event.key.keysym.sym == SDLK_RIGHT) {
+	SDL_mutexP(vid_mut);
+	xspd -= MOVE_SPEED;
+	if(xspd < -MOVE_SPEED) xspd = -MOVE_SPEED;
+	renderer->SetMove(xspd, yspd);
+	SDL_mutexV(vid_mut);
+	}
+      else if(event.key.keysym.sym == SDLK_LEFT) {
+	SDL_mutexP(vid_mut);
+	xspd += MOVE_SPEED;
+	if(xspd > MOVE_SPEED) xspd = MOVE_SPEED;
+	renderer->SetMove(xspd, yspd);
+	SDL_mutexV(vid_mut);
+	}
+      else if(event.key.keysym.sym == SDLK_UP) {
+	SDL_mutexP(vid_mut);
+ 	yspd -= MOVE_SPEED;
+	if(yspd < -MOVE_SPEED) yspd = -MOVE_SPEED;
+	renderer->SetMove(xspd, yspd);
+	SDL_mutexV(vid_mut);
+	}
+      else if(event.key.keysym.sym == SDLK_DOWN) {
+	SDL_mutexP(vid_mut);
+	yspd += MOVE_SPEED;
+	if(yspd > MOVE_SPEED) yspd = MOVE_SPEED;
+	renderer->SetMove(xspd, yspd);
+	SDL_mutexV(vid_mut);
+	}
+      }
+    else if(event.type == SDL_SG_EVENT) {
+      if(event.user.code == SG_EVENT_BUTTONCLICK) {
+	if(event.user.data1 == (void*)edoneb) {
+
+	//FIXME: Actually get the EQUIP setup from DNDBoxes Widgets
+
+	  vector<int>::iterator id = eqid.begin();
+	  for(; id != eqid.end(); ++id) {
+		//FIXME: Could ALLOC in this thread (Could be BAD in Windows!)!
+	    orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
+	    }
+	  SDL_mutexP(off_mut);
+	  nextphase = PHASE_REPLAY;
+	  last_time = SDL_GetTicks();
+	  last_offset = 0;
+	  playback_speed = 5; //Default is play
+	  gui->Lock();
+	  rcontrols->Set(playback_speed);
+	  gui->Unlock();
+	  SDL_mutexV(off_mut);
+	  }
+	else if(event.user.data1 == (void*)rdoneb) {
+	  nextphase = PHASE_DECLARE; //Move on to declaring orders for next turn
+	  }
+	}
+
+      else if(event.user.code == SG_EVENT_STICKYON) {
+	if(event.user.data1 == (void*)ddoneb) {
+	  if(!game->SetReady(id, true)) {
+	    gui->Lock();
+	    ddoneb->TurnOff(); // Reject this attempt
+	    gui->Unlock();
+	    }
+	  }
+	else {
+	  exiting = 1;  //Return
+	  }
+	}
+      else if(event.user.code == SG_EVENT_STICKYOFF) {
+	if(event.user.data1 == (void*)ddoneb) {
+	  if(game->SetReady(id, false)) {
+	    gui->Lock();
+	    ddoneb->TurnOn(); // Reject this attempt
+	    gui->Unlock();
+	    }
+	  }
+	else {
+	  exiting = 1;  //Return
+	  }
+	}
+      else if(event.user.code == SG_EVENT_SELECT) {
+	if(event.user.data1 == (void*)(ednd)) {
+	  const Unit *u = game->UnitRef(eqid[*((int*)(event.user.data2))]);
+	  if(u != NULL) {
+	    gui->Lock();
+	    estats->SetText(u->name);
+	    gui->Unlock();
+	    }
+	  }
+	else if(event.user.data1 == (void*)(rcontrols)) {
+	  SDL_mutexP(off_mut);
+	  Uint32 cur_time = SDL_GetTicks();
+	  if(offset == 3000 && playback_speed == 3	//Re-play
+		&& *((int*)(event.user.data2)) > 3) {
+	    offset = 0;
+	    }
+	  else if(offset == 0 && playback_speed == 3	//Re-reverse
+		&& *((int*)(event.user.data2)) < 3) {
+	    offset = 3000;
+	    }
+	  else {
+	    CalcOffset(cur_time);
+	    }
+	  playback_speed = *((int*)(event.user.data2));
+	  last_time = cur_time;
+	  last_offset = offset;
+	  SDL_mutexV(off_mut);
+	  }
+	}
+      else if(event.user.code == SG_EVENT_SCROLLUP) {
+	SDL_mutexP(vid_mut);
+	cur_zoom -= 0.5;
+	if(cur_zoom < 8.0) cur_zoom = 8.0;
+	renderer->SetZoom(cur_zoom, ZOOM_DELAY);
+	SDL_mutexV(vid_mut);
+	}
+      else if(event.user.code == SG_EVENT_SCROLLDOWN) {
+	SDL_mutexP(vid_mut);
+	cur_zoom += 0.5;
+	if(cur_zoom > 32.0) cur_zoom = 32.0;
+	renderer->SetZoom(cur_zoom, ZOOM_DELAY);
+	SDL_mutexV(vid_mut);
+	}
+      }
     }
   return exiting;
   }
@@ -339,12 +334,11 @@ bool Player_Local::Run() {
   SDL_Thread *th = SDL_CreateThread(event_thread_func, (void*)(this));
 
   while(exiting == 0) {
-    SDL_PumpEvents();
     if(pround != game->CurrentRound() - 1) {
       pround = game->CurrentRound() - 1;
       game->UpdatePercept(id, pround);
 
-      SDL_mutexP(gui_mut);
+      gui->Lock();
 
       ddoneb->TurnOff(); // Make sure "Ready" isn't checked next time
 
@@ -355,16 +349,16 @@ bool Player_Local::Run() {
       sprintf(buf, "Play/Replay Turn (#%d)%c", game->CurrentRound()-1, 0);
       rtext->SetText(buf);
 
-      SDL_mutexV(gui_mut);
+      gui->Unlock();
       }
 
     if(phase != nextphase) {
-      SDL_mutexP(gui_mut);
+      gui->Lock();
       if(nextphase == PHASE_REPLAY) UpdateEquipIDs();
       gui->MasterWidget()->RemoveWidget(wind[phase]);
       phase = nextphase;
       gui->MasterWidget()->AddWidget(wind[phase]);
-      SDL_mutexV(gui_mut);
+      gui->Unlock();
       }
     Uint32 cur_time = SDL_GetTicks();
 
@@ -376,14 +370,12 @@ bool Player_Local::Run() {
       rstamp->SetText(buf);
       }
 
-    SDL_PumpEvents();
-
-    SDL_mutexP(gui_mut);
+    SDL_mutexP(vid_mut);
     renderer->StartScene();
-    gui->RenderStart(cur_time);
-    SDL_mutexV(gui_mut);
+    SDL_mutexV(vid_mut);
 
-    SDL_PumpEvents();
+    gui->RenderStart(cur_time, true);
+
     if(phase == PHASE_DECLARE) {
       world->Render();
       }
@@ -391,13 +383,11 @@ bool Player_Local::Run() {
       world->Render(offset);
       }
 
-    SDL_PumpEvents();
-    SDL_mutexP(gui_mut);
-    gui->RenderFinish(cur_time);
-    SDL_mutexV(gui_mut);
+    gui->RenderFinish(cur_time, true);
 
-    SDL_PumpEvents();
+    SDL_mutexP(vid_mut);
     renderer->FinishScene();
+    SDL_mutexV(vid_mut);
     }
 
   SDL_WaitThread(th, NULL);
@@ -492,16 +482,16 @@ void Player_Local::UpdateEquipIDs() {
       last_time = SDL_GetTicks();
       last_offset = 0;
       playback_speed = 5; //Default is play
-      SDL_mutexP(gui_mut);
+      gui->Lock();
       rcontrols->Set(playback_speed);
-      SDL_mutexV(gui_mut);
+      gui->Unlock();
       SDL_mutexV(off_mut);
       }
     }
   }
 
 	//Note: off_mut must be locked before calling this function!
-void Player_Local::CalcOffset(Uint32 cur_time) { // off_mut must
+void Player_Local::CalcOffset(Uint32 cur_time) {
   switch(playback_speed) {
     case(0): {	// Rewind
       offset = last_offset - (cur_time - last_time) * 4;
@@ -532,16 +522,15 @@ void Player_Local::CalcOffset(Uint32 cur_time) { // off_mut must
   if(offset > 2147483647U) {	//Compare to INT_MAX, since is unsigned
     offset = 0;
     playback_speed = 3; //Auto-stop
-    SDL_mutexP(gui_mut);
+    gui->Lock();
     rcontrols->Set(playback_speed);
-    SDL_mutexV(gui_mut);
+    gui->Unlock();
     }
   else if(offset > 3000) {
     offset = 3000;
     playback_speed = 3; //Auto-stop
-    SDL_mutexP(gui_mut);
+    gui->Lock();
     rcontrols->Set(playback_speed);
-    SDL_mutexV(gui_mut);
+    gui->Unlock();
     }
-  SDL_mutexV(off_mut);
   }
