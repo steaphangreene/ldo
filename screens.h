@@ -29,6 +29,7 @@ using namespace std;
 
 #include "../simplevideo/simplevideo.h"
 #include "../simplegui/simplegui.h"
+#include "../simpleconnect/simpleconnect.h"
 
 enum ScreenNum {
   POPUP_MIN,

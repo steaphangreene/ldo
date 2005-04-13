@@ -1,5 +1,6 @@
 -=Codebase=-
 Implement the missing Player_Local popups
+Get screens to delete their widgets on destruction
 
 -=Mapfile=-
 Add Scoring Options

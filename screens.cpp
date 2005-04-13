@@ -78,6 +78,7 @@ public:
   virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
 protected:
   SG_Button *cancelb, *optb, *loadb, *gob;
+  SimpleConnect *connector;
   };
 
 class Screen_Multi : public Screen {
@@ -88,6 +89,7 @@ public:
 protected:
   SG_Button *cancelb, *optb, *loadb, *gob, *connb;
   SG_StickyButton *readyb;
+  SimpleConnect *connector;
   };
 
 class Screen_Replay : public Screen {
@@ -413,16 +415,17 @@ ScreenNum Screen_Title::Handle(SimpleGUI *gui, SDL_Event &event) {
 
 
 Screen_Single::Screen_Single() {
-  main = new SG_Table(3, 7, 0.0625, 0.125);
-  main->AddWidget(new SG_TextArea("Define Teams", drkred), 0, 0, 2, 2);
+  connector = NULL;
+  main = new SG_Table(6, 7, 0.0625, 0.125);
+  main->AddWidget(new SG_TextArea("Define Teams", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
-  main->AddWidget(cancelb, 2, 0);
+  main->AddWidget(cancelb, 5, 0);
   optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  main->AddWidget(optb, 2, 1);
+  main->AddWidget(optb, 5, 1);
   loadb = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
-  main->AddWidget(loadb, 2, 2);
+  main->AddWidget(loadb, 5, 2);
   gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
-  main->AddWidget(gob, 2, 6);
+  main->AddWidget(gob, 5, 6);
   gob->Disable();
   }
 
@@ -440,26 +443,44 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SDL_Event &event) {
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
       if(cur_game) gob->Enable();
+      vector<SC_SlotType> slots;
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      connector = new SimpleConnect(slots);
+      connector->EnableNetwork("LDO:");
+      main->AddWidget(connector, 0, 2, 5, 5);
+      }
+    else if(event.user.code == SG_EVENT_OK) {
+      main->RemoveWidget(connector);
+      delete connector;
+      connector = 0;
       }
     }
   return SCREEN_SAME;
   }
 
 Screen_Multi::Screen_Multi() {
-  main = new SG_Table(3, 7, 0.0625, 0.125);
-  main->AddWidget(new SG_TextArea("Gather Players", drkred), 0, 0, 2, 2);
+  connector = NULL;
+  main = new SG_Table(6, 7, 0.0625, 0.125);
+  main->AddWidget(new SG_TextArea("Gather Players", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
-  main->AddWidget(cancelb, 2, 0);
+  main->AddWidget(cancelb, 5, 0);
   optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  main->AddWidget(optb, 2, 1);
+  main->AddWidget(optb, 5, 1);
   loadb = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
-  main->AddWidget(loadb, 2, 2);
+  main->AddWidget(loadb, 5, 2);
   connb = new SG_Button("Connect to Game", but_normal, but_disabled, but_pressed);
-  main->AddWidget(connb, 2, 3);
+  main->AddWidget(connb, 5, 3);
   readyb = new SG_StickyButton("Ready to Play", but_normal, but_disabled, but_pressed, but_activated);
-  main->AddWidget(readyb, 2, 5);
+  main->AddWidget(readyb, 5, 5);
   gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
-  main->AddWidget(gob, 2, 6);
+  main->AddWidget(gob, 5, 6);
   gob->Disable();
   }
 
@@ -482,23 +503,42 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
       gob->Disable();
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
-      if(cur_game && readyb->IsOn()) gob->Enable();
+      if(cur_game && readyb->IsOn()) {
+	gob->Enable();
+	}
+      vector<SC_SlotType> slots;
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      connector = new SimpleConnect(slots);
+      connector->EnableNetwork("LDO:");
+      main->AddWidget(connector, 0, 2, 5, 5);
+      }
+    else if(event.user.code == SG_EVENT_OK) {
+      main->RemoveWidget(connector);
+      delete connector;
+      connector = 0;
       }
     }
   return SCREEN_SAME;
   }
 
 Screen_Replay::Screen_Replay() {
-  main = new SG_Table(3, 7, 0.0625, 0.125);
-  main->AddWidget(new SG_TextArea("Load Replay", drkred), 0, 0, 2, 2);
+  main = new SG_Table(6, 7, 0.0625, 0.125);
+  main->AddWidget(new SG_TextArea("Load Replay", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
-  main->AddWidget(cancelb, 2, 0);
+  main->AddWidget(cancelb, 5, 0);
   optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  main->AddWidget(optb, 2, 1);
+  main->AddWidget(optb, 5, 1);
   loadb = new SG_Button("Load Replay", but_normal, but_disabled, but_pressed);
-  main->AddWidget(loadb, 2, 2);
+  main->AddWidget(loadb, 5, 2);
   gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
-  main->AddWidget(gob, 2, 6);
+  main->AddWidget(gob, 5, 6);
   gob->Disable();
   }
 
