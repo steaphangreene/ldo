@@ -75,10 +75,10 @@ void World::DrawMap() {
   glColor3f(0.0, 0.0, 0.0);
   glBegin(GL_LINES);
   for(float part = 0.0; part <= 128.0; part += 2.0) {
-    glVertex3f(part,  0.0,   0.0625);
-    glVertex3f(part,  128.0, 0.0625);
-    glVertex3f(0.0,   part,  0.0625);
-    glVertex3f(128.0, part,  0.0625);
+    glVertex3f(part,  0.0,   0.03125);
+    glVertex3f(part,  128.0, 0.03125);
+    glVertex3f(0.0,   part,  0.03125);
+    glVertex3f(128.0, part,  0.03125);
     }
   glEnd();
   glPopMatrix();

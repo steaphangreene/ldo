@@ -21,6 +21,7 @@
 // *************************************************************************
 
 double cur_zoom = 16.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
+int sel_x = -1, sel_y = -1;
 
 #include "player_local.h"
 
@@ -143,72 +144,72 @@ int Player_Local::EventHandler() {
 	exiting = 1;
 	}
       else if(event.key.keysym.sym == SDLK_RIGHT) {
-	SDL_mutexP(vid_mut);
 	xspd += MOVE_SPEED;
 	if(xspd > MOVE_SPEED) xspd = MOVE_SPEED;
+	SDL_mutexP(vid_mut);
 	renderer->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_LEFT) {
-	SDL_mutexP(vid_mut);
 	xspd -= MOVE_SPEED;
 	if(xspd < -MOVE_SPEED) xspd = -MOVE_SPEED;
+	SDL_mutexP(vid_mut);
 	renderer->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_UP) {
-	SDL_mutexP(vid_mut);
 	yspd += MOVE_SPEED;
 	if(yspd > MOVE_SPEED) yspd = MOVE_SPEED;
+	SDL_mutexP(vid_mut);
 	renderer->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_DOWN) {
-	SDL_mutexP(vid_mut);
 	yspd -= MOVE_SPEED;
 	if(yspd < -MOVE_SPEED) yspd = -MOVE_SPEED;
+	SDL_mutexP(vid_mut);
 	renderer->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_PAGEUP) {
-	SDL_mutexP(vid_mut);
 	cur_ang += 90.0;
+	SDL_mutexP(vid_mut);
 	renderer->SetAngle(cur_ang, ROT_DELAY);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_PAGEDOWN) {
-	SDL_mutexP(vid_mut);
 	cur_ang -= 90.0;
+	SDL_mutexP(vid_mut);
 	renderer->SetAngle(cur_ang, ROT_DELAY);
 	SDL_mutexV(vid_mut);
 	}
       }
     else if(event.type == SDL_KEYUP) {
       if(event.key.keysym.sym == SDLK_RIGHT) {
-	SDL_mutexP(vid_mut);
 	xspd -= MOVE_SPEED;
 	if(xspd < -MOVE_SPEED) xspd = -MOVE_SPEED;
+	SDL_mutexP(vid_mut);
 	renderer->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_LEFT) {
-	SDL_mutexP(vid_mut);
 	xspd += MOVE_SPEED;
 	if(xspd > MOVE_SPEED) xspd = MOVE_SPEED;
+	SDL_mutexP(vid_mut);
 	renderer->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_UP) {
-	SDL_mutexP(vid_mut);
  	yspd -= MOVE_SPEED;
 	if(yspd < -MOVE_SPEED) yspd = -MOVE_SPEED;
+	SDL_mutexP(vid_mut);
 	renderer->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_DOWN) {
-	SDL_mutexP(vid_mut);
 	yspd += MOVE_SPEED;
 	if(yspd > MOVE_SPEED) yspd = MOVE_SPEED;
+	SDL_mutexP(vid_mut);
 	renderer->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
@@ -293,22 +294,90 @@ int Player_Local::EventHandler() {
 	  }
 	}
       else if(event.user.code == SG_EVENT_SCROLLUP) {
-	SDL_mutexP(vid_mut);
 	cur_zoom -= 0.5;
 	if(cur_zoom < 8.0) cur_zoom = 8.0;
+	SDL_mutexP(vid_mut);
 	renderer->SetZoom(cur_zoom, ZOOM_DELAY);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.user.code == SG_EVENT_SCROLLDOWN) {
-	SDL_mutexP(vid_mut);
 	cur_zoom += 0.5;
 	if(cur_zoom > 32.0) cur_zoom = 32.0;
+	SDL_mutexP(vid_mut);
 	renderer->SetZoom(cur_zoom, ZOOM_DELAY);
 	SDL_mutexV(vid_mut);
+	}
+      else if(event.user.code == SG_EVENT_LEFTCLICK) {
+	double x = ((float*)(event.user.data2))[0];
+	double y = ((float*)(event.user.data2))[1];
+	SDL_mutexP(vid_mut);
+	renderer->ScreenToMap(x, y, 0.0);
+	SDL_mutexV(vid_mut);
+	sel_x = ((int)(x)) / 2;
+	sel_y = ((int)(y)) / 2;
 	}
       }
     }
   return exiting;
+  }
+
+
+#define SEL_BASE 0.03125
+#define SEL_HEIGHT 4.0
+
+static void DrawSelBox() {
+	//FIXME: Use REAL map x and y size for limits
+  if(sel_x < 0 || sel_y < 0 || sel_x >= 64 || sel_y >= 64) return;
+
+//  fprintf(stderr, "Selbox drawing at %d,%d\n", sel_x, sel_y);
+
+  glDisable(GL_LIGHTING);
+  glPushMatrix();
+
+  glTranslatef(sel_x*2.0+1.0, sel_y*2.0+1.0, 0.0);
+
+  glColor3f(1.0, 1.0, 0.0);
+  glBegin(GL_LINES);
+
+  glVertex3f(-1.0, -1.0, SEL_BASE);
+  glVertex3f(-1.0,  1.0, SEL_BASE);
+
+  glVertex3f(-1.0,  1.0, SEL_BASE);
+  glVertex3f( 1.0,  1.0, SEL_BASE);
+
+  glVertex3f( 1.0,  1.0, SEL_BASE);
+  glVertex3f( 1.0, -1.0, SEL_BASE);
+
+  glVertex3f( 1.0, -1.0, SEL_BASE);
+  glVertex3f(-1.0, -1.0, SEL_BASE);
+
+  glVertex3f(-1.0, -1.0, SEL_HEIGHT);
+  glVertex3f(-1.0,  1.0, SEL_HEIGHT);
+
+  glVertex3f(-1.0,  1.0, SEL_HEIGHT);
+  glVertex3f( 1.0,  1.0, SEL_HEIGHT);
+
+  glVertex3f( 1.0,  1.0, SEL_HEIGHT);
+  glVertex3f( 1.0, -1.0, SEL_HEIGHT);
+
+  glVertex3f( 1.0, -1.0, SEL_HEIGHT);
+  glVertex3f(-1.0, -1.0, SEL_HEIGHT);
+
+  glVertex3f(-1.0, -1.0, SEL_BASE);
+  glVertex3f(-1.0, -1.0, SEL_HEIGHT);
+
+  glVertex3f(-1.0,  1.0, SEL_BASE);
+  glVertex3f(-1.0,  1.0, SEL_HEIGHT);
+
+  glVertex3f( 1.0,  1.0, SEL_BASE);
+  glVertex3f( 1.0,  1.0, SEL_HEIGHT);
+
+  glVertex3f( 1.0, -1.0, SEL_BASE);
+  glVertex3f( 1.0, -1.0, SEL_HEIGHT);
+
+  glEnd();
+
+  glPopMatrix();
   }
 
 static char buf[256];
@@ -378,9 +447,11 @@ bool Player_Local::Run() {
 
     if(phase == PHASE_DECLARE) {
       world->Render();
+      DrawSelBox();
       }
     else if(phase == PHASE_REPLAY) {
       world->Render(offset);
+      DrawSelBox();
       }
 
     gui->RenderFinish(cur_time, true);
