@@ -114,6 +114,14 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   dtext->SetFontSize(30);
   wind[PHASE_DECLARE]->AddWidget(dtext, 1, 3, 4, 1);
 
+  //Temporary!
+  SG_Widget *tmp = wind[PHASE_DECLARE];
+  wind[PHASE_DECLARE] = new SG_Table(20, 20, 0.0, 0.0);
+  wind[PHASE_DECLARE]->AddWidget(tmp, 2, 0, 12, 12);
+  wind[PHASE_DECLARE]->AddWidget(new SG_Panel(), 0, 0, 2, 20);
+  wind[PHASE_DECLARE]->AddWidget(new SG_Panel(), 0, 12, 20, 8);
+  wind[PHASE_DECLARE]->AddWidget(new SG_Panel(), 14, 0, 6, 20);
+
   vid_mut = SDL_CreateMutex();
   off_mut = SDL_CreateMutex();
   }
@@ -312,6 +320,7 @@ int Player_Local::EventHandler() {
 	double y = ((float*)(event.user.data2))[1];
 	SDL_mutexP(vid_mut);
 	renderer->ScreenToMap(x, y, 0.0);
+//	renderer->ScreenToMapAuto(x, y);	//For Testing!
 	SDL_mutexV(vid_mut);
 	sel_x = ((int)(x)) / 2;
 	sel_y = ((int)(y)) / 2;
@@ -391,6 +400,10 @@ bool Player_Local::Run() {
 
   gui->MasterWidget()->AddWidget(wind[phase]);
 
+  //Temporary!
+  if(phase == PHASE_DECLARE) renderer->SetSubscreen(-0.8, -0.2, 0.4, 1.0);
+  else renderer->ResetSubscreen();
+
   renderer->SetOrtho();
 //  renderer->SetPerspective(45.0);	//Just for testing
   renderer->SetZExtents(0.0, 8.0);
@@ -428,6 +441,10 @@ bool Player_Local::Run() {
       phase = nextphase;
       gui->MasterWidget()->AddWidget(wind[phase]);
       gui->Unlock();
+
+      //Temporary!
+      if(phase == PHASE_DECLARE) renderer->SetSubscreen(-0.8, -0.2, 0.4, 1.0);
+      else renderer->ResetSubscreen();
       }
     Uint32 cur_time = SDL_GetTicks();
 
