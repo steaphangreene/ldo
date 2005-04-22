@@ -320,7 +320,6 @@ int Player_Local::EventHandler() {
 	double y = ((float*)(event.user.data2))[1];
 	SDL_mutexP(vid_mut);
 	renderer->ScreenToMap(x, y, 0.0);
-//	renderer->ScreenToMapAuto(x, y);	//For Testing!
 	SDL_mutexV(vid_mut);
 	sel_x = ((int)(x)) / 2;
 	sel_y = ((int)(y)) / 2;
