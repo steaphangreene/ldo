@@ -231,9 +231,8 @@ int Screens::Handle() {
 
   SDL_Event event;
 
-  while(screen != SCREEN_NONE && gui->WaitEvent(&event)) {
-    do { // while(screen != SCREEN_NONE && gui->PollEvent(&event));
-
+  while(screen != SCREEN_NONE) {
+    while(gui->PollEvent(&event)) {
       //These events are for ALL screens!
       if(event.type == SDL_KEYDOWN) {
         if(event.key.keysym.sym == SDLK_ESCAPE) {
@@ -271,8 +270,7 @@ int Screens::Handle() {
 	ScreenNum next = sscr[screen]->Handle(gui, event);
 	if(next != SCREEN_SAME) Set(next);
 	}
-
-      } while(screen != SCREEN_NONE && gui->PollEvent(&event));
+      }
 
     renderer->StartScene();
     gui->RenderStart(SDL_GetTicks());
@@ -379,6 +377,10 @@ Screen_Title::Screen_Title() {
   title->SetFontSize(100);
   main->AddWidget(title, 0, 0, 2, 2);
 
+  SG_AutoScroll *scr =
+	new SG_AutoScroll(1.0, 15.0, 0.0, -15.0, 0.0, -15.0, 0.0, 60.0);
+  main->AddWidget(scr, 0, 2, 2, 5);
+
   FILE *credfl = fopen("CREDITS", "r");
   if(credfl) {
     fseek(credfl, 0, SEEK_END);
@@ -390,9 +392,13 @@ Screen_Title::Screen_Title() {
     SG_TextArea *credits = new SG_TextArea(data, drkred);
     credits->SetMargins(0.125, 0.03125);
     credits->SetFontSize(20);
-    main->AddWidget(credits, 0, 2, 2, 5);
+    credits->SetVisibleLines(15);
+    scr->AddWidget(credits);
     delete data;
     fclose(credfl);
+
+    double vislines = credits->NumLines()+30.0;
+    scr->SetYScroll(-15.0, vislines-15.0, vislines*2.0);
     }
   }
 
