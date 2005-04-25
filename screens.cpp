@@ -431,6 +431,7 @@ Screen_Single::Screen_Single() {
   loadb = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
   main->AddWidget(loadb, 5, 2);
   gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
+  gob->SetAlignment(SG_ALIGN_LEFT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
   }
@@ -486,6 +487,7 @@ Screen_Multi::Screen_Multi() {
   readyb = new SG_StickyButton("Ready to Play", but_normal, but_disabled, but_pressed, but_activated);
   main->AddWidget(readyb, 5, 5);
   gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
+  gob->SetAlignment(SG_ALIGN_CENTER);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
   }
@@ -544,6 +546,7 @@ Screen_Replay::Screen_Replay() {
   loadb = new SG_Button("Load Replay", but_normal, but_disabled, but_pressed);
   main->AddWidget(loadb, 5, 2);
   gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
+  gob->SetAlignment(SG_ALIGN_RIGHT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
   }
