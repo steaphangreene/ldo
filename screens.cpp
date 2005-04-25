@@ -360,26 +360,26 @@ ScreenNum Screen_Config::Handle(SimpleGUI *gui, SDL_Event &event) {
   }
 
 Screen_Title::Screen_Title() {
-  main = new SG_Table(3, 7, 0.0625, 0.125);
+  main = new SG_Table(4, 9, 0.0625, 0.125);
   optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  main->AddWidget(optb, 2, 1);
+  main->AddWidget(optb, 3, 1);
   multb = new SG_Button("Multiplayer", but_normal, but_disabled, but_pressed);
-  main->AddWidget(multb, 2, 3);
+  main->AddWidget(multb, 3, 3);
   singb = new SG_Button("Single Player", but_normal, but_disabled, but_pressed);
-  main->AddWidget(singb, 2, 4);
+  main->AddWidget(singb, 3, 4);
   replb = new SG_Button("View Replay", but_normal, but_disabled, but_pressed);
-  main->AddWidget(replb, 2, 5);
+  main->AddWidget(replb, 3, 6);
   quitb = new SG_Button("Quit Game", but_normal, but_disabled, but_pressed);
-  main->AddWidget(quitb, 2, 6);
+  main->AddWidget(quitb, 3, 8);
 
   SG_TextArea *title = new SG_TextArea("LDO", drkred);
   title->SetMargins(0.125, 0.0);
   title->SetFontSize(100);
-  main->AddWidget(title, 0, 0, 2, 2);
+  main->AddWidget(title, 0, 0, 3, 3);
 
   SG_AutoScroll *scr =
 	new SG_AutoScroll(1.0, 15.0, 0.0, -15.0, 0.0, -15.0, 0.0, 60.0);
-  main->AddWidget(scr, 0, 2, 2, 5);
+  main->AddWidget(scr, 0, 3, 3, 6);
 
   FILE *credfl = fopen("CREDITS", "r");
   if(credfl) {
@@ -392,7 +392,7 @@ Screen_Title::Screen_Title() {
     SG_TextArea *credits = new SG_TextArea(data, drkred);
     credits->SetMargins(0.125, 0.03125);
     credits->SetFontSize(20);
-    credits->SetVisibleLines(15);
+    credits->SetVisibleSize(30.0, 15.0);
     scr->AddWidget(credits);
     delete data;
     fclose(credfl);
