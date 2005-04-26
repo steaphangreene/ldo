@@ -459,8 +459,8 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SDL_Event &event) {
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
-      connector = new SimpleConnect(slots);
-      connector->EnableNetwork("LDO:");
+      connector = new SimpleConnect();
+      connector->Config(slots);
       main->AddWidget(connector, 0, 2, 5, 5);
       }
     else if(event.user.code == SG_EVENT_OK) {
@@ -514,17 +514,8 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
       if(cur_game && readyb->IsOn()) {
 	gob->Enable();
 	}
-      vector<SC_SlotType> slots;
-      slots.push_back(SC_SLOT_PLAYER);
-      slots.push_back(SC_SLOT_PLAYER);
-      slots.push_back(SC_SLOT_PLAYER);
-      slots.push_back(SC_SLOT_PLAYER);
-      slots.push_back(SC_SLOT_PLAYER);
-      slots.push_back(SC_SLOT_PLAYER);
-      slots.push_back(SC_SLOT_PLAYER);
-      slots.push_back(SC_SLOT_PLAYER);
-      connector = new SimpleConnect(slots);
-      connector->EnableNetwork("LDO:");
+      connector = new SimpleConnect();
+      connector->Search("LDO:");
       main->AddWidget(connector, 0, 2, 5, 5);
       }
     else if(event.user.code == SG_EVENT_OK) {
