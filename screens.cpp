@@ -20,6 +20,8 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
+#include "SDL_net.h"
+
 #include "screens.h"
 #include "audio.h"
 #include "click.h"
@@ -85,11 +87,14 @@ class Screen_Multi : public Screen {
 public:
   Screen_Multi();
   virtual ~Screen_Multi();
+  virtual ScreenNum Start(SimpleGUI *gui);
   virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual void Finish(SimpleGUI *gui);
 protected:
   SG_Button *cancelb, *optb, *loadb, *gob, *connb;
   SG_StickyButton *readyb;
   SimpleConnect *connector;
+  bool net_init;
   };
 
 class Screen_Replay : public Screen {
@@ -421,7 +426,6 @@ ScreenNum Screen_Title::Handle(SimpleGUI *gui, SDL_Event &event) {
 
 
 Screen_Single::Screen_Single() {
-  connector = NULL;
   main = new SG_Table(6, 7, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Define Teams", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
@@ -434,9 +438,16 @@ Screen_Single::Screen_Single() {
   gob->SetAlignment(SG_ALIGN_LEFT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
+  connector = new SimpleConnect();
+  main->AddWidget(connector, 0, 2, 5, 5);
   }
 
 Screen_Single::~Screen_Single() {
+  if(connector) {
+    main->RemoveWidget(connector);
+    delete connector;
+    connector = NULL;
+    }
   //FIXME: Fill!
   }
 
@@ -459,21 +470,16 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SDL_Event &event) {
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
-      connector = new SimpleConnect();
       connector->Config(slots);
-      main->AddWidget(connector, 0, 2, 5, 5);
       }
     else if(event.user.code == SG_EVENT_OK) {
-      main->RemoveWidget(connector);
-      delete connector;
-      connector = 0;
       }
     }
   return SCREEN_SAME;
   }
 
 Screen_Multi::Screen_Multi() {
-  connector = NULL;
+  net_init = false;
   main = new SG_Table(6, 7, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Gather Players", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
@@ -490,10 +496,41 @@ Screen_Multi::Screen_Multi() {
   gob->SetAlignment(SG_ALIGN_CENTER);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
+  connector = new SimpleConnect();
+  main->AddWidget(connector, 0, 2, 5, 5);
   }
 
 Screen_Multi::~Screen_Multi() {
-  //FIXME: Fill!
+  if(connector) {
+    main->RemoveWidget(connector);
+    delete connector;
+    connector = NULL;
+    }
+  if(net_init) {
+    SDLNet_Quit();
+    net_init = false;
+    }
+  //FIXME: Cleanup Widgets!
+  }
+
+ScreenNum Screen_Multi::Start(SimpleGUI *gui) {
+  Screen::Start(gui);
+  if(!net_init) {
+    if(SDLNet_Init() < 0) {
+      fprintf(stderr, "ERROR: SDLNet_Init Failed: %s\n", SDL_GetError());
+      exit(1);
+      }
+    net_init = true;
+    }
+
+  connector->Search("LDO:");
+
+  return SCREEN_SAME;
+  }
+
+void Screen_Multi::Finish(SimpleGUI *gui) {
+  Screen::Finish(gui);
+  connector->Reset();
   }
 
 ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
@@ -514,14 +551,9 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
       if(cur_game && readyb->IsOn()) {
 	gob->Enable();
 	}
-      connector = new SimpleConnect();
       connector->Search("LDO:");
-      main->AddWidget(connector, 0, 2, 5, 5);
       }
     else if(event.user.code == SG_EVENT_OK) {
-      main->RemoveWidget(connector);
-      delete connector;
-      connector = 0;
       }
     }
   return SCREEN_SAME;
