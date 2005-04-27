@@ -80,6 +80,7 @@ public:
   virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
 protected:
   SG_Button *cancelb, *optb, *loadb, *gob;
+  SG_ScrollingArea *connscr;
   SimpleConnect *connector;
   };
 
@@ -93,6 +94,7 @@ public:
 protected:
   SG_Button *cancelb, *optb, *loadb, *gob, *connb;
   SG_StickyButton *readyb;
+  SG_ScrollingArea *connscr;
   SimpleConnect *connector;
   bool net_init;
   };
@@ -438,16 +440,13 @@ Screen_Single::Screen_Single() {
   gob->SetAlignment(SG_ALIGN_LEFT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
+  connscr = new SG_ScrollingArea(8.0, 8.0);
+  main->AddWidget(connscr, 0, 2, 5, 5);
   connector = new SimpleConnect();
-  main->AddWidget(connector, 0, 2, 5, 5);
+  connscr->AddWidget(connector);
   }
 
 Screen_Single::~Screen_Single() {
-  if(connector) {
-    main->RemoveWidget(connector);
-    delete connector;
-    connector = NULL;
-    }
   //FIXME: Fill!
   }
 
@@ -496,14 +495,16 @@ Screen_Multi::Screen_Multi() {
   gob->SetAlignment(SG_ALIGN_CENTER);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
+  connscr = new SG_ScrollingArea(8.0, 8.0);
+  main->AddWidget(connscr, 0, 2, 5, 5);
   connector = new SimpleConnect();
-  main->AddWidget(connector, 0, 2, 5, 5);
+  connscr->AddWidget(connector);
   }
 
 Screen_Multi::~Screen_Multi() {
-  if(connector) {
-    main->RemoveWidget(connector);
-    delete connector;
+  if(connscr) {
+    main->RemoveWidget(connscr);
+    delete connscr;	// To delete connector before shutting down SDL_net!
     connector = NULL;
     }
   if(net_init) {
