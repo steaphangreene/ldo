@@ -92,7 +92,7 @@ public:
   virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
   virtual void Finish(SimpleGUI *gui);
 protected:
-  SG_Button *cancelb, *optb, *loadb, *gob, *connb;
+  SG_Button *cancelb, *optb, *hostb, *gob, *scanb;
   SG_StickyButton *readyb;
   SG_ScrollingArea *connscr;
   SimpleConnect *connector;
@@ -486,11 +486,11 @@ Screen_Multi::Screen_Multi() {
   main->AddWidget(cancelb, 5, 0);
   optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   main->AddWidget(optb, 5, 1);
-  loadb = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
-  main->AddWidget(loadb, 5, 2);
-  connb = new SG_Button("Connect to Game", but_normal, but_disabled, but_pressed);
-  main->AddWidget(connb, 5, 3);
-  readyb = new SG_StickyButton("Ready to Play", but_normal, but_disabled, but_pressed, but_activated);
+  hostb = new SG_Button("Host", but_normal, but_disabled, but_pressed);
+  main->AddWidget(hostb, 5, 2);
+  scanb = new SG_Button("Search", but_normal, but_disabled, but_pressed);
+  main->AddWidget(scanb, 5, 3);
+  readyb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
   main->AddWidget(readyb, 5, 5);
   gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
   gob->SetAlignment(SG_ALIGN_CENTER);	//Temporary!
@@ -541,8 +541,11 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
     if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
       else if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
-      else if(event.user.data1 == (void*)loadb) return POPUP_LOADMAP;
+      else if(event.user.data1 == (void*)hostb) return POPUP_LOADMAP;
       else if(event.user.data1 == (void*)gob) return SCREEN_PLAY;
+      else if(event.user.data1 == (void*)scanb) {
+	connector->Search();
+	}
       }
     else if(event.user.code == SG_EVENT_STICKYON) {
       if(cur_game) gob->Enable();
