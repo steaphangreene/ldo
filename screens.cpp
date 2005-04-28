@@ -469,7 +469,8 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SDL_Event &event) {
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
-      connector->Config(slots);
+      connector->SetSlots(slots);
+      connector->Config();
       }
     else if(event.user.code == SG_EVENT_OK) {
       }
@@ -524,7 +525,8 @@ ScreenNum Screen_Multi::Start(SimpleGUI *gui) {
     net_init = true;
     }
 
-  connector->Search("LDO:");
+  connector->SetTag("LDO");
+  connector->Search();
 
   return SCREEN_SAME;
   }
@@ -562,7 +564,8 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
-      connector->Host("LDO:", slots);
+      connector->SetSlots(slots);
+      connector->Host();
       }
     else if(event.user.code == SG_EVENT_OK) {
       }
