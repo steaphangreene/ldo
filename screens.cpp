@@ -552,6 +552,7 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
       if(cur_game && readyb->IsOn()) {
 	gob->Enable();
 	}
+      connector->SetMapName(cur_game->MapName());
       vector<SC_SlotType> slots;
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
