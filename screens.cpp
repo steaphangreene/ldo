@@ -542,7 +542,23 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
       else if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
       else if(event.user.data1 == (void*)hostb) return POPUP_LOADMAP;
-      else if(event.user.data1 == (void*)gob) return SCREEN_PLAY;
+      else if(event.user.data1 == (void*)gob) {
+	SimpleConnections conn = connector->ClaimConnections();
+	char buf[16] = {0};
+	if(conn.sock) { // Client
+	  SDLNet_TCP_Recv(conn.sock, buf, 16);
+	  fprintf(stderr, "Recived '%s' from server\n", buf);
+	  }
+	else {		// Server
+	  sprintf(buf, "Hello%c", 0);
+	  vector<SlotData>::iterator slot = conn.slots.begin();
+	  for(; slot != conn.slots.end(); ++slot) {
+	    if(slot->sock) SDLNet_TCP_Send(slot->sock, buf, 16);
+	    }
+	  fprintf(stderr, "Sent data to clients\n");
+	  }
+	return SCREEN_PLAY;
+	}
       else if(event.user.data1 == (void*)scanb) {
 	connector->Search();
 	}
