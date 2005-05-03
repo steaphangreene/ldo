@@ -28,6 +28,7 @@
 using namespace std;
 
 #include "../simplevideo/simplevideo.h"
+#include "../simpleaudio/simpleaudio.h"
 #include "../simplegui/simplegui.h"
 #include "../simpleconnect/simpleconnect.h"
 
@@ -69,7 +70,8 @@ private:
   map<ScreenNum, Screen *> sscr;	//Map of ScreenNums to Screens
   int click;				//Button Click Sound
 
-  SimpleVideo *renderer;
+  SimpleVideo *video;
+  SimpleAudio *audio;
   };
 
 #endif // SCREENS_H

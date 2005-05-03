@@ -23,7 +23,6 @@
 #include "SDL_net.h"
 
 #include "screens.h"
-#include "audio.h"
 #include "click.h"
 
 #include "game.h"
@@ -47,8 +46,8 @@ class Screen {
 public:
   Screen() { main = NULL; };
   virtual ~Screen() { if(main) delete main; };
-  virtual ScreenNum Start(SimpleGUI *gui);
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual ScreenNum Start(SimpleGUI *gui, SimpleAudio *audio);
+  virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
   virtual void Finish(SimpleGUI *gui);
 protected:
   SG_Table *main;
@@ -58,7 +57,7 @@ class Screen_Title : public Screen {
 public:
   Screen_Title();
   virtual ~Screen_Title();
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
 protected:
   SG_Button *optb, *multb, *singb, *replb, *quitb;
   };
@@ -67,8 +66,8 @@ class Screen_Config : public Screen {
 public:
   Screen_Config();
   virtual ~Screen_Config();
-  virtual ScreenNum Start(SimpleGUI *gui);
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual ScreenNum Start(SimpleGUI *gui, SimpleAudio *audio);
+  virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
 protected:
   SG_Button *backb;
   };
@@ -77,7 +76,7 @@ class Screen_Single : public Screen {
 public:
   Screen_Single();
   virtual ~Screen_Single();
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
 protected:
   SG_Button *cancelb, *optb, *loadb, *gob;
   SG_ScrollingArea *connscr;
@@ -88,8 +87,8 @@ class Screen_Multi : public Screen {
 public:
   Screen_Multi();
   virtual ~Screen_Multi();
-  virtual ScreenNum Start(SimpleGUI *gui);
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual ScreenNum Start(SimpleGUI *gui, SimpleAudio *audio);
+  virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
   virtual void Finish(SimpleGUI *gui);
 protected:
   SG_Button *cancelb, *optb, *hostb, *gob, *scanb;
@@ -103,7 +102,7 @@ class Screen_Replay : public Screen {
 public:
   Screen_Replay();
   virtual ~Screen_Replay();
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
 protected:
   SG_Button *cancelb, *optb, *loadb, *gob;
   };
@@ -112,8 +111,8 @@ class Screen_Play : public Screen {
 public:
   Screen_Play();
   virtual ~Screen_Play();
-  virtual ScreenNum Start(SimpleGUI *gui);
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual ScreenNum Start(SimpleGUI *gui, SimpleAudio *audio);
+  virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
   virtual void Finish(SimpleGUI *gui);
 protected:
   SG_Button *optb, *doneb;
@@ -123,8 +122,8 @@ class Screen_Results : public Screen {
 public:
   Screen_Results();
   virtual ~Screen_Results();
-  virtual ScreenNum Start(SimpleGUI *gui);
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual ScreenNum Start(SimpleGUI *gui, SimpleAudio *audio);
+  virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
 protected:
   SG_Button *replb, *saveb, *doneb, *quitb;
   };
@@ -134,7 +133,7 @@ class Popup : public Screen {
 public:
   Popup() { main = NULL; };
   virtual ~Popup() {};
-  virtual ScreenNum Start(SimpleGUI *gui);
+  virtual ScreenNum Start(SimpleGUI *gui, SimpleAudio *audio);
   virtual void Finish(SimpleGUI *gui);
   };
 
@@ -142,7 +141,7 @@ class Popup_LoadMap : public Popup {
 public:
   Popup_LoadMap();
   virtual ~Popup_LoadMap();
-  virtual ScreenNum Handle(SimpleGUI *gui, SDL_Event &event);
+  virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
   };
 
 
@@ -152,11 +151,11 @@ Screens::Screens() {
   screen = SCREEN_NONE;
   last_screen = SCREEN_NONE;
 
-  renderer = new SimpleVideo(640, 360, 16.0/9.0);
-  audio_init(4096);
-  click = audio_buildsound(click_data, sizeof(click_data));
-  music = audio_loadmusic("music/cantus.wav");
-  cur_music = audio_loop(music, 16, 0);
+  video = new SimpleVideo(640, 360, 16.0/9.0);
+  audio = new SimpleAudio(4096);
+  click = audio->BuildSound(click_data, sizeof(click_data));
+  music = audio->LoadMusic("music/cantus.wav");
+  cur_music = audio->Loop(music, 16, 0);
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
   gui->LoadFont("fonts/Denmark Regular.ttf", 24);
@@ -186,7 +185,7 @@ Screens::~Screens() {
   if(cur_game) delete cur_game;
   cur_game = NULL;
 
-  audio_stop(cur_music);
+  audio->Stop(cur_music);
   cur_music = NULL;
 
   map<ScreenNum, Screen *>::iterator itrs = sscr.begin();
@@ -210,7 +209,7 @@ void Screens::Set(ScreenNum s) {
   if(s < POPUP_MAX) {		//It's a Popup, not a Screen
     popup = s;
     if(sscr.count(popup)) {
-      sscr[popup]->Start(gui);
+      sscr[popup]->Start(gui, audio);
       }
     return;			//Don't want to swap screens too.
     }
@@ -228,7 +227,7 @@ void Screens::Set(ScreenNum s) {
     }
 
   if(sscr.count(screen)) {
-    ScreenNum res = sscr[screen]->Start(gui);
+    ScreenNum res = sscr[screen]->Start(gui, audio);
     if(res != SCREEN_SAME) Set(res);
     }
   }
@@ -259,7 +258,7 @@ int Screens::Handle() {
 	  case(SG_EVENT_STICKYON):
 	  case(SG_EVENT_SELECT):
 	  case(SG_EVENT_BUTTONPRESS): {
-	    audio_play(click, 8, 8);
+	    audio->Play(click, 8, 8);
 	    }break;
 	  default: {
 	    }break;
@@ -268,28 +267,28 @@ int Screens::Handle() {
 
       //This calls the individual popup (if there is one)
       if(popup != SCREEN_NONE && sscr.count(popup)) {
-	ScreenNum next = sscr[popup]->Handle(gui, event);
+	ScreenNum next = sscr[popup]->Handle(gui, audio, event);
 	if(next != SCREEN_SAME) Set(next);
 	}
 
       //This calls the individual screen (if there is one - there should be!)
       if(screen != SCREEN_NONE && sscr.count(screen)) {
-	ScreenNum next = sscr[screen]->Handle(gui, event);
+	ScreenNum next = sscr[screen]->Handle(gui, audio, event);
 	if(next != SCREEN_SAME) Set(next);
 	}
       }
 
-    renderer->StartScene();
+    video->StartScene();
     gui->RenderStart(SDL_GetTicks());
     gui->RenderFinish(SDL_GetTicks());
-    renderer->FinishScene();
+    video->FinishScene();
     }
 
   return 0;
   }
 
 
-ScreenNum Screen::Start(SimpleGUI *gui) {
+ScreenNum Screen::Start(SimpleGUI *gui, SimpleAudio *audio) {
   gui->MasterWidget()->AddWidget(main);
   return SCREEN_SAME;
   }
@@ -298,11 +297,11 @@ void Screen::Finish(SimpleGUI *gui) {
   gui->MasterWidget()->RemoveWidget(main);
   }
 
-ScreenNum Screen::Handle(SimpleGUI *gui, SDL_Event &event) {
+ScreenNum Screen::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
   return SCREEN_SAME;
   }
 
-ScreenNum Popup::Start(SimpleGUI *gui) {
+ScreenNum Popup::Start(SimpleGUI *gui, SimpleAudio *audio) {
   gui->SetPopupWidget(main);
   return SCREEN_SAME;
   }
@@ -352,12 +351,12 @@ Screen_Config::~Screen_Config() {
   //FIXME: Fill!
   }
 
-ScreenNum Screen_Config::Start(SimpleGUI *gui) {
-  Screen::Start(gui);
+ScreenNum Screen_Config::Start(SimpleGUI *gui, SimpleAudio *audio) {
+  Screen::Start(gui, audio);
   return SCREEN_SAME;
   }
 
-ScreenNum Screen_Config::Handle(SimpleGUI *gui, SDL_Event &event) {
+ScreenNum Screen_Config::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)backb) return SCREEN_BACK;
@@ -413,7 +412,7 @@ Screen_Title::~Screen_Title() {
   //FIXME: Fill!
   }
 
-ScreenNum Screen_Title::Handle(SimpleGUI *gui, SDL_Event &event) {
+ScreenNum Screen_Title::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
@@ -450,7 +449,7 @@ Screen_Single::~Screen_Single() {
   //FIXME: Fill!
   }
 
-ScreenNum Screen_Single::Handle(SimpleGUI *gui, SDL_Event &event) {
+ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
@@ -515,8 +514,8 @@ Screen_Multi::~Screen_Multi() {
   //FIXME: Cleanup Widgets!
   }
 
-ScreenNum Screen_Multi::Start(SimpleGUI *gui) {
-  Screen::Start(gui);
+ScreenNum Screen_Multi::Start(SimpleGUI *gui, SimpleAudio *audio) {
+  Screen::Start(gui, audio);
   if(!net_init) {
     if(SDLNet_Init() < 0) {
       fprintf(stderr, "ERROR: SDLNet_Init Failed: %s\n", SDL_GetError());
@@ -536,7 +535,7 @@ void Screen_Multi::Finish(SimpleGUI *gui) {
   connector->Reset();
   }
 
-ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SDL_Event &event) {
+ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
@@ -621,7 +620,7 @@ Screen_Replay::~Screen_Replay() {
   //FIXME: Fill!
   }
 
-ScreenNum Screen_Replay::Handle(SimpleGUI *gui, SDL_Event &event) {
+ScreenNum Screen_Replay::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
@@ -654,12 +653,12 @@ Screen_Results::~Screen_Results() {
   //FIXME: Fill!
   }
 
-ScreenNum Screen_Results::Start(SimpleGUI *gui) {
-  Screen::Start(gui);
+ScreenNum Screen_Results::Start(SimpleGUI *gui, SimpleAudio *audio) {
+  Screen::Start(gui, audio);
   return SCREEN_SAME;
   }
 
-ScreenNum Screen_Results::Handle(SimpleGUI *gui, SDL_Event &event) {
+ScreenNum Screen_Results::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)replb) return SCREEN_PLAY;
@@ -685,13 +684,13 @@ Screen_Play::Screen_Play() {
 Screen_Play::~Screen_Play() {
   }
 
-ScreenNum Screen_Play::Start(SimpleGUI *gui) {
-  audio_stop(cur_music);
+ScreenNum Screen_Play::Start(SimpleGUI *gui, SimpleAudio *audio) {
+  audio->Stop(cur_music);
   cur_music = NULL;
 
   PlayResult res = cur_game->Play();
 
-  cur_music = audio_loop(music, 8, 0);
+  cur_music = audio->Loop(music, 8, 0);
 
   if(res == PLAY_FINISHED) return SCREEN_RESULTS;
   else if(res == PLAY_CONFIG) return SCREEN_CONFIG;
@@ -707,7 +706,7 @@ void Screen_Play::Finish(SimpleGUI *gui) {
 //  Do Nothing!
   }
 
-ScreenNum Screen_Play::Handle(SimpleGUI *gui, SDL_Event &event) {
+ScreenNum Screen_Play::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
 //  Do Nothing!
   return SCREEN_SAME;
   }
@@ -720,7 +719,7 @@ Popup_LoadMap::~Popup_LoadMap() {
   //FIXME: Fill!
   }
 
-ScreenNum Popup_LoadMap::Handle(SimpleGUI *gui, SDL_Event &event) {
+ScreenNum Popup_LoadMap::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_FILEOPEN) {
       string fn = ((SG_FileBrowser *)(main))->FileName();

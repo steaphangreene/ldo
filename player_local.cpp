@@ -37,18 +37,22 @@ int sel_x = -1, sel_y = -1;
 
 Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 	: Player(gm, tp, num) {
-  gui = SimpleGUI::CurrentGUI(); //Yes, this is ok, it's static!
+  gui = SimpleGUI::Current(); //Yes, this is ok, it's static!
   if(!gui) {
     //FIXME: Initialize GUI myself if it's not already done for me!
     }
-  renderer = SimpleVideo::CurrentVideo(); //Yes, this is ok, it's static!
-  if(!renderer) {
-    //FIXME: Initialize renderer myself if it's not already done for me!
+  video = SimpleVideo::Current(); //Yes, this is ok, it's static!
+  if(!video) {
+    //FIXME: Initialize video myself if it's not already done for me!
+    }
+  audio = SimpleAudio::Current(); //Yes, this is ok, it's static!
+  if(!audio) {
+    //FIXME: Initialize audio myself if it's not already done for me!
     }
 
   world = new World(&percept, &orders);
 
-  music = audio_loadmusic("music/iconoclasm.wav");
+  music = audio->LoadMusic("music/iconoclasm.wav");
   cur_music = NULL;
 
   phase = PHASE_NONE;
@@ -155,40 +159,40 @@ int Player_Local::EventHandler() {
 	xspd += MOVE_SPEED;
 	if(xspd > MOVE_SPEED) xspd = MOVE_SPEED;
 	SDL_mutexP(vid_mut);
-	renderer->SetMove(xspd, yspd);
+	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_LEFT) {
 	xspd -= MOVE_SPEED;
 	if(xspd < -MOVE_SPEED) xspd = -MOVE_SPEED;
 	SDL_mutexP(vid_mut);
-	renderer->SetMove(xspd, yspd);
+	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_UP) {
 	yspd += MOVE_SPEED;
 	if(yspd > MOVE_SPEED) yspd = MOVE_SPEED;
 	SDL_mutexP(vid_mut);
-	renderer->SetMove(xspd, yspd);
+	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_DOWN) {
 	yspd -= MOVE_SPEED;
 	if(yspd < -MOVE_SPEED) yspd = -MOVE_SPEED;
 	SDL_mutexP(vid_mut);
-	renderer->SetMove(xspd, yspd);
+	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_PAGEUP) {
 	cur_ang += 90.0;
 	SDL_mutexP(vid_mut);
-	renderer->SetAngle(cur_ang, ROT_DELAY);
+	video->SetAngle(cur_ang, ROT_DELAY);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_PAGEDOWN) {
 	cur_ang -= 90.0;
 	SDL_mutexP(vid_mut);
-	renderer->SetAngle(cur_ang, ROT_DELAY);
+	video->SetAngle(cur_ang, ROT_DELAY);
 	SDL_mutexV(vid_mut);
 	}
       }
@@ -197,28 +201,28 @@ int Player_Local::EventHandler() {
 	xspd -= MOVE_SPEED;
 	if(xspd < -MOVE_SPEED) xspd = -MOVE_SPEED;
 	SDL_mutexP(vid_mut);
-	renderer->SetMove(xspd, yspd);
+	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_LEFT) {
 	xspd += MOVE_SPEED;
 	if(xspd > MOVE_SPEED) xspd = MOVE_SPEED;
 	SDL_mutexP(vid_mut);
-	renderer->SetMove(xspd, yspd);
+	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_UP) {
  	yspd -= MOVE_SPEED;
 	if(yspd < -MOVE_SPEED) yspd = -MOVE_SPEED;
 	SDL_mutexP(vid_mut);
-	renderer->SetMove(xspd, yspd);
+	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.key.keysym.sym == SDLK_DOWN) {
 	yspd += MOVE_SPEED;
 	if(yspd > MOVE_SPEED) yspd = MOVE_SPEED;
 	SDL_mutexP(vid_mut);
-	renderer->SetMove(xspd, yspd);
+	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
 	}
       }
@@ -305,21 +309,21 @@ int Player_Local::EventHandler() {
 	cur_zoom -= 0.5;
 	if(cur_zoom < 8.0) cur_zoom = 8.0;
 	SDL_mutexP(vid_mut);
-	renderer->SetZoom(cur_zoom, ZOOM_DELAY);
+	video->SetZoom(cur_zoom, ZOOM_DELAY);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.user.code == SG_EVENT_SCROLLDOWN) {
 	cur_zoom += 0.5;
 	if(cur_zoom > 32.0) cur_zoom = 32.0;
 	SDL_mutexP(vid_mut);
-	renderer->SetZoom(cur_zoom, ZOOM_DELAY);
+	video->SetZoom(cur_zoom, ZOOM_DELAY);
 	SDL_mutexV(vid_mut);
 	}
       else if(event.user.code == SG_EVENT_LEFTCLICK) {
 	double x = ((float*)(event.user.data2))[0];
 	double y = ((float*)(event.user.data2))[1];
 	SDL_mutexP(vid_mut);
-	renderer->ScreenToMap(x, y, 0.0);
+	video->ScreenToMap(x, y, 0.0);
 	SDL_mutexV(vid_mut);
 	sel_x = ((int)(x)) / 2;
 	sel_y = ((int)(y)) / 2;
@@ -393,23 +397,23 @@ static char buf[256];
 bool Player_Local::Run() {
   Player::Run();	// Start with the basics
 
-  if(!cur_music) cur_music = audio_loop(music, 16, 0);
+  if(!cur_music) cur_music = audio->Loop(music, 16, 0);
 
   UpdateEquipIDs();	// See if we need to do the Equip thing
 
   gui->MasterWidget()->AddWidget(wind[phase]);
 
   //Temporary!
-  if(phase == PHASE_DECLARE) renderer->SetSubscreen(-0.8, -0.2, 0.4, 1.0);
-  else renderer->ResetSubscreen();
+  if(phase == PHASE_DECLARE) video->SetSubscreen(-0.8, -0.2, 0.4, 1.0);
+  else video->ResetSubscreen();
 
-  renderer->SetOrtho();
-//  renderer->SetPerspective(45.0);	//Just for testing
-  renderer->SetZExtents(0.0, 8.0);
-  renderer->SetPosition(64.0, 64.0, 0);	//FIXME: Really find start pos
-  renderer->SetAngle(cur_ang, 0);
-  renderer->SetZoom(cur_zoom, 0);
-  renderer->SetDown(cur_down, 0);
+  video->SetOrtho();
+//  video->SetPerspective(45.0);	//Just for testing
+  video->SetZExtents(0.0, 8.0);
+  video->SetPosition(64.0, 64.0, 0);	//FIXME: Really find start pos
+  video->SetAngle(cur_ang, 0);
+  video->SetZoom(cur_zoom, 0);
+  video->SetDown(cur_down, 0);
 
   exiting = 0;
   SDL_Thread *th = SDL_CreateThread(event_thread_func, (void*)(this));
@@ -442,8 +446,8 @@ bool Player_Local::Run() {
       gui->Unlock();
 
       //Temporary!
-      if(phase == PHASE_DECLARE) renderer->SetSubscreen(-0.8, -0.2, 0.4, 1.0);
-      else renderer->ResetSubscreen();
+      if(phase == PHASE_DECLARE) video->SetSubscreen(-0.8, -0.2, 0.4, 1.0);
+      else video->ResetSubscreen();
       }
     Uint32 cur_time = SDL_GetTicks();
 
@@ -456,7 +460,7 @@ bool Player_Local::Run() {
       }
 
     SDL_mutexP(vid_mut);
-    renderer->StartScene();
+    video->StartScene();
     SDL_mutexV(vid_mut);
 
     gui->RenderStart(cur_time, true);
@@ -473,7 +477,7 @@ bool Player_Local::Run() {
     gui->RenderFinish(cur_time, true);
 
     SDL_mutexP(vid_mut);
-    renderer->FinishScene();
+    video->FinishScene();
     SDL_mutexV(vid_mut);
     }
 
@@ -481,7 +485,7 @@ bool Player_Local::Run() {
 
   gui->MasterWidget()->RemoveWidget(wind[phase]);
 
-  if(cur_music) audio_stop(cur_music);
+  if(cur_music) audio->Stop(cur_music);
   cur_music = NULL;
 
   game->TermThreads();	// Tell everyone else to exit too

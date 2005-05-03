@@ -30,7 +30,7 @@
 #include "SDL_thread.h"
 #include "../simplegui/simplegui.h"
 #include "../simplevideo/simplevideo.h"
-#include "audio.h"
+#include "../simpleaudio/simpleaudio.h"
 
 enum Phase {
   PHASE_NONE = -1,
@@ -60,7 +60,8 @@ protected:
   PopPhase nextpopphase;	//Current phase of popup
 
   SimpleGUI *gui;
-  SimpleVideo *renderer;
+  SimpleVideo *video;
+  SimpleAudio *audio;
   World *world;
 
   SG_Table *wind[PHASE_MAX];	//Screens for each phase
