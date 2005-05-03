@@ -52,8 +52,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 
   world = new World(&percept, &orders);
 
-  music = audio->LoadMusic("music/iconoclasm.wav");
-  cur_music = NULL;
+  music = audio->LoadMusic("music/iconoclasm.ogg");
+  cur_music = -1;
 
   phase = PHASE_NONE;
   popphase = POPPHASE_NONE;
@@ -397,7 +397,7 @@ static char buf[256];
 bool Player_Local::Run() {
   Player::Run();	// Start with the basics
 
-  if(!cur_music) cur_music = audio->Loop(music, 16, 0);
+  if(cur_music < 0) cur_music = audio->Loop(music);
 
   UpdateEquipIDs();	// See if we need to do the Equip thing
 
@@ -485,8 +485,8 @@ bool Player_Local::Run() {
 
   gui->MasterWidget()->RemoveWidget(wind[phase]);
 
-  if(cur_music) audio->Stop(cur_music);
-  cur_music = NULL;
+  if(cur_music >= 0) audio->Stop(cur_music);
+  cur_music = -1;
 
   game->TermThreads();	// Tell everyone else to exit too
 

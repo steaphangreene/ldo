@@ -94,7 +94,7 @@ protected:
   SG_TransLabel *dtext;
 
   int music;			//Background Music (Temporary)
-  Sound *cur_music;		//Currently Playing Music (Temporary)
+  PlayingSound cur_music;	//Currently Playing Music (Temporary)
 
   SDL_mutex *vid_mut;		//MutEx to protect renderer
 

@@ -40,7 +40,7 @@ Game *cur_game = NULL;			//Temporary, just for testing
 static int drkred = 0;	//Global colordef
 
 int music = 0;			//Background Music (Temporary)
-Sound *cur_music = NULL;	//Currently Playing Music (Temporary)
+PlayingSound cur_music = -1;	//Currently Playing Music (Temporary)
 
 class Screen {
 public:
@@ -152,10 +152,10 @@ Screens::Screens() {
   last_screen = SCREEN_NONE;
 
   video = new SimpleVideo(640, 360, 16.0/9.0);
-  audio = new SimpleAudio(4096);
+  audio = new SimpleAudio();
   click = audio->BuildSound(click_data, sizeof(click_data));
-  music = audio->LoadMusic("music/cantus.wav");
-  cur_music = audio->Loop(music, 16, 0);
+  music = audio->LoadMusic("music/cantus.ogg");
+  cur_music = audio->Loop(music);
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
   gui->LoadFont("fonts/Denmark Regular.ttf", 24);
@@ -186,7 +186,7 @@ Screens::~Screens() {
   cur_game = NULL;
 
   audio->Stop(cur_music);
-  cur_music = NULL;
+  cur_music = -1;
 
   map<ScreenNum, Screen *>::iterator itrs = sscr.begin();
   for(; itrs != sscr.end(); ++itrs) {
@@ -258,7 +258,7 @@ int Screens::Handle() {
 	  case(SG_EVENT_STICKYON):
 	  case(SG_EVENT_SELECT):
 	  case(SG_EVENT_BUTTONPRESS): {
-	    audio->Play(click, 8, 8);
+	    audio->Play(click);
 	    }break;
 	  default: {
 	    }break;
@@ -686,7 +686,7 @@ Screen_Play::~Screen_Play() {
 
 ScreenNum Screen_Play::Start(SimpleGUI *gui, SimpleAudio *audio) {
   audio->Stop(cur_music);
-  cur_music = NULL;
+  cur_music = -1;
 
   PlayResult res = cur_game->Play();
 
