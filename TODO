@@ -1,3 +1,6 @@
+-=Errors=-
+Track/Fix segfault if one opens a new map while a map is opened.
+
 -=Codebase=-
 Implement the missing Player_Local popups
 Get screens to delete their widgets on destruction
