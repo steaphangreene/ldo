@@ -439,7 +439,7 @@ Screen_Single::Screen_Single() {
   gob->SetAlignment(SG_ALIGN_LEFT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
-  connscr = new SG_ScrollingArea(8.0, 8.0);
+  connscr = new SG_ScrollingArea(SG_AUTOSIZE, 8.0);
   main->AddWidget(connscr, 0, 2, 5, 5);
   connector = new SimpleConnect();
   connscr->AddWidget(connector);
@@ -495,7 +495,7 @@ Screen_Multi::Screen_Multi() {
   gob->SetAlignment(SG_ALIGN_CENTER);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
-  connscr = new SG_ScrollingArea(8.0, 8.0);
+  connscr = new SG_ScrollingArea(SG_AUTOSIZE, 8.0);
   main->AddWidget(connscr, 0, 2, 5, 5);
   connector = new SimpleConnect();
   connscr->AddWidget(connector);
@@ -558,6 +558,14 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &ev
 	}
       connector->SetMapName(cur_game->MapName());
       vector<SC_SlotType> slots;
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
+      slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
       slots.push_back(SC_SLOT_PLAYER);
