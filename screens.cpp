@@ -38,6 +38,7 @@ SDL_Surface *mouse_cursor;
 Game *cur_game = NULL;			//Temporary, just for testing
 
 static int drkred = 0;	//Global colordef
+static vector<int> cols; //Team colors
 
 int music = 0;			//Background Music (Temporary)
 PlayingSound cur_music = -1;	//Currently Playing Music (Temporary)
@@ -159,6 +160,10 @@ Screens::Screens() {
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
   gui->LoadFont("fonts/Denmark Regular.ttf", 24);
+
+  cols.push_back(gui->NewColor(0.0, 1.0, 0.0));
+  cols.push_back(gui->NewColor(0.0, 0.0, 1.0));
+  cols.push_back(gui->NewColor(1.0, 1.0, 0.0));
 
   mouse_cursor = SDL_CreateRGBSurfaceFrom(cursor, 256, 256, 32, 256*4, TGA_COLFIELDS);
   gui->SetMouseCursor(mouse_cursor, 0.125, 0.125);
@@ -442,6 +447,7 @@ Screen_Single::Screen_Single() {
   connscr = new SG_ScrollingArea(SG_AUTOSIZE, 8.0);
   main->AddWidget(connscr, 0, 2, 5, 5);
   connector = new SimpleConnect();
+  connector->SetColors(cols);
   connscr->AddWidget(connector);
   }
 
@@ -460,15 +466,26 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &e
     else if(event.user.code == SG_EVENT_FILEOPEN) {
       if(cur_game) gob->Enable();
       vector<SC_SlotType> slots;
+      vector<int> slot_cols;
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(1);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(1);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(1);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(2);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(2);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(2);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(3);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(3);
       connector->SetSlots(slots);
+      connector->SetSlotColors(slot_cols);
+      connector->SetSlotTeams(slot_cols);
       connector->Config();
       }
     else if(event.user.code == SG_EVENT_OK) {
@@ -498,6 +515,7 @@ Screen_Multi::Screen_Multi() {
   connscr = new SG_ScrollingArea(SG_AUTOSIZE, 8.0);
   main->AddWidget(connscr, 0, 2, 5, 5);
   connector = new SimpleConnect();
+  connector->SetColors(cols);
   connscr->AddWidget(connector);
   }
 
@@ -558,23 +576,42 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &ev
 	}
       connector->SetMapName(cur_game->MapName());
       vector<SC_SlotType> slots;
+      vector<int> slot_cols;
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(1);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(1);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(1);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(1);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(1);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(1);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(3);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(3);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(3);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(3);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(2);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(2);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(2);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(2);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(2);
       slots.push_back(SC_SLOT_PLAYER);
+      slot_cols.push_back(2);
       connector->SetSlots(slots);
+      connector->SetSlotColors(slot_cols);
+      connector->SetSlotTeams(slot_cols);
       connector->Host();
       }
     else if(event.user.code == SG_EVENT_OK) {
