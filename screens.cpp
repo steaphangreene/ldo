@@ -163,7 +163,8 @@ Screens::Screens() {
 
   cols.push_back(gui->NewColor(0.0, 1.0, 0.0));
   cols.push_back(gui->NewColor(0.0, 0.0, 1.0));
-  cols.push_back(gui->NewColor(1.0, 1.0, 0.0));
+  cols.push_back(gui->NewColor(1.0, 0.0, 0.0));	//Temporary Model Has No Yellow
+//  cols.push_back(gui->NewColor(1.0, 1.0, 0.0));
 
   mouse_cursor = SDL_CreateRGBSurfaceFrom(cursor, 256, 256, 32, 256*4, TGA_COLFIELDS);
   gui->SetMouseCursor(mouse_cursor, 0.125, 0.125);

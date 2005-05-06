@@ -32,6 +32,8 @@ World::World(Percept *per, Orders *ord) {
   pointx = 0.0;
   pointy = 0.0;
   models.push_back(SM_LoadModel("models/players/trooper"));
+  models.push_back(SM_LoadModel("models/players/trooper", "blue"));
+  models.push_back(SM_LoadModel("models/players/trooper", "red"));
   }
 
 World::~World() {
@@ -102,7 +104,7 @@ void World::DrawModels(Uint32 offset) {
       float y = act->y * 2 + 1;
       glPushMatrix();
       glTranslatef(x, y, 0.0);
-      models[0]->Render(offset, anims, times);
+      models[1]->Render(offset, anims, times);
       glPopMatrix();
       }
     }
