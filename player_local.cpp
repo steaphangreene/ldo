@@ -546,7 +546,7 @@ void Player_Local::UpdateEquipIDs() {
 
       // Hardcoded loadout for now - Temporary!
     if(troops.size() != 2) dnd->AddItem(gun_icon, 16, 5, 4, 6);
-    if(troops.size() != 1) dnd->AddItem(gren_icon, 22, 12);
+    if(troops.size() != 1) dnd->AddItem(gren_icon, 22, 12, 2, 2);
 
     dnd->SetBackground(new SG_Panel(equip_bg));
 
