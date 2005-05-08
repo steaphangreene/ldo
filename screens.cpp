@@ -464,6 +464,9 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &e
       else if(event.user.data1 == (void*)loadb) return POPUP_LOADMAP;
       else if(event.user.data1 == (void*)gob) return SCREEN_PLAY;
       }
+    else if(event.user.code == SG_EVENT_CONNECTDONE) {
+      return SCREEN_PLAY;
+      }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
       if(cur_game) gob->Enable();
       vector<SC_SlotType> slots;
