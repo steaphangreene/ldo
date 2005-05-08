@@ -540,7 +540,7 @@ void Player_Local::UpdateEquipIDs() {
       }
 
     SG_DNDBoxes *dnd = new SG_DNDBoxes(36, 24);
-    dnd->Include( 0,  5,  4,  6, 4, 6, 1, 0);	//Left Hand
+    dnd->Include( 0,  5,  4,  6, 4, 6, 1, 1);	//Left Hand
     dnd->Include(16,  5,  4,  6, 4, 6, 2, 0);	//Right Hand
     dnd->Include( 2,  1,  4,  2, 2, 2, 3, 0);	//Left Shoulder
     dnd->Include(14,  1,  4,  2, 2, 2, 4, 0);	//Right Shoulder
@@ -553,8 +553,8 @@ void Player_Local::UpdateEquipIDs() {
     dnd->Include( 0, 16, 36,  8, 2, 2, 0, 0);	//Ground
 
       // Hardcoded loadout for now - Temporary!
-    if(troops.size() != 2) dnd->AddItem(gun_icon, 16, 5, 4, 6);
-    if(troops.size() != 1) dnd->AddItem(gren_icon, 24, 12, 2, 2);
+    if(troops.size() != 2) dnd->AddItem(gun_icon, 16, 5, 4, 6, 1, 1);
+    if(troops.size() != 1) dnd->AddItem(gren_icon, 24, 12, 2, 2, 2, 0);
 
     dnd->SetBackground(new SG_Panel(equip_bg));
 
