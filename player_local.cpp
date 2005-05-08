@@ -20,6 +20,8 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
+#include "SDL_image.h"
+
 double cur_zoom = 16.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
 int sel_x = -1, sel_y = -1;
 
@@ -68,7 +70,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   but_activated = SDL_LoadBMP("buttontex_activated.bmp");
   gun_icon = SDL_CreateRGBSurfaceFrom(m41, 170, 256, 32, 170*4, TGA_COLFIELDS);
   gren_icon = SDL_CreateRGBSurfaceFrom(mark2, 256, 256, 32, 256*4, TGA_COLFIELDS);
-  equip_bg = SDL_LoadBMP("equip_bg.bmp");
+  equip_bg = IMG_Load("graphics/equip_bg.png");
 
   //Define base GUI for Equip phase
   wind[PHASE_EQUIP] = new SG_Table(16, 9, 0.0, 0.0);
@@ -529,22 +531,22 @@ void Player_Local::UpdateEquipIDs() {
       ednd = NULL;
       }
 
-    SG_DNDBoxes *dnd = new SG_DNDBoxes(18, 12);
-    dnd->Include(1, 1, 2, 1);
-    dnd->Include(7, 1, 2, 1);
-    dnd->Include(11, 2, 3, 3);
-    dnd->Include(0, 3, 2, 3);
-    dnd->Include(8, 3, 2, 3);
-    dnd->Include(0, 7, 2, 1);
-    dnd->Include(8, 7, 2, 1);
-    dnd->Include(11, 6, 4, 1);
-    dnd->Include(11, 7);
-    dnd->Include(14, 7);
-    dnd->Include(0, 9, 18, 3);
+    SG_DNDBoxes *dnd = new SG_DNDBoxes(36, 24);
+    dnd->Include( 2,  1,  4,  2,  2,  2);	//Left Shoulder
+    dnd->Include(14,  1,  4,  2,  2,  2);	//Right Shoulder
+    dnd->Include(22,  2,  6,  6,  2,  2);	//Backpack
+    dnd->Include( 0,  5,  4,  6,  4,  6);	//Left Hand
+    dnd->Include(16,  5,  4,  6,  4,  6);	//Right Hand
+    dnd->Include( 0, 13,  4,  2,  2,  2);	//Left Leg
+    dnd->Include(16, 13,  4,  2,  2,  2);	//Right Leg
+    dnd->Include(22, 10,  8,  2,  2,  2);	//Main Belt
+    dnd->Include(22, 12,  2,  2,  2,  2);	//Left Belt
+    dnd->Include(28, 12,  2,  2,  2,  2);	//Right Belt
+    dnd->Include( 0, 16, 36,  8,  2,  2);	//Ground
 
       // Hardcoded loadout for now - Temporary!
-    if(troops.size() != 2) dnd->AddItem(gun_icon, 8, 3, 2, 3);
-    if(troops.size() != 1) dnd->AddItem(gren_icon, 11, 7);
+    if(troops.size() != 2) dnd->AddItem(gun_icon, 16, 5, 4, 6);
+    if(troops.size() != 1) dnd->AddItem(gren_icon, 22, 12);
 
     dnd->SetBackground(new SG_Panel(equip_bg));
 

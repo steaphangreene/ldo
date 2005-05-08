@@ -119,4 +119,3 @@ void World::Render(Uint32 offset) {	// Render for playback
   DrawMap();
   DrawModels(offset);
   }
-
