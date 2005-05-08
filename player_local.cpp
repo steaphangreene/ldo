@@ -330,6 +330,12 @@ int Player_Local::EventHandler() {
 	sel_x = ((int)(x)) / 2;
 	sel_y = ((int)(y)) / 2;
 	}
+      else if(event.user.code == SG_EVENT_DND) {
+	fprintf(stderr, "DEBUG: Accepted that DnD request!\n");
+	}
+      else if(event.user.code == SG_EVENT_DNDDENIED) {
+	fprintf(stderr, "DEBUG: Denied that DnD request!\n");
+	}
       }
     }
   return exiting;
@@ -534,19 +540,19 @@ void Player_Local::UpdateEquipIDs() {
     SG_DNDBoxes *dnd = new SG_DNDBoxes(36, 24);
     dnd->Include( 2,  1,  4,  2,  2,  2);	//Left Shoulder
     dnd->Include(14,  1,  4,  2,  2,  2);	//Right Shoulder
-    dnd->Include(22,  2,  6,  6,  2,  2);	//Backpack
     dnd->Include( 0,  5,  4,  6,  4,  6);	//Left Hand
     dnd->Include(16,  5,  4,  6,  4,  6);	//Right Hand
     dnd->Include( 0, 13,  4,  2,  2,  2);	//Left Leg
     dnd->Include(16, 13,  4,  2,  2,  2);	//Right Leg
-    dnd->Include(22, 10,  8,  2,  2,  2);	//Main Belt
-    dnd->Include(22, 12,  2,  2,  2,  2);	//Left Belt
-    dnd->Include(28, 12,  2,  2,  2,  2);	//Right Belt
+    dnd->Include(25,  2,  6,  6,  2,  2);	//Backpack
+    dnd->Include(24, 10,  8,  2,  2,  2);	//Main Belt
+    dnd->Include(24, 12,  2,  2,  2,  2);	//Left Belt
+    dnd->Include(30, 12,  2,  2,  2,  2);	//Right Belt
     dnd->Include( 0, 16, 36,  8,  2,  2);	//Ground
 
       // Hardcoded loadout for now - Temporary!
     if(troops.size() != 2) dnd->AddItem(gun_icon, 16, 5, 4, 6);
-    if(troops.size() != 1) dnd->AddItem(gren_icon, 22, 12, 2, 2);
+    if(troops.size() != 1) dnd->AddItem(gren_icon, 24, 12, 2, 2);
 
     dnd->SetBackground(new SG_Panel(equip_bg));
 
