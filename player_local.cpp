@@ -332,12 +332,35 @@ int Player_Local::EventHandler() {
 	}
       else if(event.user.code == SG_EVENT_DND) {
 	int *vars = (int*)(event.user.data2);
-	fprintf(stderr, "DnD %d from (%d,%d)[%d] to (%d,%d)[%d]\n",
-		vars[0], vars[3], vars[4], vars[6], vars[1], vars[2], vars[5]);
+//	fprintf(stderr, "DnD %d from (%d,%d)[%d] to (%d,%d)[%d]\n",
+//		vars[0], vars[3], vars[4], vars[6], vars[1], vars[2], vars[5]);
+	if(vars[6] == 0) {	// Moved FROM ground
+	  vector<SG_DNDBoxes*>::iterator dnd = dnds.begin();
+	  gui->Lock();
+	  for(; dnd != dnds.end(); ++dnd) {
+	    if((*dnd) != (SG_DNDBoxes *)(event.user.data1)) {
+	      (*dnd)->RemoveItem(vars[3], vars[4]);
+	      }
+	    }
+	  gui->Unlock();
+	  }
+	if(vars[5] == 0) {	// Moved TO ground
+	  vector<SG_DNDBoxes*>::iterator dnd = dnds.begin();
+	  gui->Lock();
+	  for(; dnd != dnds.end(); ++dnd) {
+	    if((*dnd) != (SG_DNDBoxes *)(event.user.data1)) {
+	      if(vars[0] == 1)
+	        (*dnd)->AddItem(gun_icon, vars[1], vars[2], 4, 6, 1, 1);
+	      else if(vars[0] == 2)
+	        (*dnd)->AddItem(gren_icon, vars[1], vars[2], 2, 2, 2, 0);
+	      }
+	    }
+	  gui->Unlock();
+	  }
 	}
-      else if(event.user.code == SG_EVENT_DNDDENIED) {
-	fprintf(stderr, "DEBUG: Denied that DnD request!\n");
-	}
+//      else if(event.user.code == SG_EVENT_DNDDENIED) {
+//	fprintf(stderr, "DEBUG: Denied that DnD request!\n");
+//	}
       }
     }
   return exiting;
@@ -529,7 +552,7 @@ void Player_Local::UpdateEquipIDs() {
     }
 
   vector<string> troops;
-  vector<SG_Alignment *> dnds;
+  vector<SG_Alignment *> adnds;
   vector<int>::iterator id = eqid.begin();
   for(; id != eqid.end(); ++id) {
     troops.push_back(game->UnitRef(*id)->name);
@@ -537,6 +560,7 @@ void Player_Local::UpdateEquipIDs() {
       wind[PHASE_EQUIP]->RemoveWidget(ednd);
       delete ednd;
       ednd = NULL;
+      dnds.clear();
       }
 
     SG_DNDBoxes *dnd = new SG_DNDBoxes(36, 24);
@@ -558,13 +582,14 @@ void Player_Local::UpdateEquipIDs() {
 
     dnd->SetBackground(new SG_Panel(equip_bg));
 
+    adnds.push_back(dnd);
     dnds.push_back(dnd);
     }
 
   if(troops.size() > 0) {
     nextphase = PHASE_EQUIP;
     if(ednd == NULL) {
-      ednd = new SG_MultiTab(troops, dnds, 9,
+      ednd = new SG_MultiTab(troops, adnds, 9,
 	but_normal, but_disabled, but_pressed, but_activated);
       wind[PHASE_EQUIP]->AddWidget(ednd, 0, 0, 12, 9);
       estats->SetText(troops[0]);
@@ -575,6 +600,7 @@ void Player_Local::UpdateEquipIDs() {
       wind[PHASE_EQUIP]->RemoveWidget(ednd);
       delete ednd;
       ednd = NULL;
+      dnds.clear();
       }
     if(game->CurrentRound() == 1) nextphase = PHASE_DECLARE;
     else {

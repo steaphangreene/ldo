@@ -68,6 +68,7 @@ protected:
   int drkred;			//Colors
 
   SG_MultiTab *ednd;		//Widgets for Equip phase
+  vector<SG_DNDBoxes*> dnds;
   SG_TextArea *estats;
   SG_Button *ecancelb, *edoneb;
   vector<int> eqid;		//Data for Equip phase
