@@ -406,7 +406,7 @@ Screen_Title::Screen_Title() {
     credits->SetFontSize(20);
     credits->SetVisibleSize(30.0, 15.0);
     scr->AddWidget(credits);
-    delete data;
+    delete [] data;
     fclose(credfl);
 
     double vislines = credits->NumLines()+30.0;
