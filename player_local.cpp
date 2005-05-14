@@ -29,10 +29,6 @@ int sel_x = -1, sel_y = -1;
 
 #include "game.h"
 
-#include "m41.h"
-#include "mark2.h"
-#define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
-
 #define MOVE_SPEED 10.0	//Cells-per-second
 #define ZOOM_DELAY 250
 #define ROT_DELAY 500
@@ -68,8 +64,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   but_pressed = SDL_LoadBMP("buttontex_pressed.bmp");
   but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
   but_activated = SDL_LoadBMP("buttontex_activated.bmp");
-  gun_icon = SDL_CreateRGBSurfaceFrom(m41, 170, 256, 32, 170*4, TGA_COLFIELDS);
-  gren_icon = SDL_CreateRGBSurfaceFrom(mark2, 256, 256, 32, 256*4, TGA_COLFIELDS);
+  gun_icon = IMG_Load("graphics/m41.png");
+  gren_icon = IMG_Load("graphics/mark2.png");
   equip_bg = IMG_Load("graphics/equip_bg.png");
 
   //Define base GUI for Equip phase

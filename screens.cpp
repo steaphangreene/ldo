@@ -21,6 +21,7 @@
 // *************************************************************************
 
 #include "SDL_net.h"
+#include "SDL_image.h"
 
 #include "screens.h"
 #include "click.h"
@@ -30,10 +31,6 @@
 #include "player_local.h"
 
 SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
-
-#include "cursor.h"
-SDL_Surface *mouse_cursor;
-#define TGA_COLFIELDS SG_COL_U32B3, SG_COL_U32B2, SG_COL_U32B1, SG_COL_U32B4
 
 Game *cur_game = NULL;			//Temporary, just for testing
 
@@ -166,7 +163,7 @@ Screens::Screens() {
   cols.push_back(gui->NewColor(1.0, 0.0, 0.0));	//Temporary Model Has No Yellow
 //  cols.push_back(gui->NewColor(1.0, 1.0, 0.0));
 
-  mouse_cursor = SDL_CreateRGBSurfaceFrom(cursor, 256, 256, 32, 256*4, TGA_COLFIELDS);
+  SDL_Surface *mouse_cursor = IMG_Load("graphics/cursor.png");
   gui->SetMouseCursor(mouse_cursor, 0.125, 0.125);
 
   but_normal = SDL_LoadBMP("buttontex_normal.bmp");
