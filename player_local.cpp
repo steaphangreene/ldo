@@ -363,7 +363,7 @@ int Player_Local::EventHandler() {
   }
 
 
-#define SEL_BASE 0.03125
+#define SEL_BASE 0.0625
 #define SEL_HEIGHT 4.0
 
 static void DrawSelBox() {
@@ -377,6 +377,7 @@ static void DrawSelBox() {
 
   glTranslatef(sel_x*2.0+1.0, sel_y*2.0+1.0, 0.0);
 
+  glBindTexture(GL_TEXTURE_2D, 0);
   glColor3f(1.0, 1.0, 0.0);
   glBegin(GL_LINES);
 

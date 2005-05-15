@@ -62,6 +62,7 @@ void World::DrawMap() {
   glPushMatrix();
   glBegin(GL_QUADS);	//Temporary test world
 
+  glBindTexture(GL_TEXTURE_2D, 0);
   glNormal3d(0.0, 0.0, 1.0);
   for(float x = 1.0; x <= 127.0; x += 2.0) {
     for(float y = 1.0; y <= 127.0; y += 2.0) {
