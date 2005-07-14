@@ -24,6 +24,7 @@
 
 double cur_zoom = 16.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
 int sel_x = -1, sel_y = -1;
+int mouse_x = -1, mouse_y = -1;
 
 #include "player_local.h"
 
@@ -81,7 +82,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   //Define base GUI for Replay phase
   wind[PHASE_REPLAY] = new SG_Table(6, 7, 0.0625, 0.125);
   wind[PHASE_REPLAY]->SetBackground(
-	new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU));
+	new SG_PassThrough(SG_PT_CLICK, SG_PT_CLICK, SG_PT_CLICK));
   roptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   wind[PHASE_REPLAY]->AddWidget(roptb, 0, 6);
   rdoneb = new SG_Button("Ok", but_normal, but_disabled, but_pressed);
@@ -106,8 +107,9 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 
   //Define base GUI for Declare phase
   wind[PHASE_DECLARE] = new SG_Table(6, 7, 0.0625, 0.125);
-  wind[PHASE_DECLARE]->SetBackground(
-	new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU));
+  SG_PassThrough *ps = new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU);
+  wind[PHASE_DECLARE]->SetBackground(ps);
+  ps->SetSendMotion();
   doptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 6);
   ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
@@ -323,8 +325,25 @@ int Player_Local::EventHandler() {
 	SDL_mutexP(vid_mut);
 	video->ScreenToMap(x, y, 0.0);
 	SDL_mutexV(vid_mut);
-	sel_x = ((int)(x)) / 2;
-	sel_y = ((int)(y)) / 2;
+	int s_x = ((int)(x)) / 2;
+	int s_y = ((int)(y)) / 2;
+	if(UnitPresent(s_x, s_y) > 0) {
+	  sel_x = s_x;
+	  sel_y = s_y;
+	  }
+	else {
+	  sel_x = -1;
+	  sel_y = -1;
+	  }
+	}
+      else if(event.user.code == SG_EVENT_MOTION) {
+	double x = ((float*)(event.user.data2))[0];
+	double y = ((float*)(event.user.data2))[1];
+	SDL_mutexP(vid_mut);
+	video->ScreenToMap(x, y, 0.0);
+	SDL_mutexV(vid_mut);
+	mouse_x = ((int)(x)) / 2;
+	mouse_y = ((int)(y)) / 2;
 	}
       else if(event.user.code == SG_EVENT_DND) {
 	int *vars = (int*)(event.user.data2);
@@ -437,6 +456,12 @@ bool Player_Local::Run() {
 
     if(phase == PHASE_DECLARE) {
       world->Render();
+
+      int unitthere = UnitPresent(mouse_x, mouse_y);
+      if(unitthere > 0) world->DrawSelBox(mouse_x, mouse_y, 0.0, 1.0, 0.0);
+      else if(unitthere < 0) world->DrawSelBox(mouse_x, mouse_y, 1.0, 0.0, 0.0);
+      else world->DrawSelBox(mouse_x, mouse_y, 1.0, 1.0, 0.0);
+
       world->DrawSelBox(sel_x, sel_y);
       }
     else if(phase == PHASE_REPLAY) {
@@ -596,4 +621,12 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
     rcontrols->Set(playback_speed);
     gui->Unlock();
     }
+  }
+
+int Player_Local::UnitPresent(int xc, int yc) {
+  vector<UnitAct>::iterator act = percept.my_acts.begin();
+  for(; act != percept.my_acts.end(); ++act) {
+    if(act->x == xc && act->y == yc) return 1;
+    }
+  return 0;     //Nothing there
   }

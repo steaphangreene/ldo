@@ -124,15 +124,7 @@ void World::Render(Uint32 offset) {	// Render for playback
   DrawModels(offset);
   }
 
-int World::UnitPresent(int xc, int yc) {
-  vector<UnitAct>::iterator act = percept->my_acts.begin();
-  for(; act != percept->my_acts.end(); ++act) {
-    if(act->x == xc && act->y == yc) return 1;
-    }
-  return 0;	//Nothing there
-  }
-
-void World::DrawSelBox(int sel_x, int sel_y) {
+void World::DrawSelBox(int sel_x, int sel_y, float r, float g, float b) {
         //FIXME: Use REAL map x and y size for limits
   if(sel_x < 0 || sel_y < 0 || sel_x >= 64 || sel_y >= 64) return;
 
@@ -145,10 +137,7 @@ void World::DrawSelBox(int sel_x, int sel_y) {
 
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  int unitthere = UnitPresent(sel_x, sel_y);
-  if(unitthere > 0) glColor3f(0.0, 1.0, 0.0);
-  else if(unitthere < 0) glColor3f(1.0, 0.0, 0.0);
-  else glColor3f(1.0, 1.0, 0.0);
+  glColor3f(r, g, b);
 
   glBegin(GL_LINES);
 
