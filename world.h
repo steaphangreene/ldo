@@ -43,6 +43,9 @@ public:
   void SetViewPoint(float xv, float yv);
   void SetViewAngle(int ang);
 
+  int UnitPresent(int xc, int yc);	// Enemy = -1, Own = 1, None/Neutral = 0
+  void DrawSelBox(int sel_x, int sel_y);
+
 protected:
   void DrawMap();
   void DrawModels(Uint32 offset);

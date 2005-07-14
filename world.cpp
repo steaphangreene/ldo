@@ -20,6 +20,9 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
+#define SEL_BASE 0.0625
+#define SEL_HEIGHT 4.0
+
 #include <cmath>
 using namespace std;
 
@@ -119,4 +122,73 @@ void World::Render() {			// Render for declaration
 void World::Render(Uint32 offset) {	// Render for playback
   DrawMap();
   DrawModels(offset);
+  }
+
+int World::UnitPresent(int xc, int yc) {
+  vector<UnitAct>::iterator act = percept->my_acts.begin();
+  for(; act != percept->my_acts.end(); ++act) {
+    if(act->x == xc && act->y == yc) return 1;
+    }
+  return 0;	//Nothing there
+  }
+
+void World::DrawSelBox(int sel_x, int sel_y) {
+        //FIXME: Use REAL map x and y size for limits
+  if(sel_x < 0 || sel_y < 0 || sel_x >= 64 || sel_y >= 64) return;
+
+//  fprintf(stderr, "Selbox drawing at %d,%d\n", sel_x, sel_y);
+
+  glDisable(GL_LIGHTING);
+  glPushMatrix();
+
+  glTranslatef(sel_x*2.0+1.0, sel_y*2.0+1.0, 0.0);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  int unitthere = UnitPresent(sel_x, sel_y);
+  if(unitthere > 0) glColor3f(0.0, 1.0, 0.0);
+  else if(unitthere < 0) glColor3f(1.0, 0.0, 0.0);
+  else glColor3f(1.0, 1.0, 0.0);
+
+  glBegin(GL_LINES);
+
+  glVertex3f(-1.0, -1.0, SEL_BASE);
+  glVertex3f(-1.0,  1.0, SEL_BASE);
+
+  glVertex3f(-1.0,  1.0, SEL_BASE);
+  glVertex3f( 1.0,  1.0, SEL_BASE);
+
+  glVertex3f( 1.0,  1.0, SEL_BASE);
+  glVertex3f( 1.0, -1.0, SEL_BASE);
+
+  glVertex3f( 1.0, -1.0, SEL_BASE);
+  glVertex3f(-1.0, -1.0, SEL_BASE);
+
+  glVertex3f(-1.0, -1.0, SEL_HEIGHT);
+  glVertex3f(-1.0,  1.0, SEL_HEIGHT);
+
+  glVertex3f(-1.0,  1.0, SEL_HEIGHT);
+  glVertex3f( 1.0,  1.0, SEL_HEIGHT);
+
+  glVertex3f( 1.0,  1.0, SEL_HEIGHT);
+  glVertex3f( 1.0, -1.0, SEL_HEIGHT);
+
+  glVertex3f( 1.0, -1.0, SEL_HEIGHT);
+  glVertex3f(-1.0, -1.0, SEL_HEIGHT);
+
+  glVertex3f(-1.0, -1.0, SEL_BASE);
+  glVertex3f(-1.0, -1.0, SEL_HEIGHT);
+
+  glVertex3f(-1.0,  1.0, SEL_BASE);
+  glVertex3f(-1.0,  1.0, SEL_HEIGHT);
+
+  glVertex3f( 1.0,  1.0, SEL_BASE);
+  glVertex3f( 1.0,  1.0, SEL_HEIGHT);
+
+  glVertex3f( 1.0, -1.0, SEL_BASE);
+  glVertex3f( 1.0, -1.0, SEL_HEIGHT);
+
+  glEnd();
+
+  glPopMatrix();
   }

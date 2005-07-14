@@ -362,66 +362,6 @@ int Player_Local::EventHandler() {
   return exiting;
   }
 
-
-#define SEL_BASE 0.0625
-#define SEL_HEIGHT 4.0
-
-static void DrawSelBox() {
-	//FIXME: Use REAL map x and y size for limits
-  if(sel_x < 0 || sel_y < 0 || sel_x >= 64 || sel_y >= 64) return;
-
-//  fprintf(stderr, "Selbox drawing at %d,%d\n", sel_x, sel_y);
-
-  glDisable(GL_LIGHTING);
-  glPushMatrix();
-
-  glTranslatef(sel_x*2.0+1.0, sel_y*2.0+1.0, 0.0);
-
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glColor3f(1.0, 1.0, 0.0);
-  glBegin(GL_LINES);
-
-  glVertex3f(-1.0, -1.0, SEL_BASE);
-  glVertex3f(-1.0,  1.0, SEL_BASE);
-
-  glVertex3f(-1.0,  1.0, SEL_BASE);
-  glVertex3f( 1.0,  1.0, SEL_BASE);
-
-  glVertex3f( 1.0,  1.0, SEL_BASE);
-  glVertex3f( 1.0, -1.0, SEL_BASE);
-
-  glVertex3f( 1.0, -1.0, SEL_BASE);
-  glVertex3f(-1.0, -1.0, SEL_BASE);
-
-  glVertex3f(-1.0, -1.0, SEL_HEIGHT);
-  glVertex3f(-1.0,  1.0, SEL_HEIGHT);
-
-  glVertex3f(-1.0,  1.0, SEL_HEIGHT);
-  glVertex3f( 1.0,  1.0, SEL_HEIGHT);
-
-  glVertex3f( 1.0,  1.0, SEL_HEIGHT);
-  glVertex3f( 1.0, -1.0, SEL_HEIGHT);
-
-  glVertex3f( 1.0, -1.0, SEL_HEIGHT);
-  glVertex3f(-1.0, -1.0, SEL_HEIGHT);
-
-  glVertex3f(-1.0, -1.0, SEL_BASE);
-  glVertex3f(-1.0, -1.0, SEL_HEIGHT);
-
-  glVertex3f(-1.0,  1.0, SEL_BASE);
-  glVertex3f(-1.0,  1.0, SEL_HEIGHT);
-
-  glVertex3f( 1.0,  1.0, SEL_BASE);
-  glVertex3f( 1.0,  1.0, SEL_HEIGHT);
-
-  glVertex3f( 1.0, -1.0, SEL_BASE);
-  glVertex3f( 1.0, -1.0, SEL_HEIGHT);
-
-  glEnd();
-
-  glPopMatrix();
-  }
-
 static char buf[256];
 
 bool Player_Local::Run() {
@@ -497,11 +437,10 @@ bool Player_Local::Run() {
 
     if(phase == PHASE_DECLARE) {
       world->Render();
-      DrawSelBox();
+      world->DrawSelBox(sel_x, sel_y);
       }
     else if(phase == PHASE_REPLAY) {
       world->Render(offset);
-      DrawSelBox();
       }
 
     gui->RenderFinish(cur_time, true);
