@@ -623,7 +623,7 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
     }
   }
 
-int Player_Local::UnitPresent(int xc, int yc) {
+int Player_Local::UnitPresent(int xc, int yc) {	//FIXME: Should be in percept
   vector<UnitAct>::iterator act = percept.my_acts.begin();
   for(; act != percept.my_acts.end(); ++act) {
     if(act->x == xc && act->y == yc) return 1;
