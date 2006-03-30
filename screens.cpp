@@ -149,7 +149,8 @@ Screens::Screens() {
   screen = SCREEN_NONE;
   last_screen = SCREEN_NONE;
 
-  video = new SimpleVideo(640, 360, 16.0/9.0);
+//  video = new SimpleVideo(640, 360, 16.0/9.0);
+  video = new SimpleVideo(1024, 640, 16.0/10.0);
   audio = new SimpleAudio();
   click = audio->BuildSound(click_data, sizeof(click_data));
   music = audio->LoadMusic("music/cantus.ogg");
