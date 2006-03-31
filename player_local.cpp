@@ -390,7 +390,7 @@ bool Player_Local::Run() {
 
   UpdateEquipIDs();	// See if we need to do the Equip thing
 
-  gui->MasterWidget()->AddWidget(wind[phase]);
+  if(phase != PHASE_NONE) gui->MasterWidget()->AddWidget(wind[phase]);
 
 //  //Temporary!
 //  if(phase == PHASE_DECLARE) video->SetSubscreen(-0.8, -0.2, 0.4, 1.0);
