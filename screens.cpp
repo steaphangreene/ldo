@@ -402,7 +402,7 @@ Screen_Title::Screen_Title() {
     SG_TextArea *credits = new SG_TextArea(data, drkred);
     credits->SetMargins(0.125, 0.03125);
     credits->SetFontSize(20);
-    credits->SetVisibleSize(30.0, 15.0);
+    credits->SetVisibleLines(15);
     scr->AddWidget(credits);
     delete [] data;
     fclose(credfl);
