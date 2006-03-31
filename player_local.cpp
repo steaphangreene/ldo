@@ -87,7 +87,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[PHASE_REPLAY]->AddWidget(roptb, 0, 6);
   rdoneb = new SG_Button("Ok", but_normal, but_disabled, but_pressed);
   wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 6);
-  rtext = new SG_TransLabel("Play/Replay Turn", drkred);
+  rtext = new SG_TransLabel("Playback Turn", drkred);
   rtext->SetFontSize(30);
   wind[PHASE_REPLAY]->AddWidget(rtext, 1, 3, 4, 1);
   rstamp = new SG_TransLabel("<Time Offset>", drkred);
@@ -114,7 +114,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 6);
   ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
   wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 6);
-  dtext = new SG_TransLabel("Declare Next Turn (#1)", drkred);
+  dtext = new SG_TransLabel("Declare Turn (#1)", drkred);
   dtext->SetFontSize(30);
   wind[PHASE_DECLARE]->AddWidget(dtext, 1, 3, 4, 1);
 
@@ -418,9 +418,9 @@ bool Player_Local::Run() {
 
       UpdateEquipIDs();	 // See if we need to do the Equip thing again
 
-      sprintf(buf, "Declare Next Turn (#%d)%c", game->CurrentRound(), 0);
+      sprintf(buf, "Declare Turn (#%d)%c", game->CurrentRound(), 0);
       dtext->SetText(buf);
-      sprintf(buf, "Play/Replay Turn (#%d)%c", game->CurrentRound()-1, 0);
+      sprintf(buf, "Playback Turn (#%d)%c", game->CurrentRound()-1, 0);
       rtext->SetText(buf);
 
       gui->Unlock();
