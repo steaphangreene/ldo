@@ -65,6 +65,9 @@ WOBJS:=	screens.win32_o percept.win32_o orders.win32_o world.win32_o \
 	./scripts/tga2raw.csh $*
 	./scripts/raw2header.csh $*
 
+ChangeLog:      *.cpp *.h TODO COPYING Makefile .svn scripts/*
+	./scripts/svn2cl.sh | sed 's-stea-sgreene-g' > ChangeLog
+
 %.o:	%.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
