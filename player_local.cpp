@@ -80,19 +80,19 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   ednd = NULL;
 
   //Define base GUI for Replay phase
-  wind[PHASE_REPLAY] = new SG_Table(6, 7, 0.0625, 0.125);
+  wind[PHASE_REPLAY] = new SG_Table(6, 14, 0.0625, 0.125);
   wind[PHASE_REPLAY]->SetBackground(
 	new SG_PassThrough(SG_PT_CLICK, SG_PT_CLICK, SG_PT_CLICK));
   roptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  wind[PHASE_REPLAY]->AddWidget(roptb, 0, 6);
+  wind[PHASE_REPLAY]->AddWidget(roptb, 0, 13);
   rdoneb = new SG_Button("Ok", but_normal, but_disabled, but_pressed);
-  wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 6);
+  wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 13);
   rtext = new SG_TransLabel("Playback Turn", drkred);
   rtext->SetFontSize(30);
-  wind[PHASE_REPLAY]->AddWidget(rtext, 1, 3, 4, 1);
+  wind[PHASE_REPLAY]->AddWidget(rtext, 1, 12, 4, 1);
   rstamp = new SG_TransLabel("<Time Offset>", drkred);
   rstamp->SetFontSize(20);
-  wind[PHASE_REPLAY]->AddWidget(rstamp, 2, 4, 2, 1);
+  wind[PHASE_REPLAY]->AddWidget(rstamp, 1, 11, 4, 1);
   vector<string> conts;			//Temporary - until textures
   conts.push_back("<<");
   conts.push_back("<");
@@ -103,21 +103,21 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   conts.push_back(">>");
   rcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
   rcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
-  wind[PHASE_REPLAY]->AddWidget(rcontrols, 2, 6, 2, 1);
+  wind[PHASE_REPLAY]->AddWidget(rcontrols, 2, 13, 2, 1);
 
   //Define base GUI for Declare phase
-  wind[PHASE_DECLARE] = new SG_Table(6, 7, 0.0625, 0.125);
+  wind[PHASE_DECLARE] = new SG_Table(6, 14, 0.0625, 0.125);
   SG_PassThrough *ps = new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU);
   wind[PHASE_DECLARE]->SetBackground(ps);
   ps->SetSendMotion();
   doptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
-  wind[PHASE_DECLARE]->AddWidget(doptb, 0, 6);
+  wind[PHASE_DECLARE]->AddWidget(doptb, 0, 13);
   ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
-  wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 6);
+  wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 13);
   dtext = new SG_TransLabel("Declare Turn (#1)", drkred);
   dtext->SetFontSize(50);
   dtext->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_DECLARE]->AddWidget(dtext, 1, 3, 4, 1);
+  wind[PHASE_DECLARE]->AddWidget(dtext, 1, 12, 4, 1);
 
 //  //Temporary!
 //  SG_Widget *tmp = wind[PHASE_DECLARE];

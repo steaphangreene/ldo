@@ -149,14 +149,13 @@ Screens::Screens() {
   screen = SCREEN_NONE;
   last_screen = SCREEN_NONE;
 
-//  video = new SimpleVideo(640, 360, 16.0/9.0);
   video = new SimpleVideo(1024, 640, 16.0/10.0);
   audio = new SimpleAudio();
   click = audio->BuildSound(click_data, sizeof(click_data));
   music = audio->LoadMusic("music/cantus.ogg");
   cur_music = audio->Loop(music);
 
-  gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/9.0);
+  gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/10.0);
   gui->LoadFont("fonts/Denmark Regular.ttf", 24);
 
   cols.push_back(gui->NewColor(0.0, 1.0, 0.0));
