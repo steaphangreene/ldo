@@ -115,7 +115,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
   wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 6);
   dtext = new SG_TransLabel("Declare Turn (#1)", drkred);
-  dtext->SetFontSize(30);
+  dtext->SetFontSize(50);
+  dtext->SetAlignment(SG_ALIGN_CENTER);
   wind[PHASE_DECLARE]->AddWidget(dtext, 1, 3, 4, 1);
 
 //  //Temporary!

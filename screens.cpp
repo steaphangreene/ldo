@@ -384,6 +384,7 @@ Screen_Title::Screen_Title() {
 
   SG_TextArea *title = new SG_TextArea("LDO", drkred);
   title->SetMargins(0.125, 0.0);
+  title->SetVisibleSize(SG_AUTOSIZE, SG_AUTOSIZE);
   title->SetFontSize(100);
   main->AddWidget(title, 0, 0, 3, 3);
 
