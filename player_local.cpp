@@ -88,10 +88,12 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   rdoneb = new SG_Button("Ok", but_normal, but_disabled, but_pressed);
   wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 13);
   rtext = new SG_TransLabel("Playback Turn", drkred);
-  rtext->SetFontSize(30);
+  rtext->SetFontSize(50);
+  rtext->SetAlignment(SG_ALIGN_CENTER);
   wind[PHASE_REPLAY]->AddWidget(rtext, 1, 12, 4, 1);
   rstamp = new SG_TransLabel("<Time Offset>", drkred);
-  rstamp->SetFontSize(20);
+  rstamp->SetFontSize(50);
+  rstamp->SetAlignment(SG_ALIGN_CENTER);
   wind[PHASE_REPLAY]->AddWidget(rstamp, 1, 11, 4, 1);
   vector<string> conts;			//Temporary - until textures
   conts.push_back("<<");
