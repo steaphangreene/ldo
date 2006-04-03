@@ -107,9 +107,25 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 
   //Define base GUI for Declare phase
   wind[PHASE_DECLARE] = new SG_Table(6, 14, 0.0625, 0.125);
-  SG_PassThrough *ps = new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU);
-  wind[PHASE_DECLARE]->SetBackground(ps);
-  ps->SetSendMotion();
+  dpass = new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU);
+  wind[PHASE_DECLARE]->SetBackground(dpass);
+  dpass->SetSendMotion();
+
+  mactions[0].push_back("View");
+  mactions[0].push_back("Stats");
+  mactions[1].push_back("View");
+  mactions[1].push_back("Stats");
+  mactions[2].push_back("View");
+  mactions[2].push_back("Stats");
+  ractions[0].push_back("<No Unit Selected>");
+  ractions[1].push_back("Go Here");
+  ractions[1].push_back("Run Here");
+  ractions[1].push_back("Attack Here");
+  ractions[1].push_back("Throw Here");
+  ractions[2].push_back("<Enemy Selected>");
+  dpass->SetMenu(2, mactions[0]);
+  dpass->SetMenu(3, ractions[0]);
+
   doptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 13);
   ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
@@ -331,10 +347,14 @@ int Player_Local::EventHandler() {
 	if(UnitPresent(s_x, s_y) > 0) {
 	  sel_x = s_x;
 	  sel_y = s_y;
+	  dpass->SetMenu(2, mactions[1]);
+	  dpass->SetMenu(3, ractions[1]);
 	  }
 	else {
 	  sel_x = -1;
 	  sel_y = -1;
+	  dpass->SetMenu(2, mactions[0]);
+	  dpass->SetMenu(3, ractions[0]);
 	  }
 	}
       else if(event.user.code == SG_EVENT_MOTION) {

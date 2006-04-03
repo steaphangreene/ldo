@@ -150,7 +150,7 @@ Screens::Screens() {
   last_screen = SCREEN_NONE;
 
   video = new SimpleVideo(1024, 640, 16.0/10.0);
-  audio = new SimpleAudio();
+  audio = new SimpleAudio(2048);
   click = audio->BuildSound(click_data, sizeof(click_data));
   music = audio->LoadMusic("music/cantus.ogg");
   cur_music = audio->Loop(music);

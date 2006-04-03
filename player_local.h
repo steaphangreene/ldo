@@ -95,6 +95,9 @@ protected:
   SG_Button *doptb;		//Widgets for Declare phase
   SG_StickyButton *ddoneb;
   SG_TransLabel *dtext;
+  SG_PassThrough *dpass;
+  vector<string> mactions[3];	//For noselect, friendly, enemy
+  vector<string> ractions[3];	//For noselect, friendly, enemy
 
   int music;			//Background Music (Temporary)
   PlayingSound cur_music;	//Currently Playing Music (Temporary)
