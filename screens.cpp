@@ -30,6 +30,8 @@
 #include "player.h"
 #include "player_local.h"
 
+#include "../simplemodel/simplemodel.h"
+
 SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
 
 Game *cur_game = NULL;			//Temporary, just for testing
@@ -45,6 +47,7 @@ public:
   Screen() { main = NULL; };
   virtual ~Screen() { if(main) delete main; };
   virtual ScreenNum Start(SimpleGUI *gui, SimpleAudio *audio);
+  virtual void Render(SimpleGUI *gui, SimpleAudio *audio);
   virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
   virtual void Finish(SimpleGUI *gui);
 protected:
@@ -56,8 +59,10 @@ public:
   Screen_Title();
   virtual ~Screen_Title();
   virtual ScreenNum Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event);
+  virtual void Render(SimpleGUI *gui, SimpleAudio *audio);
 protected:
   SG_Button *optb, *multb, *singb, *replb, *quitb;
+  SimpleModel *guy;
   };
 
 class Screen_Config : public Screen {
@@ -283,6 +288,7 @@ int Screens::Handle() {
 
     video->StartScene();
     gui->RenderStart(SDL_GetTicks());
+    if(screen != SCREEN_NONE) sscr[screen]->Render(gui, audio);
     gui->RenderFinish(SDL_GetTicks());
     video->FinishScene();
     }
@@ -294,6 +300,9 @@ int Screens::Handle() {
 ScreenNum Screen::Start(SimpleGUI *gui, SimpleAudio *audio) {
   gui->MasterWidget()->AddWidget(main);
   return SCREEN_SAME;
+  }
+
+void Screen::Render(SimpleGUI *gui, SimpleAudio *audio) {
   }
 
 void Screen::Finish(SimpleGUI *gui) {
@@ -410,10 +419,17 @@ Screen_Title::Screen_Title() {
     double vislines = credits->NumLines()+30.0;
     scr->SetYScroll(-15.0, vislines-15.0, vislines*2.0);
     }
+
+  guy = SM_LoadModel("models/players/trooper");
+  }
+
+void Screen_Title::Render(SimpleGUI *gui, SimpleAudio *audio) {
   }
 
 Screen_Title::~Screen_Title() {
   //FIXME: Fill!
+  if(guy) delete guy;
+  guy = NULL;
   }
 
 ScreenNum Screen_Title::Handle(SimpleGUI *gui, SimpleAudio *audio, SDL_Event &event) {
