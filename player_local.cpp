@@ -421,6 +421,7 @@ bool Player_Local::Run() {
 
   video->SetOrtho();
 //  video->SetPerspective(45.0);	//Just for testing
+  video->SetSubscreen(-1.0, -1.0, 1.0, 1.0);
   video->SetZExtents(0.0, 8.0);
   video->SetPosition(64.0, 64.0, 0);	//FIXME: Really find start pos
   video->SetAngle(cur_ang, 0);
