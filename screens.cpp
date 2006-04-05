@@ -427,7 +427,8 @@ Screen_Title::Screen_Title() {
 
   guy = SM_LoadModel("models/players/trooper");
   Uint32 t = SDL_GetTicks()/2;
-  anims.push_back(LEGS_IDLE);
+//  anims.push_back(LEGS_IDLE); //Trooper is to jittery!
+  anims.push_back(LEGS_WALK);
   anims.push_back(TORSO_STAND);
   times.push_back(t);
   times.push_back(t);
