@@ -168,6 +168,12 @@ Screens::Screens() {
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/10.0);
   gui->LoadFont("fonts/Denmark Regular.ttf", 24);
 
+  gui->SetColor(SG_COL_BG,	0.250, 0.0, 0.0);
+  gui->SetColor(SG_COL_FG,	0.750, 0.0, 0.0);
+  gui->SetColor(SG_COL_RAISED,	0.500, 0.0, 0.0);
+  gui->SetColor(SG_COL_LOW,	0.375, 0.0, 0.0);
+  gui->SetColor(SG_COL_HIGH,	0.625, 0.0, 0.0);
+
   cols.push_back(gui->NewColor(0.0, 1.0, 0.0));
   cols.push_back(gui->NewColor(0.0, 0.0, 1.0));
   cols.push_back(gui->NewColor(1.0, 0.0, 0.0));	//Temporary Model Has No Yellow
