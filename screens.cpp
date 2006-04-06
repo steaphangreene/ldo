@@ -424,8 +424,8 @@ Screen_Title::Screen_Title() {
     }
 
   guy = SM_LoadModel("models/players/trooper");
-  weap = new SimpleModel_MD3("models/weapons2/machinegun/machinegun.md3", "models/weapons2/machinegun/machinegun.md3");
-  ((SimpleModel_Q3Dir*)(guy))->SetWeapon((SimpleModel_MD3*)(weap));
+//  weap = new SimpleModel_MD3("models/weapons2/machinegun/machinegun.md3", "models/weapons2/machinegun/machinegun.md3");
+//  ((SimpleModel_Q3Dir*)(guy))->SetWeapon((SimpleModel_MD3*)(weap));
   Uint32 t = SDL_GetTicks()/2;
 //  anims.push_back(LEGS_IDLE); //Trooper is to jittery!
   anims.push_back(LEGS_WALK);
