@@ -76,7 +76,6 @@ protected:
   vector<int> eqid;		//Data for Equip phase
 
 				//Textures for Equip phase
-  SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
   SDL_Surface *gun_icon, *gren_icon;
   SDL_Surface *equip_bg;
 

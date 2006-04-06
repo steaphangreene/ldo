@@ -31,9 +31,10 @@
 #include "player_local.h"
 
 #include "../simplemodel/simplemodel.h"
+#include "../simplemodel/simplemodel_md3.h"
+#include "../simplemodel/simplemodel_q3dir.h"
 #include "../simplemodel/sm_q3anim.h"
-
-SDL_Surface *but_normal, *but_pressed, *but_disabled, *but_activated;
+#include "../simpleconfig/simpleconfig.h"
 
 Game *cur_game = NULL;			//Temporary, just for testing
 
@@ -64,7 +65,7 @@ public:
   virtual void Render(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *audio);
 protected:
   SG_Button *optb, *multb, *singb, *replb, *quitb;
-  SimpleModel *guy;
+  SimpleModel *guy, *weap;
   vector<int> anims;
   vector<Uint32> times;
   };
@@ -174,11 +175,6 @@ Screens::Screens() {
 
   SDL_Surface *mouse_cursor = IMG_Load("graphics/cursor.png");
   gui->SetMouseCursor(mouse_cursor, 0.125, 0.125);
-
-  but_normal = SDL_LoadBMP("buttontex_normal.bmp");
-  but_pressed = SDL_LoadBMP("buttontex_pressed.bmp");
-  but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
-  but_activated = SDL_LoadBMP("buttontex_activated.bmp");
 
   drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
@@ -327,10 +323,10 @@ void Popup::Finish(SimpleGUI *gui) {
   }
 
 Screen_Config::Screen_Config() {
-  //Setup SCREEN_CONFIG
-  SG_Alignment *align;	// For temporary storage;
-
   main = new SG_Table(6, 7, 0.0625, 0.125);
+
+/*
+  SG_Alignment *align;	// For temporary storage;
 
   vector<string> cfg_tab;
   vector<SG_Alignment *> cfg_scr;
@@ -355,11 +351,13 @@ Screen_Config::Screen_Config() {
   align = new SG_Table(3, 7, 0.0625, 0.125);
   cfg_scr.push_back(align);
 
-  main->AddWidget(new SG_MultiTab(cfg_tab, cfg_scr, 12,
-	but_normal, but_disabled, but_pressed, but_activated),
+  main->AddWidget(new SG_MultiTab(cfg_tab, cfg_scr, 12);
 	0, 0, 5, 7);
+*/
 
-  backb = new SG_Button("Back", but_normal, but_disabled, but_pressed);
+  main->AddWidget(new SimpleConfig, 0, 0, 5, 7);
+
+  backb = new SG_Button("Back");
   main->AddWidget(backb, 5, 0);
   }
 
@@ -383,15 +381,15 @@ ScreenNum Screen_Config::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
 
 Screen_Title::Screen_Title() {
   main = new SG_Table(4, 9, 0.0625, 0.125);
-  optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  optb = new SG_Button("Options");
   main->AddWidget(optb, 3, 1);
-  multb = new SG_Button("Multiplayer", but_normal, but_disabled, but_pressed);
+  multb = new SG_Button("Multiplayer");
   main->AddWidget(multb, 3, 3);
-  singb = new SG_Button("Single Player", but_normal, but_disabled, but_pressed);
+  singb = new SG_Button("Single Player");
   main->AddWidget(singb, 3, 4);
-  replb = new SG_Button("View Replay", but_normal, but_disabled, but_pressed);
+  replb = new SG_Button("View Replay");
   main->AddWidget(replb, 3, 6);
-  quitb = new SG_Button("Quit Game", but_normal, but_disabled, but_pressed);
+  quitb = new SG_Button("Quit Game");
   main->AddWidget(quitb, 3, 8);
 
   SG_TextArea *title = new SG_TextArea("LDO", drkred);
@@ -426,6 +424,8 @@ Screen_Title::Screen_Title() {
     }
 
   guy = SM_LoadModel("models/players/trooper");
+  weap = new SimpleModel_MD3("models/weapons2/machinegun/machinegun.md3", "models/weapons2/machinegun/machinegun.md3");
+  ((SimpleModel_Q3Dir*)(guy))->SetWeapon((SimpleModel_MD3*)(weap));
   Uint32 t = SDL_GetTicks()/2;
 //  anims.push_back(LEGS_IDLE); //Trooper is to jittery!
   anims.push_back(LEGS_WALK);
@@ -455,6 +455,8 @@ Screen_Title::~Screen_Title() {
   //FIXME: Fill!
   if(guy) delete guy;
   guy = NULL;
+  if(weap) delete weap;
+  weap = NULL;
   }
 
 ScreenNum Screen_Title::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *audio, SDL_Event &event) {
@@ -474,13 +476,13 @@ ScreenNum Screen_Title::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *
 Screen_Single::Screen_Single() {
   main = new SG_Table(6, 7, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Define Teams", drkred), 0, 0, 5, 2);
-  cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
+  cancelb = new SG_Button("Cancel");
   main->AddWidget(cancelb, 5, 0);
-  optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  optb = new SG_Button("Options");
   main->AddWidget(optb, 5, 1);
-  loadb = new SG_Button("Load Scenario", but_normal, but_disabled, but_pressed);
+  loadb = new SG_Button("Load Scenario");
   main->AddWidget(loadb, 5, 2);
-  gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
+  gob = new SG_Button("Go");
   gob->SetAlignment(SG_ALIGN_LEFT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
@@ -541,17 +543,17 @@ Screen_Multi::Screen_Multi() {
   net_init = false;
   main = new SG_Table(6, 7, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Gather Players", drkred), 0, 0, 5, 2);
-  cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
+  cancelb = new SG_Button("Cancel");
   main->AddWidget(cancelb, 5, 0);
-  optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  optb = new SG_Button("Options");
   main->AddWidget(optb, 5, 1);
-  hostb = new SG_Button("Host", but_normal, but_disabled, but_pressed);
+  hostb = new SG_Button("Host");
   main->AddWidget(hostb, 5, 2);
-  scanb = new SG_Button("Search", but_normal, but_disabled, but_pressed);
+  scanb = new SG_Button("Search");
   main->AddWidget(scanb, 5, 3);
-  readyb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
+  readyb = new SG_StickyButton("Ready");
   main->AddWidget(readyb, 5, 5);
-  gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
+  gob = new SG_Button("Go");
   gob->SetAlignment(SG_ALIGN_CENTER);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
@@ -692,13 +694,13 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *
 Screen_Replay::Screen_Replay() {
   main = new SG_Table(6, 7, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Load Replay", drkred), 0, 0, 5, 2);
-  cancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
+  cancelb = new SG_Button("Cancel");
   main->AddWidget(cancelb, 5, 0);
-  optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  optb = new SG_Button("Options");
   main->AddWidget(optb, 5, 1);
-  loadb = new SG_Button("Load Replay", but_normal, but_disabled, but_pressed);
+  loadb = new SG_Button("Load Replay");
   main->AddWidget(loadb, 5, 2);
-  gob = new SG_Button("Go", but_normal, but_disabled, but_pressed);
+  gob = new SG_Button("Go");
   gob->SetAlignment(SG_ALIGN_RIGHT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
@@ -727,13 +729,13 @@ ScreenNum Screen_Replay::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
 Screen_Results::Screen_Results() {
   main = new SG_Table(6, 7, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Game Results", drkred), 0, 0, 2, 2);
-  replb = new SG_Button("Replay", but_normal, but_disabled, but_pressed);
+  replb = new SG_Button("Replay");
   main->AddWidget(replb, 5, 0);
-  saveb = new SG_Button("Save", but_normal, but_disabled, but_pressed);
+  saveb = new SG_Button("Save");
   main->AddWidget(saveb, 5, 1);
-  doneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
+  doneb = new SG_Button("Done");
   main->AddWidget(doneb, 5, 2);
-  quitb = new SG_Button("Quit", but_normal, but_disabled, but_pressed);
+  quitb = new SG_Button("Quit");
   main->AddWidget(quitb, 5, 6);
   }
 
@@ -763,9 +765,9 @@ Screen_Play::Screen_Play() {
 //  main = new SG_Table(6, 7, 0.0625, 0.125);
 //  main->AddWidget(new SG_TextArea("Playing LDO", drkred),
 //	0, 0, 4, 2);
-//  optb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+//  optb = new SG_Button("Options");
 //  main->AddWidget(optb, 0, 6);
-//  doneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
+//  doneb = new SG_Button("Done");
 //  main->AddWidget(doneb, 5, 6);
   }
 

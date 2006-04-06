@@ -61,19 +61,15 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
 
   drkred = gui->NewColor(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
-  but_normal = SDL_LoadBMP("buttontex_normal.bmp");
-  but_pressed = SDL_LoadBMP("buttontex_pressed.bmp");
-  but_disabled = SDL_LoadBMP("buttontex_disabled.bmp");
-  but_activated = SDL_LoadBMP("buttontex_activated.bmp");
   gun_icon = IMG_Load("graphics/m41.png");
   gren_icon = IMG_Load("graphics/mark2.png");
   equip_bg = IMG_Load("graphics/equip_bg.png");
 
   //Define base GUI for Equip phase
   wind[PHASE_EQUIP] = new SG_Table(16, 9, 0.0, 0.0);
-  ecancelb = new SG_Button("Cancel", but_normal, but_disabled, but_pressed);
+  ecancelb = new SG_Button("Cancel");
   wind[PHASE_EQUIP]->AddWidget(ecancelb, 12, 0, 2, 1);
-  edoneb = new SG_Button("Done", but_normal, but_disabled, but_pressed);
+  edoneb = new SG_Button("Done");
   wind[PHASE_EQUIP]->AddWidget(edoneb, 14, 0, 2, 1);
   estats = new SG_TextArea("", drkred);
   wind[PHASE_EQUIP]->AddWidget(estats, 12, 1, 4, 1);
@@ -83,9 +79,9 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   wind[PHASE_REPLAY] = new SG_Table(6, 14, 0.0625, 0.125);
   wind[PHASE_REPLAY]->SetBackground(
 	new SG_PassThrough(SG_PT_CLICK, SG_PT_CLICK, SG_PT_CLICK));
-  roptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  roptb = new SG_Button("Options");
   wind[PHASE_REPLAY]->AddWidget(roptb, 0, 13);
-  rdoneb = new SG_Button("Ok", but_normal, but_disabled, but_pressed);
+  rdoneb = new SG_Button("Ok");
   wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 13);
   rtext = new SG_TransLabel("Playback Turn", drkred);
   rtext->SetFontSize(50);
@@ -128,9 +124,9 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   dpass->SetMenu(2, mactions[0]);
   dpass->SetMenu(3, ractions[0]);
 
-  doptb = new SG_Button("Options", but_normal, but_disabled, but_pressed);
+  doptb = new SG_Button("Options");
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 13);
-  ddoneb = new SG_StickyButton("Ready", but_normal, but_disabled, but_pressed, but_activated);
+  ddoneb = new SG_StickyButton("Ready");
   wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 13);
   dtext = new SG_TransLabel("Declare Turn (#1)", drkred);
   dtext->SetFontSize(50);
@@ -574,8 +570,7 @@ void Player_Local::UpdateEquipIDs() {
   if(troops.size() > 0) {
     nextphase = PHASE_EQUIP;
     if(ednd == NULL) {
-      ednd = new SG_MultiTab(troops, adnds, 9,
-	but_normal, but_disabled, but_pressed, but_activated);
+      ednd = new SG_MultiTab(troops, adnds, 9);
       wind[PHASE_EQUIP]->AddWidget(ednd, 0, 0, 12, 9);
       estats->SetText(troops[0]);
       }
