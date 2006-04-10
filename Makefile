@@ -55,8 +55,7 @@ OBJS:=	screens.o percept.o orders.o world.o \
 #PRODUCTION OPTIONS (CROSS-COMPILED FOR WINDOWS)
 WCXX=	i586-mingw32msvc-g++
 WCXXFLAGS=	-s -O2 -Wall `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --cflags` `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-zzip-config --cflags`
-#WLIBS=	../simplegui/libsimplegui.win32_a ../simplemodel/libsimplemodel.win32_a ../simpletexture/libsimpletexture.win32_a ../simplevideo/libsimplevideo.win32_a ../simpleaudio/libsimpleaudio.win32_a ../simpleconnect/libsimpleconnect.win32_a ../simpleconfig/libsimpleconfig.win32_a `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` -lSDL_net -lwsock32 -lSDL_ttf -lSDL_image -lSDL_mixer -lvorbisfile -lvorbis -logg -lSDL -lpng -ljpeg -lpng `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-zzip-config --libs` -lopengl32 -lglu32
-WLIBS=	../simplegui/libsimplegui.win32_a ../simplemodel/libsimplemodel.win32_a ../simpletexture/libsimpletexture.win32_a ../simplevideo/libsimplevideo.win32_a ../simpleaudio/libsimpleaudio.win32_a ../simpleconnect/libsimpleconnect.win32_a ../simpleconfig/libsimpleconfig.win32_a `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` -lSDL_net -lwsock32 -lSDL_ttf -lSDL_image -lSDL_mixer -lvorbisfile -lvorbis -logg -lSDL -lpng -ljpeg -lpng -lzziplib -lzlib -lzzip -lopengl32 -lglu32
+WLIBS=	../simplegui/libsimplegui.win32_a ../simplemodel/libsimplemodel.win32_a ../simpletexture/libsimpletexture.win32_a ../simplevideo/libsimplevideo.win32_a ../simpleaudio/libsimpleaudio.win32_a ../simpleconnect/libsimpleconnect.win32_a ../simpleconfig/libsimpleconfig.win32_a `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-sdl-config --libs` -lSDL_net -lwsock32 -lSDL_ttf -lSDL_image -lSDL_mixer -lvorbisfile -lvorbis -logg -lSDL -lpng -ljpeg -lpng `/usr/i586-mingw32msvc/bin/i586-mingw32msvc-zzip-config --libs` -lopengl32 -lglu32
 
 WOBJS:=	screens.win32_o percept.win32_o orders.win32_o world.win32_o \
 	game.win32_o unit.win32_o player.win32_o player_local.win32_o \
