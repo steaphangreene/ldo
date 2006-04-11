@@ -522,22 +522,12 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
       if(cur_game) gob->Enable();
       vector<SC_SlotType> slots;
       vector<int> slot_cols;
-      slots.push_back(SC_SLOT_PLAYER);
-      slot_cols.push_back(1);
-      slots.push_back(SC_SLOT_PLAYER);
-      slot_cols.push_back(1);
-      slots.push_back(SC_SLOT_PLAYER);
-      slot_cols.push_back(1);
-      slots.push_back(SC_SLOT_PLAYER);
-      slot_cols.push_back(2);
-      slots.push_back(SC_SLOT_PLAYER);
-      slot_cols.push_back(2);
-      slots.push_back(SC_SLOT_PLAYER);
-      slot_cols.push_back(2);
-      slots.push_back(SC_SLOT_PLAYER);
-      slot_cols.push_back(3);
-      slots.push_back(SC_SLOT_PLAYER);
-      slot_cols.push_back(3);
+      for(int side = 0; side < cur_game->MapNumSides(); ++side) {
+	for(int pl = 0; pl < cur_game->MapNumSidePlayers(side); ++pl) {
+	  slots.push_back(SC_SLOT_PLAYER);
+	  slot_cols.push_back(side+1);
+	  }
+	}
       connector->SetSlots(slots);
       connector->SetSlotColors(slot_cols);
       connector->SetSlotTeams(slot_cols);

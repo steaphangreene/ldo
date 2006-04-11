@@ -476,7 +476,8 @@ bool Player_Local::Run() {
     if(phase == PHASE_REPLAY) {
       SDL_mutexP(off_mut);
       CalcOffset(cur_time);
-      sprintf(buf, "%d.%.3d seconds%c", offset / 1000, offset % 1000, 0);
+      sprintf(buf, "%d.%.3d seconds%c",
+	(game->CurrentRound()-2)*3 + offset / 1000, offset % 1000, 0);
       SDL_mutexV(off_mut);
       rstamp->SetText(buf);
       }
@@ -488,7 +489,7 @@ bool Player_Local::Run() {
     gui->RenderStart(cur_time, true);
 
     if(phase == PHASE_DECLARE) {
-      world->Render();
+      world->Render((game->CurrentRound()-1)*3000);
 
       int unit;
       int unitthere = UnitPresent(mouse_x, mouse_y, unit);
@@ -499,7 +500,7 @@ bool Player_Local::Run() {
       world->DrawSelBox(sel_x, sel_y);
       }
     else if(phase == PHASE_REPLAY) {
-      world->Render(offset);
+      world->Render((game->CurrentRound()-2)*3000 + offset);
       }
 
     gui->RenderFinish(cur_time, true);
@@ -530,12 +531,15 @@ bool Player_Local::Run() {
 
 	//Note: gui_mut must be locked before calling this function!
 void Player_Local::UpdateEquipIDs() {
+  Uint32 start_time = (game->CurrentRound()-1)*3000;
   set<int> eqtmp;	//Temporary set of ids for eq
   eqid.clear();
 
   vector<UnitAct>::iterator act = percept.my_acts.begin();
   for(; act != percept.my_acts.end(); ++act) {
-    if(act->act == ACT_EQUIP) eqtmp.insert(act->id);
+    if(act->act == ACT_EQUIP && act->time >= start_time) {
+      eqtmp.insert(act->id);
+      }
     }
 
   vector<UnitOrder>::iterator order = orders.orders.begin();

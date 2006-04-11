@@ -37,7 +37,6 @@ public:
   World(Percept *per, Orders *ord);
   ~World();
 
-  void Render();			// Render for declaration
   void Render(Uint32 offset);		// Render for playback
 
   void SetViewPoint(float xv, float yv);

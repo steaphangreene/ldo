@@ -3,21 +3,33 @@ LDO_GAMESAVE_FILE
 Temporary Test Map;
 This map is all about a temporary test.;
 3
-0
-
-0
-
 1
 0;
 1
+1;
+1
+2;
+3
 2
 0;1;
 2
+2;3;
+2
+4;5;
+6
 5
 1;2;3;4;5;
 3
 6;7;8;
-8
+5
+9;10;11;12;13;
+3
+14;15;16;
+5
+17;18;19;20;21;
+3
+22;23;24;
+24
 1;0;Clark, John;
 2;0;Chavez, Ding;
 3;0;Johnston, Homer;
@@ -26,3 +38,20 @@ This map is all about a temporary test.;
 6;1;Hart, Cleatus;
 7;1;Early, Joe Bob;
 8;1;Van Damme, Cleatus;
+9;2;Smith, John
+10;2;Smith, John
+11;2;Smith, John
+12;2;Smith, John
+13;2;Smith, John
+14;3;Smith, John
+15;3;Smith, John
+16;3;Smith, John
+17;4;Carver, Eliot
+18;4;Carver, Eliot
+19;4;Carver, Eliot
+20;4;Carver, Eliot
+21;4;Carver, Eliot
+22;5;Carver, Eliot
+23;5;Carver, Eliot
+24;5;Carver, Eliot
+

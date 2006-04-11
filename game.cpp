@@ -272,6 +272,11 @@ void Game::SetPercept(int plnum, Percept *prcpt) {
     fprintf(stderr, "ERROR: Multiple percepts requested for one player!\n");
     exit(1);
     }
+  for(Uint32 sq=0; sq < plsquads[plnum].size(); ++sq) {
+    for(Uint32 un=0; un < squnits[plsquads[plnum][sq]].size(); ++un) {
+      prcpt->my_units.insert(squnits[plsquads[plnum][sq]][un]);
+      }
+    }
   percept[plnum] = prcpt;
   }
 
@@ -280,18 +285,20 @@ void Game::UpdatePercept(int plnum, int rnd) {
     fprintf(stderr, "ERROR: Percept requested in future or pre-start!\n");
     exit(1);
     }
-  if(rnd == (int)(percept.size())) {
+
+  if(rnd >= (int)(master.size())) {
     // Current (Unresolved) Round
-    *(percept[plnum]) = master[rnd];	//Temporary!
+    rnd = (int)(master.size()) - 1;	//Temporary!
     }
-  else {
-    // Old (Resolved) Round
-    *(percept[plnum]) = master[rnd];	//Temporary!
+
+  percept[plnum]->Clear();
+  vector<UnitAct>::const_iterator itr = master[rnd].my_acts.begin();
+  for(; itr != master[rnd].my_acts.end(); ++itr) {
+    if(percept[plnum]->my_units.count(itr->id) > 0) {
+      percept[plnum]->my_acts.push_back(*itr);
+      }
     }
   }
-
-
-
 
 //Thread Stuff
 static int player_thread_func(void *arg) {
@@ -367,18 +374,37 @@ int Game::ThreadHandler() {
   return 0;
   }
 
-void Game::ResolveRound() {		// FIXME: Implement this
-//  fprintf(stderr, "DEBUG: Resolving Next Round\n");
+void Game::ResolveRound() {
   master.push_back(master.back());
 
   vector<Player *>::const_iterator itrp = player.begin();
   for(; itrp != player.end(); ++itrp) {
-    if(orders.count((*itrp)->ID()) < 1) {
-      fprintf(stderr, "ERROR: Somebody's orders got lost!\n");
+    int pnum = (*itrp)->ID();
+    if(orders.count(pnum) < 1) {
+      fprintf(stderr, "ERROR: Player %d's orders got lost!\n", pnum);
       TermThreads();
       }
     else {
-      //FIXME: Act on orders!
+      vector<UnitOrder>::const_iterator order = orders[pnum]->orders.begin();
+      for(; order != orders[pnum]->orders.end(); ++order) {
+	fprintf(stderr, "ORDER[Player%d], %d do %d at %d to (%d,%d)\n", pnum,
+		order->id, order->order, order->time,
+		order->targ1, order->targ2);
+	switch(order->order) {
+	  case(ORDER_MOVE): {
+	    master[0].my_acts.push_back(UnitAct(order->id,
+		CurrentRound()*3000 + order->time, 0, 0,
+		ACT_MOVE, order->targ1, order->targ2));
+	    }break;
+	  case(ORDER_EQUIP): {
+	    //FIXME: Arrange equip accordingly
+	    }break;
+	  default: {
+	    fprintf(stderr, "WARNING: Got unknown ORDER from Player%d\n", pnum);
+	    }break;
+	  }
+	}
       }
+    orders[pnum]->Clear();
     }
   }

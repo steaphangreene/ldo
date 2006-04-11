@@ -62,6 +62,9 @@ public:
 
   const string &MapName() { return mapname; };
   const string &MapDesc() { return mapdesc; };
+  int MapNumPlayers() { return int(plsquads.size()); };
+  int MapNumSides() { return int(sides.size()); };
+  int MapNumSidePlayers(int sd) { return int(sides[sd].size()); };
 
   void SetOrders(int plnum, Orders *ord);
   void SetPercept(int plnum, Percept *prcpt);

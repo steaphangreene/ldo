@@ -38,6 +38,8 @@ enum Act {	// For Example
   ACT_EQUIP,	// Unit needs to be (re)equipped
   ACT_DUCK,
   ACT_STAND,
+  ACT_MOVE,
+  ACT_RUN,
   ACT_MAX
   };
 

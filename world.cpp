@@ -104,6 +104,7 @@ void World::DrawModels(Uint32 offset) {
     if(act->time <= offset) {
       times[0] = act->time;
       times[1] = act->time;
+//      fprintf(stderr, "Action Time: (%d/%d)\n", act->time, offset);
       float x = act->x * 2 + 1;
       float y = act->y * 2 + 1;
       glPushMatrix();
@@ -112,11 +113,6 @@ void World::DrawModels(Uint32 offset) {
       glPopMatrix();
       }
     }
-  }
-
-void World::Render() {			// Render for declaration
-  DrawMap();
-  DrawModels(3000);
   }
 
 void World::Render(Uint32 offset) {	// Render for playback

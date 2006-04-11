@@ -39,7 +39,19 @@ bool Player_AI::Run() {
       pround = game->CurrentRound() - 1;
       game->UpdatePercept(id, pround);
       SDL_Delay(10);
+
+      if(pround == 0) {
+	vector<UnitAct>::iterator act = percept.my_acts.begin();
+	for(; act != percept.my_acts.end(); ++act) {
+	  if(act->act == ACT_EQUIP) {
+	    orders.orders.push_back(UnitOrder(act->id, 0, ORDER_EQUIP));
+	    }
+	  SDL_Delay(10);
+	  }
+	}
+
       game->SetReady(id, true);
+      SDL_Delay(10);
       }
     if(game->ShouldTerm()) exiting = 1;
     SDL_Delay(10);
