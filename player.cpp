@@ -40,9 +40,5 @@ Player::~Player() {
   }
 
 bool Player::Run() {
-  if(game->CurrentRound() - 1 != pround) {
-    pround = game->CurrentRound() - 1;
-    game->UpdatePercept(id, pround);
-    }
   return true;
   }

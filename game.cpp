@@ -370,4 +370,15 @@ int Game::ThreadHandler() {
 void Game::ResolveRound() {		// FIXME: Implement this
 //  fprintf(stderr, "DEBUG: Resolving Next Round\n");
   master.push_back(master.back());
+
+  vector<Player *>::const_iterator itrp = player.begin();
+  for(; itrp != player.end(); ++itrp) {
+    if(orders.count((*itrp)->ID()) < 1) {
+      fprintf(stderr, "ERROR: Somebody's orders got lost!\n");
+      TermThreads();
+      }
+    else {
+      //FIXME: Act on orders!
+      }
+    }
   }

@@ -20,51 +20,18 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-#ifndef ORDERS_H
-#define ORDERS_H
+#ifndef PLAYER_AI_H
+#define PLAYER_AI_H
 
-#include "SDL.h"
+#include "player.h"
 
-#include <set>
-#include <vector>
-#include <cstdio>
-using namespace std;
-
-#include "unit.h"
-
-enum Order {	// For Example
-  ORDER_NONE,
-  ORDER_EQUIP,	// Unit got (re)equipped
-  ORDER_DUCK,
-  ORDER_STAND,
-  ORDER_MOVE,
-  ORDER_RUN,
-  ORDER_MAX
-  };
-
-struct UnitOrder {
+class Player_AI : public Player {
 public:
-  UnitOrder(int i, int t, Order o, int t1 = 0, int t2 = 0)
-	{ id = i; time = t; order = o; targ1 = t1, targ2 = t2; };
-  int id;
-  Uint32 time;
-  Order order;
-  int targ1;	//Depending on order, may be a unit id, or x coord, or unused
-  int targ2;	//Depending on order, may be a unit id, or y coord, or unused
+  Player_AI(Game *gm, PlayerType tp, int num);
+  virtual ~Player_AI();
+  virtual bool Run();
+
+protected:
   };
 
-class Orders {
-public:
-  Orders();
-  ~Orders();
-
-  int Load(FILE *fl, unsigned int ver);
-  int Save(FILE *fl, unsigned int ver);
-
-  void Clear();
-
-  vector<UnitOrder> orders;	//List of unit orders
-  };
-
-#endif // ORDERS_H
-
+#endif // PLAYER_AI_H

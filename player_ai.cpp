@@ -20,51 +20,32 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-#ifndef ORDERS_H
-#define ORDERS_H
+#include "player_ai.h"
+#include "game.h"
 
-#include "SDL.h"
+Player_AI::Player_AI(Game *gm, PlayerType tp, int num)
+	: Player(gm, tp, num) {
+  }
 
-#include <set>
-#include <vector>
-#include <cstdio>
-using namespace std;
+Player_AI::~Player_AI() {
+  }
 
-#include "unit.h"
+bool Player_AI::Run() {
+  Player::Run();	// Start with the basics
 
-enum Order {	// For Example
-  ORDER_NONE,
-  ORDER_EQUIP,	// Unit got (re)equipped
-  ORDER_DUCK,
-  ORDER_STAND,
-  ORDER_MOVE,
-  ORDER_RUN,
-  ORDER_MAX
-  };
+  int exiting = 0;
+  while(exiting == 0) {
+    if(pround != game->CurrentRound() - 1) {
+      pround = game->CurrentRound() - 1;
+      game->UpdatePercept(id, pround);
+      SDL_Delay(10);
+      game->SetReady(id, true);
+      }
+    if(game->ShouldTerm()) exiting = 1;
+    SDL_Delay(10);
+    }
 
-struct UnitOrder {
-public:
-  UnitOrder(int i, int t, Order o, int t1 = 0, int t2 = 0)
-	{ id = i; time = t; order = o; targ1 = t1, targ2 = t2; };
-  int id;
-  Uint32 time;
-  Order order;
-  int targ1;	//Depending on order, may be a unit id, or x coord, or unused
-  int targ2;	//Depending on order, may be a unit id, or y coord, or unused
-  };
+  game->TermThreads();	// Tell everyone else to exit too
 
-class Orders {
-public:
-  Orders();
-  ~Orders();
-
-  int Load(FILE *fl, unsigned int ver);
-  int Save(FILE *fl, unsigned int ver);
-
-  void Clear();
-
-  vector<UnitOrder> orders;	//List of unit orders
-  };
-
-#endif // ORDERS_H
-
+  return exiting;
+  }

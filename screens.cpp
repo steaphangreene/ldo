@@ -29,6 +29,7 @@
 #include "game.h"
 #include "player.h"
 #include "player_local.h"
+#include "player_ai.h"
 
 #include "../simplemodel/simplemodel.h"
 #include "../simplemodel/simplemodel_md3.h"
@@ -506,15 +507,16 @@ Screen_Single::~Screen_Single() {
   }
 
 ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *audio, SDL_Event &event) {
+  bool play_game = false;
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
       else if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
       else if(event.user.data1 == (void*)loadb) return POPUP_LOADMAP;
-      else if(event.user.data1 == (void*)gob) return SCREEN_PLAY;
+      else if(event.user.data1 == (void*)gob) play_game = true;
       }
     else if(event.user.code == SG_EVENT_CONNECTDONE) {
-      return SCREEN_PLAY;
+      play_game = true;
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
       if(cur_game) gob->Enable();
@@ -544,7 +546,20 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
     else if(event.user.code == SG_EVENT_OK) {
       }
     }
-  return SCREEN_SAME;
+  if(!play_game) return SCREEN_SAME;
+
+  SimpleConnections conn = connector->ClaimConnections();
+  vector<SlotData>::iterator slot = conn.slots.begin();
+  for(int pn=0; slot != conn.slots.end(); ++slot, ++pn) {
+    if(slot->ptype == SC_PLAYER_LOCAL) {
+      cur_game->AttachPlayer(new Player_Local(cur_game, PLAYER_LOCAL, pn));
+      }
+    else { //if(slot->ptype == SC_PLAYER_AI) {
+      cur_game->AttachPlayer(new Player_AI(cur_game, PLAYER_AI, pn));
+      }
+    }
+
+  return SCREEN_PLAY;
   }
 
 Screen_Multi::Screen_Multi() {
@@ -830,9 +845,9 @@ ScreenNum Popup_LoadMap::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
       else {
 	//cur_game->Save(fn); // Uncomment for auto-upgrade of mapfile
 
-	cur_game->AttachPlayer( // temporary!
-		new Player_Local(cur_game, PLAYER_LOCAL, 0)
-		);
+	//cur_game->AttachPlayer( // temporary!
+	//	new Player_Local(cur_game, PLAYER_LOCAL, 0)
+	//	);
 
 	return POPUP_CLEAR;
 	}

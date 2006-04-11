@@ -23,7 +23,7 @@
 #include "SDL_image.h"
 
 double cur_zoom = 16.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
-int sel_x = -1, sel_y = -1;
+int sel_x = -1, sel_y = -1, sel_id = -1;
 int mouse_x = -1, mouse_y = -1;
 
 #include "player_local.h"
@@ -267,6 +267,18 @@ int Player_Local::EventHandler() {
 	  }
 	}
 
+      else if(event.user.code == SG_EVENT_MENU + 3) {
+	if(*((int*)event.user.data2) == 0) {
+	  orders.orders.push_back(
+		UnitOrder(sel_id, 0, ORDER_MOVE, mouse_x, mouse_y));
+	  }
+	fprintf(stderr, "Got right-menu event %d\n", *((int*)event.user.data2));
+	}
+
+      else if(event.user.code == SG_EVENT_MENU + 2) {
+	fprintf(stderr, "Got mid-menu event %d\n", *((int*)event.user.data2));
+	}
+
       else if(event.user.code == SG_EVENT_STICKYON) {
 	if(event.user.data1 == (void*)ddoneb) {
 	  if(!game->SetReady(id, true)) {
@@ -342,13 +354,14 @@ int Player_Local::EventHandler() {
 	SDL_mutexV(vid_mut);
 	int s_x = ((int)(x)) / 2;
 	int s_y = ((int)(y)) / 2;
-	if(UnitPresent(s_x, s_y) > 0) {
+	if(UnitPresent(s_x, s_y, sel_id) > 0) {
 	  sel_x = s_x;
 	  sel_y = s_y;
 	  dpass->SetMenu(2, mactions[1]);
 	  dpass->SetMenu(3, ractions[1]);
 	  }
 	else {
+	  sel_id = -1;
 	  sel_x = -1;
 	  sel_y = -1;
 	  dpass->SetMenu(2, mactions[0]);
@@ -477,7 +490,8 @@ bool Player_Local::Run() {
     if(phase == PHASE_DECLARE) {
       world->Render();
 
-      int unitthere = UnitPresent(mouse_x, mouse_y);
+      int unit;
+      int unitthere = UnitPresent(mouse_x, mouse_y, unit);
       if(unitthere > 0) world->DrawSelBox(mouse_x, mouse_y, 0.0, 1.0, 0.0);
       else if(unitthere < 0) world->DrawSelBox(mouse_x, mouse_y, 1.0, 0.0, 0.0);
       else world->DrawSelBox(mouse_x, mouse_y, 1.0, 1.0, 0.0);
@@ -493,6 +507,13 @@ bool Player_Local::Run() {
     SDL_mutexP(vid_mut);
     video->FinishScene();
     SDL_mutexV(vid_mut);
+
+    if(game->ShouldTerm()) {
+      SDL_Event event;
+      event.type = SDL_KEYDOWN;
+      event.key.keysym.sym = SDLK_ESCAPE;
+      SDL_PushEvent(&event);
+      }
     }
 
   SDL_WaitThread(th, NULL);
@@ -642,10 +663,14 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
     }
   }
 
-int Player_Local::UnitPresent(int xc, int yc) {	//FIXME: Should be in percept
+//FIXME: Should be in percept
+int Player_Local::UnitPresent(int xc, int yc, int &id) {
   vector<UnitAct>::iterator act = percept.my_acts.begin();
   for(; act != percept.my_acts.end(); ++act) {
-    if(act->x == xc && act->y == yc) return 1;
+    if(act->x == xc && act->y == yc) {
+      id = act->id;
+      return 1;
+      }
     }
   return 0;     //Nothing there
   }
