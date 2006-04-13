@@ -23,30 +23,14 @@
 all:	ldo
 win32:	ldo.exe
 
-#PRODUCTION OPTIONS (STANDARD)
-#CXX=	g++
-#CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags` `zzip-config --cflags`
-#LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a ../simpletexture/libsimpletexture.a ../simplevideo/libsimplevideo.a ../simpleaudio/libsimpleaudio.a ../simpleconnect/libsimpleconnect.a ../simpleconfig/libsimpleconfig.a `sdl-config --libs` -lSDL_net -lSDL_ttf -lSDL_image -lSDL_mixer `zzip-config --libs` -lGL -lGLU
-
-#PRODUCTION OPTIONS (WORKAROUND FOR MacOS-X)
-#CXX=	g++
-#CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags` `zzip-config --cflags`
-#LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a ../simpletexture/libsimpletexture.a ../simplevideo/libsimplevideo.a ../simpleaudio/libsimpleaudio.a ../simpleconnect/libsimpleconnect.a ../simpleconfig/libsimpleconfig.a `sdl-config --libs` -lSDL_net -lSDL_ttf -lSDL_image -lSDL_mixer `zzip-config --libs` -framework OpenGL
-
-#PRODUCTION OPTIONS (WORKAROUND FOR CYGWIN)
-#CXX=	g++
-#CXXFLAGS=	-s -O2 -Wall `sdl-config --cflags` `zzip-config --cflags`
-#LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a ../simpletexture/libsimpletexture.a ../simplevideo/libsimplevideo.a ../simpleaudio/libsimpleaudio.a ../simpleconnect/libsimpleconnect.a ../simpleconfig/libsimpleconfig.a `sdl-config --libs` -lSDL_net -lSDL_ttf -lSDL_image -lSDL_mixer -L/usr/X11R6/bin `zzip-config --libs` -lopengl32 -lglu32
-
-#DEGUGGING OPTIONS (NO EFENCE)
 CXX=	g++
-CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `sdl-config --cflags` `zzip-config --cflags`
-LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a ../simpletexture/libsimpletexture.a ../simplevideo/libsimplevideo.a ../simpleaudio/libsimpleaudio.a ../simpleconnect/libsimpleconnect.a ../simpleconfig/libsimpleconfig.a `sdl-config --libs` -lSDL_net -lSDL_ttf -lSDL_image -lSDL_mixer `zzip-config --libs` -lGL -lGLU
+LIBS=	`simple-config --libs`
 
-#DEGUGGING OPTIONS (WITH EFENCE)
-#CXX=	g++
-#CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `sdl-config --cflags` `zzip-config --cflags`
-#LIBS=	../simplegui/libsimplegui.a ../simplemodel/libsimplemodel.a ../simpletexture/libsimpletexture.a ../simplevideo/libsimplevideo.a ../simpleaudio/libsimpleaudio.a ../simpleconnect/libsimpleconnect.a ../simpleconfig/libsimpleconfig.a `sdl-config --libs` -lefence -lSDL_net -lSDL_ttf -lSDL_image -lSDL_mixer `zzip-config --libs` -lGL -lGLU
+#PRODUCTION OPTIONS
+#CXXFLAGS=	-s -O2 -Wall `simple-config --cflags`
+
+#DEGUGGING OPTIONS
+CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `simple-config --cflags`
 
 OBJS:=	screens.o percept.o orders.o world.o \
 	game.o unit.o player.o main.o \

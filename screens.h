@@ -27,10 +27,10 @@
 #include <vector>
 using namespace std;
 
-#include "../simplevideo/simplevideo.h"
-#include "../simpleaudio/simpleaudio.h"
-#include "../simplegui/simplegui.h"
-#include "../simpleconnect/simpleconnect.h"
+#include "simplevideo.h"
+#include "simpleaudio.h"
+#include "simplegui.h"
+#include "simpleconnect.h"
 
 enum ScreenNum {
   POPUP_MIN,

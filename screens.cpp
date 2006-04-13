@@ -31,11 +31,11 @@
 #include "player_local.h"
 #include "player_ai.h"
 
-#include "../simplemodel/simplemodel.h"
-#include "../simplemodel/simplemodel_md3.h"
-#include "../simplemodel/simplemodel_q3dir.h"
-#include "../simplemodel/sm_q3anim.h"
-#include "../simpleconfig/simpleconfig.h"
+#include "simplemodel.h"
+#include "simplemodel_md3.h"
+#include "simplemodel_q3dir.h"
+#include "sm_q3anim.h"
+#include "simpleconfig.h"
 
 Game *cur_game = NULL;			//Temporary, just for testing
 

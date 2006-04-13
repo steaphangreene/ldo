@@ -28,9 +28,9 @@
 
 #include "SDL.h"
 #include "SDL_thread.h"
-#include "../simplegui/simplegui.h"
-#include "../simplevideo/simplevideo.h"
-#include "../simpleaudio/simpleaudio.h"
+#include "simplegui.h"
+#include "simplevideo.h"
+#include "simpleaudio.h"
 
 enum Phase {
   PHASE_NONE = -1,
