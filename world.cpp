@@ -94,8 +94,8 @@ void World::DrawModels(Uint32 offset) {
   vector<int> anims;
   vector<Uint32> times;
 
-  anims.push_back(LEGS_IDLE);
-  anims.push_back(TORSO_STAND);
+  anims.push_back(models[1]->LookUpAnimation("LEGS_IDLE"));
+  anims.push_back(models[1]->LookUpAnimation("TORSO_STAND"));
   times.push_back(0);
   times.push_back(0);
 

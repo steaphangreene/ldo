@@ -27,7 +27,6 @@
 #include "SDL_opengl.h"
 
 #include "simplemodel.h"
-#include "sm_q3anim.h"
 
 #include "percept.h"
 #include "orders.h"

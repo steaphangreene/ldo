@@ -32,7 +32,6 @@
 #include "player_ai.h"
 
 #include "simplemodel.h"
-#include "sm_q3anim.h"
 #include "simpleconfig.h"
 
 Game *cur_game = NULL;			//Temporary, just for testing
@@ -434,9 +433,9 @@ Screen_Title::Screen_Title() {
   weap = SM_LoadModel("models/weapons2/machinegun/machinegun.md3");
   guy->AttachSubmodel("tag_weapon", weap);
   Uint32 t = SDL_GetTicks()/2;
-//  anims.push_back(LEGS_IDLE); //Trooper is to jittery!
-  anims.push_back(LEGS_WALK);
-  anims.push_back(TORSO_STAND);
+//  anims.push_back(guy->LookUpAnimation("LEGS_IDLE")); //Trooper is to jittery!
+  anims.push_back(guy->LookUpAnimation("LEGS_WALK"));
+  anims.push_back(guy->LookUpAnimation("TORSO_STAND"));
   times.push_back(t);
   times.push_back(t);
   }
