@@ -32,8 +32,6 @@
 #include "player_ai.h"
 
 #include "simplemodel.h"
-#include "simplemodel_md3.h"
-#include "simplemodel_q3dir.h"
 #include "sm_q3anim.h"
 #include "simpleconfig.h"
 
@@ -431,10 +429,10 @@ Screen_Title::Screen_Title() {
     }
 
   SimpleModel::AddSourceFile("models/md3-trooper");
+  SimpleModel::AddSourceFile("models/wep2-m41a");
   guy = SM_LoadModel("models/players/trooper");
-  weap = new SimpleModel_MD3("models/wep2-m41a",
-	"models/weapons2/machinegun/machinegun.md3");
-  ((SimpleModel_Q3Dir*)(guy))->SetWeapon((SimpleModel_MD3*)(weap));
+  weap = SM_LoadModel("models/weapons2/machinegun/machinegun.md3");
+  guy->AttachSubmodel("tag_weapon", weap);
   Uint32 t = SDL_GetTicks()/2;
 //  anims.push_back(LEGS_IDLE); //Trooper is to jittery!
   anims.push_back(LEGS_WALK);
