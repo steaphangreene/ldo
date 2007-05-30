@@ -137,9 +137,9 @@ int Game::Save(const string &filename) {
   }
 
 int Game::Save(const vector< vector<int> > &vec, FILE *fl) {
-  if(fprintf(fl, "%d\n", vec.size()) < 2) return 0;
+  if(fprintf(fl, "%d\n", (Sint32)(vec.size())) < 2) return 0;
   for(unsigned int side = 0; side < vec.size(); ++side) {
-    if(fprintf(fl, "%d\n", vec[side].size()) < 2) return 0;
+    if(fprintf(fl, "%d\n", (Sint32)(vec[side].size())) < 2) return 0;
     for(unsigned int pl = 0; pl < vec[side].size(); ++pl) {
       if(fprintf(fl, "%d;", vec[side][pl]) < 2) return 0;
       }
