@@ -164,7 +164,7 @@ Screens::Screens() {
   cur_music = audio->Loop(music);
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/10.0);
-  gui->LoadFont("fonts/Denmark Regular.ttf", 24);
+  gui->LoadFont("fonts/Denmark Regular.ttf", 100);
 
   gui->SetColor(SG_COL_BG,	0.250, 0.0, 0.0);
   gui->SetColor(SG_COL_FG,	0.750, 0.0, 0.0);
@@ -384,7 +384,7 @@ ScreenNum Screen_Config::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
   }
 
 Screen_Title::Screen_Title() {
-  main = new SG_Table(4, 9, 0.0625, 0.125);
+  main = new SG_Table(4, 13, 0.0625, 0.125);
   optb = new SG_Button("Options");
   main->AddWidget(optb, 3, 1);
   multb = new SG_Button("Multiplayer");
@@ -400,11 +400,11 @@ Screen_Title::Screen_Title() {
   title->SetMargins(0.125, 0.0);
   title->SetVisibleSize(SG_AUTOSIZE, SG_AUTOSIZE);
   title->SetFontSize(100);
-  main->AddWidget(title, 0, 0, 3, 3);
+  main->AddWidget(title, 0, 0, 3, 4);
 
   SG_AutoScroll *scr =
 	new SG_AutoScroll(1.0, 15.0, 0.0, -15.0, 0.0, -15.0, 0.0, 60.0);
-  main->AddWidget(scr, 0, 3, 3, 6);
+  main->AddWidget(scr, 0, 4, 3, 9);
 
   FILE *credfl = fopen("CREDITS", "r");
   if(credfl) {
