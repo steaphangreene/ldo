@@ -327,7 +327,7 @@ void Popup::Finish(SimpleGUI *gui) {
   }
 
 Screen_Config::Screen_Config() {
-  main = new SG_Table(6, 7, 0.0625, 0.125);
+  main = new SG_Table(6, 10, 0.0625, 0.125);
 
 /*
   SG_Alignment *align;	// For temporary storage;
@@ -359,7 +359,7 @@ Screen_Config::Screen_Config() {
 	0, 0, 5, 7);
 */
 
-  main->AddWidget(new SimpleConfig, 0, 0, 5, 7);
+  main->AddWidget(new SimpleConfig, 0, 0, 5, 10);
 
   backb = new SG_Button("Back");
   main->AddWidget(backb, 5, 0);
@@ -399,7 +399,7 @@ Screen_Title::Screen_Title() {
   SG_TextArea *title = new SG_TextArea("LDO", drkred);
   title->SetMargins(0.125, 0.0);
   title->SetVisibleSize(SG_AUTOSIZE, SG_AUTOSIZE);
-  title->SetFontSize(100);
+  title->SetFontSize(400);
   main->AddWidget(title, 0, 0, 3, 4);
 
   SG_AutoScroll *scr =
@@ -480,20 +480,20 @@ ScreenNum Screen_Title::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *
 
 
 Screen_Single::Screen_Single() {
-  main = new SG_Table(6, 7, 0.0625, 0.125);
+  main = new SG_Table(6, 12, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Define Teams", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel");
   main->AddWidget(cancelb, 5, 0);
   optb = new SG_Button("Options");
   main->AddWidget(optb, 5, 1);
-  loadb = new SG_Button("Load Scenario");
+  loadb = new SG_Button("Load");
   main->AddWidget(loadb, 5, 2);
   gob = new SG_Button("Go");
-  gob->SetAlignment(SG_ALIGN_LEFT);	//Temporary!
+//  gob->SetAlignment(SG_ALIGN_LEFT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
-  connscr = new SG_ScrollingArea(SG_AUTOSIZE, 8.0);
-  main->AddWidget(connscr, 0, 2, 5, 5);
+  connscr = new SG_ScrollingArea(SG_AUTOSIZE, 12.0);
+  main->AddWidget(connscr, 0, 2, 5, 10);
   connector = new SimpleConnect();
   connector->SetColors(cols);
   connscr->AddWidget(connector);
@@ -551,7 +551,7 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
 
 Screen_Multi::Screen_Multi() {
   net_init = false;
-  main = new SG_Table(6, 7, 0.0625, 0.125);
+  main = new SG_Table(6, 12, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Gather Players", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel");
   main->AddWidget(cancelb, 5, 0);
@@ -564,11 +564,11 @@ Screen_Multi::Screen_Multi() {
   readyb = new SG_StickyButton("Ready");
   main->AddWidget(readyb, 5, 5);
   gob = new SG_Button("Go");
-  gob->SetAlignment(SG_ALIGN_CENTER);	//Temporary!
+//  gob->SetAlignment(SG_ALIGN_CENTER);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
-  connscr = new SG_ScrollingArea(SG_AUTOSIZE, 8.0);
-  main->AddWidget(connscr, 0, 2, 5, 5);
+  connscr = new SG_ScrollingArea(SG_AUTOSIZE, 12.0);
+  main->AddWidget(connscr, 0, 2, 5, 10);
   connector = new SimpleConnect();
   connector->SetColors(cols);
   connscr->AddWidget(connector);
@@ -702,16 +702,16 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *
   }
 
 Screen_Replay::Screen_Replay() {
-  main = new SG_Table(6, 7, 0.0625, 0.125);
+  main = new SG_Table(6, 12, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Load Replay", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel");
   main->AddWidget(cancelb, 5, 0);
   optb = new SG_Button("Options");
   main->AddWidget(optb, 5, 1);
-  loadb = new SG_Button("Load Replay");
+  loadb = new SG_Button("Load");
   main->AddWidget(loadb, 5, 2);
   gob = new SG_Button("Go");
-  gob->SetAlignment(SG_ALIGN_RIGHT);	//Temporary!
+//  gob->SetAlignment(SG_ALIGN_RIGHT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
   }
@@ -737,8 +737,8 @@ ScreenNum Screen_Replay::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
 
 
 Screen_Results::Screen_Results() {
-  main = new SG_Table(6, 7, 0.0625, 0.125);
-  main->AddWidget(new SG_TextArea("Game Results", drkred), 0, 0, 2, 2);
+  main = new SG_Table(6, 10, 0.0625, 0.125);
+  main->AddWidget(new SG_TextArea("Game Results", drkred), 0, 0, 5, 2);
   replb = new SG_Button("Replay");
   main->AddWidget(replb, 5, 0);
   saveb = new SG_Button("Save");

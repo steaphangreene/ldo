@@ -66,7 +66,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
   equip_bg = IMG_Load("graphics/equip_bg.png");
 
   //Define base GUI for Equip phase
-  wind[PHASE_EQUIP] = new SG_Table(16, 9, 0.0, 0.0);
+  wind[PHASE_EQUIP] = new SG_Table(16, 24, 0.0, 0.0);
   ecancelb = new SG_Button("Cancel");
   wind[PHASE_EQUIP]->AddWidget(ecancelb, 12, 0, 2, 1);
   edoneb = new SG_Button("Done");
@@ -595,8 +595,8 @@ void Player_Local::UpdateEquipIDs() {
   if(troops.size() > 0) {
     nextphase = PHASE_EQUIP;
     if(ednd == NULL) {
-      ednd = new SG_MultiTab(troops, adnds, 9);
-      wind[PHASE_EQUIP]->AddWidget(ednd, 0, 0, 12, 9);
+      ednd = new SG_MultiTab(troops, adnds, 24);
+      wind[PHASE_EQUIP]->AddWidget(ednd, 0, 0, 12, 24);
       estats->SetText(troops[0]);
       }
     }
