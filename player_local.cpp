@@ -581,7 +581,7 @@ void Player_Local::UpdateEquipIDs() {
       dnds.clear();
       }
 
-    SG_DNDBoxes *dnd = new SG_DNDBoxes(36, 24);
+    SG_DNDBoxes *dnd = new SG_DNDBoxes(36, 28);
     dnd->Include( 0,  5,  4,  6, 4, 6, 1, 1);	//Left Hand
     dnd->Include(16,  5,  4,  6, 4, 6, 2, 0);	//Right Hand
     dnd->Include( 2,  1,  4,  2, 2, 2, 3, 0);	//Left Shoulder
@@ -592,7 +592,7 @@ void Player_Local::UpdateEquipIDs() {
     dnd->Include(24, 10,  8,  2, 2, 2, 8, 0);	//Main Belt
     dnd->Include(24, 12,  2,  2, 2, 2, 8, 0);	//Left Belt
     dnd->Include(30, 12,  2,  2, 2, 2, 8, 0);	//Right Belt
-    dnd->Include( 0, 16, 36,  8, 2, 2, 0, 0);	//Ground
+    dnd->Include( 0, 16, 36,  12, 2, 2, 0, 0);	//Ground
 
       // Hardcoded loadout for now - Temporary!
     if(troops.size() != 2) dnd->AddItem(gun_icon, 16, 5, 4, 6, 1, 1);
