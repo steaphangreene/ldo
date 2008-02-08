@@ -294,6 +294,8 @@ void Game::UpdatePercept(int plnum, int rnd) {
   percept[plnum]->Clear();
   vector<UnitAct>::const_iterator itr = master[rnd].my_acts.begin();
   for(; itr != master[rnd].my_acts.end(); ++itr) {
+//    fprintf(stderr, "Sending %d action %d for %d (Round %d)\n",
+//	plnum, itr->act, itr->id, rnd);
     if(percept[plnum]->my_units.count(itr->id) > 0) {
       percept[plnum]->my_acts.push_back(*itr);
       }
@@ -375,8 +377,9 @@ int Game::ThreadHandler() {
   }
 
 void Game::ResolveRound() {
-  master.push_back(master.back());
+  master.push_back(Percept());
 
+  set<int> ordered;
   vector<Player *>::const_iterator itrp = player.begin();
   for(; itrp != player.end(); ++itrp) {
     int pnum = (*itrp)->ID();
@@ -387,17 +390,44 @@ void Game::ResolveRound() {
     else {
       vector<UnitOrder>::const_iterator order = orders[pnum]->orders.begin();
       for(; order != orders[pnum]->orders.end(); ++order) {
-	fprintf(stderr, "ORDER[Player%d], %d do %d at %d to (%d,%d)\n", pnum,
-		order->id, order->order, order->time,
-		order->targ1, order->targ2);
+//	fprintf(stderr, "ORDER[Player%d], %d do %d at %d to (%d,%d)\n", pnum,
+//		order->id, order->order, order->time,
+//		order->targ1, order->targ2);
 	switch(order->order) {
 	  case(ORDER_MOVE): {
-	    master[0].my_acts.push_back(UnitAct(order->id,
-		CurrentRound()*3000 + order->time, 0, 0,
-		ACT_MOVE, order->targ1, order->targ2));
+	    int x=0, y=0;
+	    vector<UnitAct>::const_iterator prev =
+		master[master.size() - 2].my_acts.begin();
+	    for(; prev != master[master.size() - 2].my_acts.end(); ++prev) {
+	      if(prev->id == order->id) {
+		x = prev->x;
+		y = prev->y;
+		}
+	      }
+	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
+		(CurrentRound() - 2) * 3000 + order->time, order->targ1, order->targ2,
+		ACT_MOVE, x, y));
+	    ordered.insert(order->id);
+	    }break;
+	  case(ORDER_RUN): {
+	    int x=0, y=0;
+	    vector<UnitAct>::const_iterator prev =
+		master[master.size() - 2].my_acts.begin();
+	    for(; prev != master[master.size() - 2].my_acts.end(); ++prev) {
+	      if(prev->id == order->id) {
+		x = prev->x;
+		y = prev->y;
+		}
+	      }
+	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
+		(CurrentRound() - 2) * 3000 + order->time, order->targ1, order->targ2,
+		ACT_RUN, x, y));
+	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_EQUIP): {
-	    //FIXME: Arrange equip accordingly
+	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
+		(CurrentRound() - 2) * 3000 + order->time, order->targ1, order->targ2,
+		ACT_STAND, order->targ1, order->targ2));
 	    }break;
 	  default: {
 	    fprintf(stderr, "WARNING: Got unknown ORDER from Player%d\n", pnum);
@@ -406,5 +436,21 @@ void Game::ResolveRound() {
 	}
       }
     orders[pnum]->Clear();
+    }
+
+  //Create STAND orders for all units not given other orders
+  set<int>::const_iterator unit = master[0].my_units.begin();
+  for(; unit != master[0].my_units.end(); ++unit) {
+    if(ordered.count(*unit) == 0) {
+      vector<UnitAct>::const_iterator prev =
+		master[master.size() - 2].my_acts.begin();
+      for(; prev != master[master.size() - 2].my_acts.end(); ++prev) {
+	if(prev->id == (*unit)) {
+	  master[master.size() - 1].my_acts.push_back(UnitAct((*unit),
+		(CurrentRound() - 2) * 3000, prev->x, prev->y,
+		ACT_STAND, prev->x, prev->y));
+	  }
+	}
+      }
     }
   }

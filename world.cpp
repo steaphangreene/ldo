@@ -94,23 +94,79 @@ void World::DrawModels(Uint32 offset) {
   vector<int> anims;
   vector<Uint32> times;
 
-  anims.push_back(models[1]->LookUpAnimation("LEGS_IDLE"));
-  anims.push_back(models[1]->LookUpAnimation("TORSO_STAND"));
+  anims.push_back(0);
+  anims.push_back(0);
   times.push_back(0);
   times.push_back(0);
 
   vector<UnitAct>::iterator act = percept->my_acts.begin();
   for(; act != percept->my_acts.end(); ++act) {
     if(act->time <= offset) {
+      anims[0] = models[1]->LookUpAnimation("LEGS_IDLE");
+      anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
       times[0] = act->time;
       times[1] = act->time;
-//      fprintf(stderr, "Action Time: (%d/%d)\n", act->time, offset);
       float x = act->x * 2 + 1;
       float y = act->y * 2 + 1;
+      if(act->act == ACT_STAND) {
+	if(act->time + 0 <= offset) {
+	  x = act->targ1 * 2 + 1;
+	  y = act->targ2 * 2 + 1;
+	  }
+	}
+      else if(act->act == ACT_MOVE) {
+	if(act->time + 3000 <= offset) {
+	  x = act->x * 2 + 1;
+	  y = act->y * 2 + 1;
+	  }
+	else {
+	  Uint32 off = offset - act->time;
+	  anims[0] = models[1]->LookUpAnimation("LEGS_WALK");
+	  x = (act->targ1 * 2 + 1) * (3000 - off) + (act->x * 2 + 1) * off;
+	  y = (act->targ2 * 2 + 1) * (3000 - off) + (act->y * 2 + 1) * off;
+	  x /= 3000.0; y /= 3000.0;
+	  }
+	}
+      else if(act->act == ACT_RUN) {
+	if(act->time + 3000 <= offset) {
+	  x = act->x * 2 + 1;
+	  y = act->y * 2 + 1;
+	  }
+	else {
+	  Uint32 off = offset - act->time;
+	  anims[0] = models[1]->LookUpAnimation("LEGS_RUN");
+	  x = (act->targ1 * 2 + 1) * (3000 - off) + (act->x * 2 + 1) * off;
+	  y = (act->targ2 * 2 + 1) * (3000 - off) + (act->y * 2 + 1) * off;
+	  x /= 3000.0; y /= 3000.0;
+	  }
+	}
+      else if(act->act == ACT_EQUIP) {
+	anims[0] = models[1]->LookUpAnimation("LEGS_IDLE");
+	if(act->time + 1500 <= offset) {
+	  anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
+	  times[1] += 1500;
+	  }
+	else if(act->time + 1000 <= offset) {
+	  anims[1] = models[1]->LookUpAnimation("TORSO_RAISE");
+	  times[1] += 1000;
+	  }
+	else if(act->time + 500 <= offset) {
+	  anims[1] = models[1]->LookUpAnimation("TORSO_DROP");
+	  times[1] += 500;
+	  }
+	else {
+	  anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
+	  }
+        }
+//      fprintf(stderr, "Action Time: (%d/%d)\n", act->time, offset);
       glPushMatrix();
       glTranslatef(x, y, 0.0);
       models[1]->Render(offset, anims, times);
       glPopMatrix();
+      }
+    else {
+      fprintf(stderr, "Not Doing %d on %d, since %d > %d\n",
+	act->act, act->id, act->time, offset);
       }
     }
   }

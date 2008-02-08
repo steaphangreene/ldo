@@ -272,11 +272,15 @@ int Player_Local::EventHandler() {
 	  orders.orders.push_back(
 		UnitOrder(sel_id, 0, ORDER_MOVE, mouse_x, mouse_y));
 	  }
-	fprintf(stderr, "Got right-menu event %d\n", *((int*)event.user.data2));
+	else if(*((int*)event.user.data2) == 1) {
+	  orders.orders.push_back(
+		UnitOrder(sel_id, 0, ORDER_RUN, mouse_x, mouse_y));
+	  }
+//	fprintf(stderr, "Got right-menu event %d\n", *((int*)event.user.data2));
 	}
 
       else if(event.user.code == SG_EVENT_MENU + 2) {
-	fprintf(stderr, "Got mid-menu event %d\n", *((int*)event.user.data2));
+//	fprintf(stderr, "Got mid-menu event %d\n", *((int*)event.user.data2));
 	}
 
       else if(event.user.code == SG_EVENT_STICKYON) {
