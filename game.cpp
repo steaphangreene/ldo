@@ -393,32 +393,23 @@ void Game::ResolveRound() {
 //	fprintf(stderr, "ORDER[Player%d], %d do %d at %d to (%d,%d)\n", pnum,
 //		order->id, order->order, order->time,
 //		order->targ1, order->targ2);
+	int x=0, y=0;
+	vector<UnitAct>::const_iterator prev =
+		master[master.size() - 2].my_acts.begin();
+	for(; prev != master[master.size() - 2].my_acts.end(); ++prev) {
+	  if(prev->id == order->id) {
+	    x = prev->x;
+	    y = prev->y;
+	    }
+	  }
 	switch(order->order) {
 	  case(ORDER_MOVE): {
-	    int x=0, y=0;
-	    vector<UnitAct>::const_iterator prev =
-		master[master.size() - 2].my_acts.begin();
-	    for(; prev != master[master.size() - 2].my_acts.end(); ++prev) {
-	      if(prev->id == order->id) {
-		x = prev->x;
-		y = prev->y;
-		}
-	      }
 	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
 		(CurrentRound() - 2) * 3000 + order->time, order->targ1, order->targ2,
 		ACT_MOVE, x, y));
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_RUN): {
-	    int x=0, y=0;
-	    vector<UnitAct>::const_iterator prev =
-		master[master.size() - 2].my_acts.begin();
-	    for(; prev != master[master.size() - 2].my_acts.end(); ++prev) {
-	      if(prev->id == order->id) {
-		x = prev->x;
-		y = prev->y;
-		}
-	      }
 	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
 		(CurrentRound() - 2) * 3000 + order->time, order->targ1, order->targ2,
 		ACT_RUN, x, y));
@@ -426,8 +417,18 @@ void Game::ResolveRound() {
 	    }break;
 	  case(ORDER_EQUIP): {
 	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time, order->targ1, order->targ2,
-		ACT_STAND, order->targ1, order->targ2));
+		(CurrentRound() - 2) * 3000 + order->time, x, y,
+		ACT_EQUIP, order->targ1, order->targ2));
+	    if(master.size() > 2) {	// Initial Equip is Free
+	      ordered.insert(order->id);
+	      }
+	    }break;
+	  case(ORDER_SHOOT): {
+	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
+		(CurrentRound() - 2) * 3000 + order->time, x, y,
+		ACT_SHOOT, order->targ1, order->targ2));
+	    ordered.insert(order->id);
+	    fprintf(stderr, "%d ordered: %d\n", order->id, int(order->order));
 	    }break;
 	  default: {
 	    fprintf(stderr, "WARNING: Got unknown ORDER from Player%d\n", pnum);

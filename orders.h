@@ -39,6 +39,8 @@ enum Order {	// For Example
   ORDER_STAND,
   ORDER_MOVE,
   ORDER_RUN,
+  ORDER_SHOOT,
+  ORDER_THROW,
   ORDER_MAX
   };
 

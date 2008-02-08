@@ -99,8 +99,16 @@ void World::DrawModels(Uint32 offset) {
   times.push_back(0);
   times.push_back(0);
 
-  vector<UnitAct>::iterator act = percept->my_acts.begin();
-  for(; act != percept->my_acts.end(); ++act) {
+  map<int, UnitAct> unitact;
+  vector<UnitAct>::const_iterator rawact = percept->my_acts.begin();
+  for(; rawact != percept->my_acts.end(); ++rawact) {
+    unitact.erase(rawact->id);
+    unitact.insert(pair<int,UnitAct>(rawact->id, *rawact));
+    }
+
+  map<int, UnitAct>::const_iterator mapact = unitact.begin();
+  for(; mapact != unitact.end(); ++mapact) {
+    const UnitAct *act = &(mapact->second);
     if(act->time <= offset) {
       anims[0] = models[1]->LookUpAnimation("LEGS_IDLE");
       anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
@@ -149,8 +157,17 @@ void World::DrawModels(Uint32 offset) {
 	  a = 180.0 * atan2f(act->y - act->targ2, act->x - act->targ1) / M_PI;
 	  }
 	}
-      else if(act->act == ACT_EQUIP) {
+      else if(act->act == ACT_SHOOT) {
 	anims[0] = models[1]->LookUpAnimation("LEGS_IDLE");
+	if(act->time + 1500 <= offset) {
+	  anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
+	  times[1] += 1500;
+	  }
+	else {
+	  anims[1] = models[1]->LookUpAnimation("TORSO_ATTACK");
+	  }
+	}
+      else if(act->act == ACT_EQUIP) {
 	if(act->time + 1500 <= offset) {
 	  anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;

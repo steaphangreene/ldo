@@ -276,6 +276,14 @@ int Player_Local::EventHandler() {
 	  orders.orders.push_back(
 		UnitOrder(sel_id, 0, ORDER_RUN, mouse_x, mouse_y));
 	  }
+	else if(*((int*)event.user.data2) == 2) {
+	  orders.orders.push_back(
+		UnitOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y));
+	  }
+	else if(*((int*)event.user.data2) == 3) {
+	  orders.orders.push_back(
+		UnitOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y));
+	  }
 //	fprintf(stderr, "Got right-menu event %d\n", *((int*)event.user.data2));
 	}
 

@@ -40,6 +40,8 @@ enum Act {	// For Example
   ACT_STAND,
   ACT_MOVE,
   ACT_RUN,
+  ACT_SHOOT,
+  ACT_THROW,
   ACT_MAX
   };
 
