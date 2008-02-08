@@ -108,6 +108,7 @@ void World::DrawModels(Uint32 offset) {
       times[1] = act->time;
       float x = act->x * 2 + 1;
       float y = act->y * 2 + 1;
+      float a = 0.0;
       if(act->act == ACT_STAND) {
 	if(act->time + 0 <= offset) {
 	  x = act->targ1 * 2 + 1;
@@ -125,6 +126,7 @@ void World::DrawModels(Uint32 offset) {
 	  x = (act->targ1 * 2 + 1) * (3000 - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (3000 - off) + (act->y * 2 + 1) * off;
 	  x /= 3000.0; y /= 3000.0;
+	  a = 180.0 * atan2f(act->y - act->targ2, act->x - act->targ1) / M_PI;
 	  }
 	}
       else if(act->act == ACT_RUN) {
@@ -138,6 +140,7 @@ void World::DrawModels(Uint32 offset) {
 	  x = (act->targ1 * 2 + 1) * (3000 - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (3000 - off) + (act->y * 2 + 1) * off;
 	  x /= 3000.0; y /= 3000.0;
+	  a = 180.0 * atan2f(act->y - act->targ2, act->x - act->targ1) / M_PI;
 	  }
 	}
       else if(act->act == ACT_EQUIP) {
@@ -161,6 +164,7 @@ void World::DrawModels(Uint32 offset) {
 //      fprintf(stderr, "Action Time: (%d/%d)\n", act->time, offset);
       glPushMatrix();
       glTranslatef(x, y, 0.0);
+      glRotatef(a, 0.0, 0.0, 1.0);
       models[1]->Render(offset, anims, times);
       glPopMatrix();
       }
