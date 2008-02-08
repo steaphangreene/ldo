@@ -116,30 +116,36 @@ void World::DrawModels(Uint32 offset) {
 	  }
 	}
       else if(act->act == ACT_MOVE) {
-	if(act->time + 3000 <= offset) {
+        int dx = act->x - act->targ1;
+        int dy = act->y - act->targ2;
+	float duration = sqrt(dx*dx + dy*dy) * 333.33333333;
+	if((unsigned int)(act->time + duration) <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
 	  }
 	else {
 	  Uint32 off = offset - act->time;
 	  anims[0] = models[1]->LookUpAnimation("LEGS_WALK");
-	  x = (act->targ1 * 2 + 1) * (3000 - off) + (act->x * 2 + 1) * off;
-	  y = (act->targ2 * 2 + 1) * (3000 - off) + (act->y * 2 + 1) * off;
-	  x /= 3000.0; y /= 3000.0;
+	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
+	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
+	  x /= duration; y /= duration;
 	  a = 180.0 * atan2f(act->y - act->targ2, act->x - act->targ1) / M_PI;
 	  }
 	}
       else if(act->act == ACT_RUN) {
-	if(act->time + 3000 <= offset) {
+        int dx = act->x - act->targ1;
+        int dy = act->y - act->targ2;
+	float duration = sqrt(dx*dx + dy*dy) * 166.66666666;
+	if((unsigned int)(act->time + duration) <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
 	  }
 	else {
 	  Uint32 off = offset - act->time;
 	  anims[0] = models[1]->LookUpAnimation("LEGS_RUN");
-	  x = (act->targ1 * 2 + 1) * (3000 - off) + (act->x * 2 + 1) * off;
-	  y = (act->targ2 * 2 + 1) * (3000 - off) + (act->y * 2 + 1) * off;
-	  x /= 3000.0; y /= 3000.0;
+	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
+	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
+	  x /= duration; y /= duration;
 	  a = 180.0 * atan2f(act->y - act->targ2, act->x - act->targ1) / M_PI;
 	  }
 	}
