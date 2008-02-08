@@ -428,7 +428,6 @@ void Game::ResolveRound() {
 		(CurrentRound() - 2) * 3000 + order->time, x, y,
 		ACT_SHOOT, order->targ1, order->targ2));
 	    ordered.insert(order->id);
-	    fprintf(stderr, "%d ordered: %d\n", order->id, int(order->order));
 	    }break;
 	  default: {
 	    fprintf(stderr, "WARNING: Got unknown ORDER from Player%d\n", pnum);
