@@ -34,9 +34,13 @@ World::World(Percept *per, Orders *ord) {
   angle = 45;
   pointx = 0.0;
   pointy = 0.0;
+  SimpleModel *weap = SM_LoadModel("models/weapons2/machinegun/machinegun.md3");
   models.push_back(SM_LoadModel("models/players/trooper"));
+  models.back()->AttachSubmodel("tag_weapon", weap);
   models.push_back(SM_LoadModel("models/players/trooper", "blue"));
+  models.back()->AttachSubmodel("tag_weapon", weap);
   models.push_back(SM_LoadModel("models/players/trooper", "red"));
+  models.back()->AttachSubmodel("tag_weapon", weap);
   }
 
 World::~World() {
