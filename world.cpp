@@ -2,7 +2,7 @@
 //  This file is part of Life, Death, and the Objective ("LDO")
 //  a simple squad-tactics strategy game by Steaphan Greene
 //
-//  Copyright 2005-2006 Steaphan Greene <stea@cs.binghamton.edu>
+//  Copyright 2005-2008 Steaphan Greene <stea@cs.binghamton.edu>
 //
 //  LDO is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ void World::DrawModels(Uint32 offset) {
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
 	  x /= duration; y /= duration;
-	  a = 180.0 * atan2f(act->y - act->targ2, act->x - act->targ1) / M_PI;
+	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	}
       else if(act->act == ACT_RUN) {
@@ -154,11 +154,13 @@ void World::DrawModels(Uint32 offset) {
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
 	  x /= duration; y /= duration;
-	  a = 180.0 * atan2f(act->y - act->targ2, act->x - act->targ1) / M_PI;
+	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	}
       else if(act->act == ACT_SHOOT) {
-	anims[0] = models[1]->LookUpAnimation("LEGS_IDLE");
+        int dx = act->targ1 - act->x;
+        int dy = act->targ2 - act->y;
+	a = 180.0 * atan2f(dy, dx) / M_PI;
 	if(act->time + 1500 <= offset) {
 	  anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
