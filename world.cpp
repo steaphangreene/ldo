@@ -107,16 +107,20 @@ void World::DrawModels(Uint32 offset) {
   times.push_back(0);
 
   map<int, UnitAct> unitact;
-  map<int, vector<UnitAct> >::const_iterator rawact;
-  rawact = percept->my_units.begin();
-  for(; rawact != percept->my_units.end(); ++rawact) {
-    unitact.erase(rawact->first);
-    unitact.insert(pair<int,UnitAct>(rawact->first, rawact->second.back()));
+  map<int, vector<UnitAct> >::const_iterator unitacts;
+  unitacts = percept->my_units.begin();
+  for(; unitacts != percept->my_units.end(); ++unitacts) {
+    unitact.erase(unitacts->first);
+    vector<UnitAct>::const_iterator act = unitacts->second.end();  --act;
+    for(; act->time > offset && act != unitacts->second.begin();) { --act; }
+    unitact.insert(pair<int,UnitAct>(unitacts->first, *act));
     }
-  rawact = percept->other_units.begin();
-  for(; rawact != percept->other_units.end(); ++rawact) {
-    unitact.erase(rawact->first);
-    unitact.insert(pair<int,UnitAct>(rawact->first, rawact->second.back()));
+  unitacts = percept->other_units.begin();
+  for(; unitacts != percept->other_units.end(); ++unitacts) {
+    unitact.erase(unitacts->first);
+    vector<UnitAct>::const_iterator act = unitacts->second.end();  --act;
+    for(; act->time > offset && act != unitacts->second.begin();) { --act; }
+    unitact.insert(pair<int,UnitAct>(unitacts->first, *act));
     }
 
   map<int, UnitAct>::const_iterator mapact = unitact.begin();
