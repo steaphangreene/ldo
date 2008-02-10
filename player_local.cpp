@@ -35,6 +35,7 @@ int mouse_x = -1, mouse_y = -1;
 #define ROT_DELAY 500
 
 extern Game *cur_game;
+extern int click;
 
 Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
 	: Player(gm, tp, num, c) {
@@ -245,6 +246,7 @@ int Player_Local::EventHandler() {
       }
     else if(event.type == SDL_SG_EVENT) {
       if(event.user.code == SG_EVENT_BUTTONCLICK) {
+	audio->Play(click);
 	if(event.user.data1 == (void*)edoneb) {
 
 	//FIXME: Actually get the EQUIP setup from DNDBoxes Widgets
@@ -294,6 +296,7 @@ int Player_Local::EventHandler() {
 	}
 
       else if(event.user.code == SG_EVENT_STICKYON) {
+	audio->Play(click);
 	if(event.user.data1 == (void*)ddoneb) {
 	  if(!game->SetReady(id, true)) {
 	    gui->Lock();
@@ -306,6 +309,7 @@ int Player_Local::EventHandler() {
 	  }
 	}
       else if(event.user.code == SG_EVENT_STICKYOFF) {
+	audio->Play(click);
 	if(event.user.data1 == (void*)ddoneb) {
 	  if(game->SetReady(id, false)) {
 	    gui->Lock();

@@ -68,7 +68,6 @@ private:
   SimpleGUI *gui;
 
   map<ScreenNum, Screen *> sscr;	//Map of ScreenNums to Screens
-  int click;				//Button Click Sound
 
   SimpleVideo *video;
   SimpleAudio *audio;

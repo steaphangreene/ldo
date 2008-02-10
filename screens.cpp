@@ -39,6 +39,7 @@ Game *cur_game = NULL;			//Temporary, just for testing
 static int drkred = 0;	//Global colordef
 static vector<int> cols; //Team colors
 
+int click = 0;			//Button Click Sound
 int music = 0;			//Background Music (Temporary)
 PlayingSound cur_music = -1;	//Currently Playing Music (Temporary)
 
