@@ -56,6 +56,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
 
   music = audio->LoadMusic("music/iconoclasm.ogg");
   cur_music = -1;
+  past = 0;
 
   phase = PHASE_NONE;
   popphase = POPPHASE_NONE;
@@ -79,21 +80,24 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   ednd = NULL;
 
   //Define base GUI for Replay phase
-  wind[PHASE_REPLAY] = new SG_Table(6, 14, 0.0625, 0.125);
+  wind[PHASE_REPLAY] = new SG_Table(48, 14, 0.0625, 0.125);
   wind[PHASE_REPLAY]->SetBackground(
 	new SG_PassThrough(SG_PT_CLICK, SG_PT_CLICK, SG_PT_CLICK));
   roptb = new SG_Button("Options");
-  wind[PHASE_REPLAY]->AddWidget(roptb, 0, 13);
+  wind[PHASE_REPLAY]->AddWidget(roptb, 0, 13, 8, 1);
+  rpastb = new SG_StickyButton("+");
+  rpastb->SetAlignment(SG_ALIGN_CENTER);
+  wind[PHASE_REPLAY]->AddWidget(rpastb, 14, 13, 2, 1);
   rdoneb = new SG_Button("Ok");
-  wind[PHASE_REPLAY]->AddWidget(rdoneb, 5, 13);
+  wind[PHASE_REPLAY]->AddWidget(rdoneb, 40, 13, 8, 1);
   rtext = new SG_TransLabel("Playback Turn", drkred);
   rtext->SetFontSize(50);
   rtext->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_REPLAY]->AddWidget(rtext, 1, 12, 4, 1);
+  wind[PHASE_REPLAY]->AddWidget(rtext, 8, 12, 32, 1);
   rstamp = new SG_TransLabel("<Time Offset>", drkred);
   rstamp->SetFontSize(50);
   rstamp->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_REPLAY]->AddWidget(rstamp, 1, 11, 4, 1);
+  wind[PHASE_REPLAY]->AddWidget(rstamp, 8, 11, 32, 1);
   vector<string> conts;			//Temporary - until textures
   conts.push_back("<<");
   conts.push_back("<");
@@ -104,7 +108,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   conts.push_back(">>");
   rcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
   rcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
-  wind[PHASE_REPLAY]->AddWidget(rcontrols, 2, 13, 2, 1);
+  wind[PHASE_REPLAY]->AddWidget(rcontrols, 16, 13, 16, 1);
 
   //Define base GUI for Declare phase
   wind[PHASE_DECLARE] = new SG_Table(6, 14, 0.0625, 0.125);
@@ -304,6 +308,9 @@ int Player_Local::EventHandler() {
 	    gui->Unlock();
 	    }
 	  }
+	else if(event.user.data1 == (void*)rpastb) {
+	  past = 1;
+	  }
 	else {
 	  exiting = 1;  //Return
 	  }
@@ -316,6 +323,9 @@ int Player_Local::EventHandler() {
 	    ddoneb->TurnOn(); // Reject this attempt
 	    gui->Unlock();
 	    }
+	  }
+	else if(event.user.data1 == (void*)rpastb) {
+	  past = 0;
 	  }
 	else {
 	  exiting = 1;  //Return

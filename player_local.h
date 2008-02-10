@@ -78,13 +78,14 @@ protected:
   SDL_Surface *equip_bg;
 
 
+  SG_StickyButton *rpastb;
   SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
   SG_TransLabel *rtext, *rstamp;
   SG_Tabs *rcontrols;
 
   Uint32 last_time;		//Data for Replay phase
   Uint32 offset, last_offset;
-  int playback_speed;
+  int playback_speed, past;
   SDL_mutex *off_mut;		//MutEx to protect offsets
 
   void CalcOffset(Uint32);
