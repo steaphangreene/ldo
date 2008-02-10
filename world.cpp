@@ -143,15 +143,15 @@ void World::DrawModels(Uint32 offset) {
 	}
       else if(act->act == ACT_FALL) {
 	if(act->time + 0 <= offset) {
-	  x = act->targ1 * 2 + 1;
-	  y = act->targ2 * 2 + 1;
+	  x = act->x * 2 + 1;
+	  y = act->y * 2 + 1;
 	  if(act->time + 1000 <= offset) {
-	    anims[0] = models[mod]->LookUpAnimation("BOTH_DEAD2");
-	    anims[1] = models[mod]->LookUpAnimation("BOTH_DEAD2");
+	    anims[0] = models[mod]->LookUpAnimation("BOTH_DEAD1");
+	    anims[1] = models[mod]->LookUpAnimation("BOTH_DEAD1");
 	    }
 	  else {
-	    anims[0] = models[mod]->LookUpAnimation("BOTH_DEATH2");
-	    anims[1] = models[mod]->LookUpAnimation("BOTH_DEATH2");
+	    anims[0] = models[mod]->LookUpAnimation("BOTH_DEATH1");
+	    anims[1] = models[mod]->LookUpAnimation("BOTH_DEATH1");
 	    }
 	  }
 	}
