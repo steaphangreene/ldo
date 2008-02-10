@@ -107,15 +107,16 @@ void World::DrawModels(Uint32 offset) {
   times.push_back(0);
 
   map<int, UnitAct> unitact;
-  vector<UnitAct>::const_iterator rawact = percept->my_acts.begin();
-  for(; rawact != percept->my_acts.end(); ++rawact) {
-    unitact.erase(rawact->id);
-    unitact.insert(pair<int,UnitAct>(rawact->id, *rawact));
+  map<int, vector<UnitAct> >::const_iterator rawact;
+  rawact = percept->my_units.begin();
+  for(; rawact != percept->my_units.end(); ++rawact) {
+    unitact.erase(rawact->first);
+    unitact.insert(pair<int,UnitAct>(rawact->first, rawact->second.back()));
     }
-  rawact = percept->other_acts.begin();
-  for(; rawact != percept->other_acts.end(); ++rawact) {
-    unitact.erase(rawact->id);
-    unitact.insert(pair<int,UnitAct>(rawact->id, *rawact));
+  rawact = percept->other_units.begin();
+  for(; rawact != percept->other_units.end(); ++rawact) {
+    unitact.erase(rawact->first);
+    unitact.insert(pair<int,UnitAct>(rawact->first, rawact->second.back()));
     }
 
   map<int, UnitAct>::const_iterator mapact = unitact.begin();
@@ -134,6 +135,20 @@ void World::DrawModels(Uint32 offset) {
 	if(act->time + 0 <= offset) {
 	  x = act->targ1 * 2 + 1;
 	  y = act->targ2 * 2 + 1;
+	  }
+	}
+      else if(act->act == ACT_FALL) {
+	if(act->time + 0 <= offset) {
+	  x = act->targ1 * 2 + 1;
+	  y = act->targ2 * 2 + 1;
+	  if(act->time + 1000 <= offset) {
+	    anims[0] = models[mod]->LookUpAnimation("BOTH_DEAD2");
+	    anims[1] = models[mod]->LookUpAnimation("BOTH_DEAD2");
+	    }
+	  else {
+	    anims[0] = models[mod]->LookUpAnimation("BOTH_DEATH2");
+	    anims[1] = models[mod]->LookUpAnimation("BOTH_DEATH2");
+	    }
 	  }
 	}
       else if(act->act == ACT_MOVE) {

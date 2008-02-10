@@ -35,16 +35,16 @@ bool Player_AI::Run() {
 
   int exiting = 0;
   while(exiting == 0) {
-    if(pround != game->CurrentRound() - 1) {
-      pround = game->CurrentRound() - 1;
+    if(pround != game->CurrentRound()) {
+      pround = game->CurrentRound();
       game->UpdatePercept(id, pround);
       SDL_Delay(10);
 
-      if(pround == 0) {
-	vector<UnitAct>::iterator act = percept.my_acts.begin();
-	for(; act != percept.my_acts.end(); ++act) {
-	  if(act->act == ACT_EQUIP) {
-	    orders.orders.push_back(UnitOrder(act->id, 0, ORDER_EQUIP));
+      if(pround == 1) {
+	map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
+	for(; unit != percept.my_units.end(); ++unit) {
+	  if(unit->second.back().act == ACT_EQUIP) {
+	    orders.orders.push_back(UnitOrder(unit->first, 0, ORDER_EQUIP));
 	    }
 	  SDL_Delay(10);
 	  }

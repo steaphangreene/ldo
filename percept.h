@@ -25,7 +25,7 @@
 
 #include "SDL.h"
 
-#include <set>
+#include <map>
 #include <vector>
 #include <cstdio>
 using namespace std;
@@ -68,9 +68,9 @@ public:
 
   void Clear();
 
-  set<int> my_units;		//List of all of my unit ids (doesn't change)
-  vector<UnitAct> my_acts;	//List of unit actions of my own units
-  vector<UnitAct> other_acts;	//List of unit actions of others' units
+  //List of all of unit ids and actions for own and others
+  map<int, vector<UnitAct> > my_units;
+  map<int, vector<UnitAct> > other_units;
 
   int UnitPresent(int xc, int yc, int &id);  // Enemy:-1, Own:1, None/Neutral:0
   int UnitAt(int xc, int yc);

@@ -40,7 +40,7 @@ int Percept::Load(FILE *fl, unsigned int ver) {
   if(fscanf(fl, "%d\n", &num) < 1) return 0;
   for(unsigned int unit = 0; unit < num; ++unit) {
     if(fscanf(fl, "%d;", &val) < 1) return 0;
-    my_units.insert(val);
+//    my_units.insert(val);
     fscanf(fl, "\n");
     }
 
@@ -49,48 +49,62 @@ int Percept::Load(FILE *fl, unsigned int ver) {
 
 int Percept::Save(FILE *fl, unsigned int ver) {
   if(fprintf(fl, "%d\n", (int)(my_units.size())) < 2) return 0;
-  set<int>::iterator itrm = my_units.begin();
+  map<int, vector<UnitAct> >::iterator itrm = my_units.begin();
   for(; itrm != my_units.end(); ++itrm) {
-    if(fprintf(fl, "%d\n", (*itrm)) < 2) return 0;
+    if(fprintf(fl, "%d\n", itrm->first) < 2) return 0;
     }
 
   return 1;
   }
 
 void Percept::Clear() {	//Prepares for next frame - DOES NOT CLEAR my_units
-  my_acts.clear();
-  other_acts.clear();
+  my_units.clear();
+  other_units.clear();
   }
 
 int Percept::UnitPresent(int xc, int yc, int &id) {
-  vector<UnitAct>::iterator act = my_acts.begin();
-  for(; act != my_acts.end(); ++act) {
-    if(act->x == xc && act->y == yc) {
-      id = act->id;
-      return 1;
+  map<int, vector<UnitAct> >::iterator unit;
+  unit = my_units.begin();
+  for(; unit != my_units.end(); ++unit) {
+    vector<UnitAct>::iterator act = unit->second.begin();
+    for(; act != unit->second.end(); ++act) {
+      if(act->x == xc && act->y == yc) {
+	id = act->id;
+	return 1;
+	}
       }
     }
-  act = other_acts.begin();
-  for(; act != other_acts.end(); ++act) {
-    if(act->x == xc && act->y == yc) {
-      id = act->id;
-      return -1;
+  unit = other_units.begin();
+  for(; unit != other_units.end(); ++unit) {
+    vector<UnitAct>::iterator act = unit->second.begin();
+    for(; act != unit->second.end(); ++act) {
+      if(act->x == xc && act->y == yc) {
+	id = act->id;
+	return 1;
+	}
       }
     }
   return 0;     //Nothing there
   }
 
 int Percept::UnitAt(int xc, int yc) {
-  vector<UnitAct>::iterator act = my_acts.begin();
-  for(; act != my_acts.end(); ++act) {
-    if(act->x == xc && act->y == yc) {
-      return act->id;
+  map<int, vector<UnitAct> >::iterator unit;
+  unit = my_units.begin();
+  for(; unit != my_units.end(); ++unit) {
+    vector<UnitAct>::iterator act = unit->second.begin();
+    for(; act != unit->second.end(); ++act) {
+      if(act->x == xc && act->y == yc) {
+	return act->id;
+	}
       }
     }
-  act = other_acts.begin();
-  for(; act != other_acts.end(); ++act) {
-    if(act->x == xc && act->y == yc) {
-      return act->id;
+  unit = other_units.begin();
+  for(; unit != other_units.end(); ++unit) {
+    vector<UnitAct>::iterator act = unit->second.begin();
+    for(; act != unit->second.end(); ++act) {
+      if(act->x == xc && act->y == yc) {
+	return act->id;
+	}
       }
     }
   return 0;

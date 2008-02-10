@@ -70,7 +70,7 @@ public:
   void SetPercept(int plnum, Percept *prcpt);
   void UpdatePercept(int plnum, int rnd);
 
-  int CurrentRound() { return master.size(); }
+  int CurrentRound() { return round; };
   PlayResult Play();
 
   int PlayerIDForUnit(const int unitid) { return unplayer[unitid]; };
@@ -106,7 +106,8 @@ private:
 
   map<int, Unit *> units;		// Actual unit container
 
-  vector<Percept> master;		// Master game percepts (for each turn)
+  int round;				// Current Round #
+  Percept master;			// Master game percept
   map<int, Percept *> percept;		// Percept for each player
   map<int, Orders *> orders;		// Orders from each player
 

@@ -459,8 +459,8 @@ bool Player_Local::Run() {
   SDL_Thread *th = SDL_CreateThread(event_thread_func, (void*)(this));
 
   while(exiting == 0) {
-    if(pround != game->CurrentRound() - 1) {
-      pround = game->CurrentRound() - 1;
+    if(pround != game->CurrentRound()) {
+      pround = game->CurrentRound();
       game->UpdatePercept(id, pround);
 
       gui->Lock();
@@ -507,7 +507,7 @@ bool Player_Local::Run() {
     gui->RenderStart(cur_time, true);
 
     if(phase == PHASE_DECLARE) {
-      world->Render((game->CurrentRound()-1)*3000);
+      world->Render((game->CurrentRound())*3000);
 
       int unit;
       int unitthere = percept.UnitPresent(mouse_x, mouse_y, unit);
@@ -518,7 +518,7 @@ bool Player_Local::Run() {
       world->DrawSelBox(sel_x, sel_y);
       }
     else if(phase == PHASE_REPLAY) {
-      world->Render((game->CurrentRound()-2)*3000 + offset);
+      world->Render((game->CurrentRound()-1)*3000 + offset);
       }
 
     gui->RenderFinish(cur_time, true);
@@ -553,10 +553,15 @@ void Player_Local::UpdateEquipIDs() {
   set<int> eqtmp;	//Temporary set of ids for eq
   eqid.clear();
 
-  vector<UnitAct>::iterator act = percept.my_acts.begin();
-  for(; act != percept.my_acts.end(); ++act) {
-    if(act->act == ACT_EQUIP && act->time >= start_time) {
-      eqtmp.insert(act->id);
+  map<int, vector<UnitAct> >::iterator unit;
+  unit = percept.my_units.begin();
+  for(; unit != percept.my_units.end(); ++unit) {
+    vector<UnitAct>::iterator act = unit->second.begin();
+    for(; act != unit->second.end(); ++act) {
+      if(act->act == ACT_EQUIP && act->time >= start_time
+		&& act->time < start_time+3000) {
+	//eqtmp.insert(act->id);	//Temporarily Disable Equip Screen
+	}
       }
     }
 
@@ -566,12 +571,16 @@ void Player_Local::UpdateEquipIDs() {
     }
 
   int targ = -1;	//Each troop/group equips SEPARATELY!
-  act = percept.my_acts.begin();
-  for(; act != percept.my_acts.end(); ++act) {
-    if(act->act == ACT_EQUIP && eqtmp.count(act->id)
-	&& (targ == -1 || targ == act->targ1)) {
-      targ = act->targ1;
-      eqid.push_back(act->id);
+  unit = percept.my_units.begin();
+  for(; unit != percept.my_units.end(); ++unit) {
+    vector<UnitAct>::iterator act = unit->second.begin();
+    for(; act != unit->second.end(); ++act) {
+      if(act->act == ACT_EQUIP && eqtmp.count(act->id)
+		&& (targ == -1 || targ == act->targ1)
+		&& act->time >= start_time && act->time < start_time+3000) {
+	//targ = act->targ1;		//Temporarily Disable Equip Screen
+	//eqid.push_back(act->id);
+	}
       }
     }
 

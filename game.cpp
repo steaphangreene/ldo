@@ -167,7 +167,7 @@ int Game::Load(vector< vector<int> > &vec, FILE *fl) {
 
 int Game::Load(FILE *fl) {
   unsigned int num, ver;
-  master.resize(1);
+  round = 1;
 
   memset(buf, 0, BUF_LEN);
   if(fscanf(fl, "%s\n", buf) < 1) return 0;
@@ -189,7 +189,6 @@ int Game::Load(FILE *fl) {
   if(!Load(squnits, fl)) return 0;
 
   Unit *unit_ptr;
-  map<int, int> tr2un;  //Map troop id to unit id for initial ACT_EQUIP
   if(fscanf(fl, "%d\n", &num) < 1) return 0;
   for(unsigned int unit = 0; unit < num; ++unit) {
     unit_ptr = new Unit;
@@ -199,15 +198,14 @@ int Game::Load(FILE *fl) {
       return 0;
       }
     units[unit_ptr->id] = unit_ptr;
-    master[0].my_units.insert(unit_ptr->id);
 
-    if(tr2un.count(unit_ptr->troop) == 0) {
-      tr2un[unit_ptr->troop] = unit_ptr->id;
-      }
-    int tr = tr2un[unit_ptr->troop];
-
-    master[0].my_acts.push_back(UnitAct(unit_ptr->id, 0, 30+unit, 32,
-	ACT_EQUIP, tr));  //Temporary, use REAL starting locations from map
+    //TODO: Use REAL starting locations from map
+    //TODO: Do a Real Initial Equip of Items Here
+    //TODO: Equip Requested EQUIP Items
+    master.my_units[unit_ptr->id].push_back(UnitAct(
+	unit_ptr->id, 0, 30+unit, 32, ACT_START));
+    master.my_units[unit_ptr->id].push_back(UnitAct(
+	unit_ptr->id, 0, 30+unit, 32, ACT_EQUIP, 0, 1));
     }
 
   Uint32 id = 1;
@@ -263,9 +261,9 @@ void Game::Clear() {
     }
   player.clear();
 
+  master.Clear();
   plsquads.clear();
   squnits.clear();
-  master.clear();
   percept.clear();
   orders.clear();
   }
@@ -283,35 +281,34 @@ void Game::SetPercept(int plnum, Percept *prcpt) {
     fprintf(stderr, "ERROR: Multiple percepts requested for one player!\n");
     exit(1);
     }
-  for(Uint32 sq=0; sq < plsquads[plnum].size(); ++sq) {
-    for(Uint32 un=0; un < squnits[plsquads[plnum][sq]].size(); ++un) {
-      prcpt->my_units.insert(squnits[plsquads[plnum][sq]][un]);
-      }
-    }
+//  for(Uint32 sq=0; sq < plsquads[plnum].size(); ++sq) {
+//    for(Uint32 un=0; un < squnits[plsquads[plnum][sq]].size(); ++un) {
+//      prcpt->my_units.insert(squnits[plsquads[plnum][sq]][un]);
+//      }
+//    }
   percept[plnum] = prcpt;
   }
 
 void Game::UpdatePercept(int plnum, int rnd) {
-  if(rnd < 0 || rnd >= (int)(master.size())) {
+  if(rnd < 1 || rnd > round) {
     fprintf(stderr, "ERROR: Percept requested in future or pre-start!\n");
     exit(1);
     }
 
-  if(rnd >= (int)(master.size())) {
-    // Current (Unresolved) Round
-    rnd = (int)(master.size()) - 1;	//Temporary!
-    }
+//  if(rnd >= round) {	// Current (Unresolved) Round
+//    rnd = round - 1;	//Temporary?
+//    }
 
   percept[plnum]->Clear();
-  vector<UnitAct>::const_iterator itr = master[rnd].my_acts.begin();
-  for(; itr != master[rnd].my_acts.end(); ++itr) {
+  map<int, vector<UnitAct> >::const_iterator itr = master.my_units.begin();
+  for(; itr != master.my_units.end(); ++itr) {
 //    fprintf(stderr, "Sending %d action %d for %d (Round %d)\n",
 //	plnum, itr->act, itr->id, rnd);
-    if(percept[plnum]->my_units.count(itr->id) > 0) {
-      percept[plnum]->my_acts.push_back(*itr);
+    if(plnum == PlayerIDForUnit(itr->first)) {
+      percept[plnum]->my_units.insert(*itr);
       }
     else {
-      percept[plnum]->other_acts.push_back(*itr);
+      percept[plnum]->other_units.insert(*itr);
       }
     }
   }
@@ -391,7 +388,7 @@ int Game::ThreadHandler() {
   }
 
 void Game::ResolveRound() {
-  master.push_back(Percept());
+  round++;
 
   set<int> ordered;
   vector<Player *>::const_iterator itrp = player.begin();
@@ -408,9 +405,8 @@ void Game::ResolveRound() {
 //		order->id, order->order, order->time,
 //		order->targ1, order->targ2);
 	int x=0, y=0;
-	vector<UnitAct>::const_iterator prev =
-		master[master.size() - 2].my_acts.begin();
-	for(; prev != master[master.size() - 2].my_acts.end(); ++prev) {
+	vector<UnitAct>::const_iterator prev = master.my_units[order->id].begin();
+	for(; prev != master.my_units[order->id].end(); ++prev) {
 	  if(prev->id == order->id) {
 	    x = prev->x;
 	    y = prev->y;
@@ -418,30 +414,40 @@ void Game::ResolveRound() {
 	  }
 	switch(order->order) {
 	  case(ORDER_MOVE): {
-	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time, order->targ1, order->targ2,
-		ACT_MOVE, x, y));
+	    master.my_units[order->id].push_back(UnitAct(order->id,
+		(CurrentRound() - 1) * 3000 + order->time,
+		order->targ1, order->targ2, ACT_MOVE, x, y));
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_RUN): {
-	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time, order->targ1, order->targ2,
-		ACT_RUN, x, y));
+	    master.my_units[order->id].push_back(UnitAct(order->id,
+		(CurrentRound() - 1) * 3000 + order->time,
+		order->targ1, order->targ2, ACT_RUN, x, y));
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_EQUIP): {
-	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time, x, y,
+	    if(ordered.count(order->id) <= 0) {	// Temporary: Real Resolution
+	      master.my_units[order->id].push_back(UnitAct(order->id,
+		(CurrentRound() - 1) * 3000 + order->time, x, y,
 		ACT_EQUIP, order->targ1, order->targ2));
-	    if(master.size() > 2) {	// Initial Equip is Free
+	      }
+	    if(round == 1) {	// Initial Equip is Free
 	      ordered.insert(order->id);
 	      }
 	    }break;
 	  case(ORDER_SHOOT): {
-	    master[master.size() - 1].my_acts.push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time, x, y,
+	    master.my_units[order->id].push_back(UnitAct(order->id,
+		(CurrentRound() - 1) * 3000 + order->time, x, y,
 		ACT_SHOOT, order->targ1, order->targ2));
 	    ordered.insert(order->id);
+
+	    int hit = master.UnitAt(order->targ1, order->targ2);
+	    if(hit > 0) {
+	      master.my_units[hit].push_back(UnitAct(hit,
+		(CurrentRound() - 1) * 3000 + order->time + 1000, order->targ1,
+		order->targ2, ACT_FALL, order->targ1, order->targ2));
+	      ordered.insert(hit);
+	      }
 	    }break;
 	  default: {
 	    fprintf(stderr, "WARNING: Got unknown ORDER from Player%d\n", pnum);
@@ -452,19 +458,19 @@ void Game::ResolveRound() {
     orders[pnum]->Clear();
     }
 
-  //Create STAND orders for all units not given other orders
-  set<int>::const_iterator unit = master[0].my_units.begin();
-  for(; unit != master[0].my_units.end(); ++unit) {
-    if(ordered.count(*unit) == 0) {
-      vector<UnitAct>::const_iterator prev =
-		master[master.size() - 2].my_acts.begin();
-      for(; prev != master[master.size() - 2].my_acts.end(); ++prev) {
-	if(prev->id == (*unit)) {
-	  master[master.size() - 1].my_acts.push_back(UnitAct((*unit),
-		(CurrentRound() - 2) * 3000, prev->x, prev->y,
-		ACT_STAND, prev->x, prev->y));
-	  }
-	}
-      }
-    }
+//  //Create STAND orders for all units not given other orders
+//  set<int>::const_iterator unit = master.my_units.begin();
+//  for(; unit != master.my_units.end(); ++unit) {
+//    if(ordered.count(*unit) == 0) {
+//      vector<UnitAct>::const_iterator prev =
+//		master.my_units[master.my_units.size() - 2].my_acts.begin();
+//      for(; prev != master.my_units[master.my_units.size() - 2].my_acts.end(); ++prev) {
+//	if(prev->id == (*unit)) {
+//	  master.my_units[order->id].push_back(UnitAct((*unit),
+//		(CurrentRound() - 1) * 3000, prev->x, prev->y,
+//		ACT_STAND, prev->x, prev->y));
+//	  }
+//	}
+//      }
+//    }
   }
