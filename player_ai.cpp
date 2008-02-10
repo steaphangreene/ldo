@@ -23,8 +23,8 @@
 #include "player_ai.h"
 #include "game.h"
 
-Player_AI::Player_AI(Game *gm, PlayerType tp, int num)
-	: Player(gm, tp, num) {
+Player_AI::Player_AI(Game *gm, PlayerType tp, int num, int c)
+	: Player(gm, tp, num, c) {
   }
 
 Player_AI::~Player_AI() {

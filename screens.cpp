@@ -539,10 +539,12 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
   vector<SlotData>::iterator slot = conn.slots.begin();
   for(int pn=0; slot != conn.slots.end(); ++slot, ++pn) {
     if(slot->ptype == SC_PLAYER_LOCAL) {
-      cur_game->AttachPlayer(new Player_Local(cur_game, PLAYER_LOCAL, pn));
+      cur_game->AttachPlayer(new Player_Local(cur_game, PLAYER_LOCAL, pn,
+	slot->color - 1));
       }
     else { //if(slot->ptype == SC_PLAYER_AI) {
-      cur_game->AttachPlayer(new Player_AI(cur_game, PLAYER_AI, pn));
+      cur_game->AttachPlayer(new Player_AI(cur_game, PLAYER_AI, pn,
+	slot->color - 1));
       }
     }
 

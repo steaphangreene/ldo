@@ -25,10 +25,11 @@
 
 extern Game *cur_game;
 
-Player::Player(Game *gm, PlayerType tp, int num) {
+Player::Player(Game *gm, PlayerType tp, int num, int c) {
   game = gm;
   type = tp;
   id = num;
+  color = c;
 
   pround = -1;
 

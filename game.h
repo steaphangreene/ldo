@@ -73,6 +73,10 @@ public:
   int CurrentRound() { return master.size(); }
   PlayResult Play();
 
+  int PlayerIDForUnit(const int unitid) { return unplayer[unitid]; };
+  Player *PlayerForUnit(const int unitid) { return player[unplayer[unitid]]; };
+  Player *PlayerByID(const int plid) { return player[plid]; };
+
   bool Ready(int plnum);		// Returns ready state for player
   bool SetReady(int plnum, bool rdy);	// Returns new ready state
   bool AllReady();			// returns true on all ready
@@ -97,6 +101,8 @@ private:
   vector< vector<int> > plsquads;	// List of squad ids per player
 
   vector< vector<int> > squnits;	// List of unit ids per squad
+
+  map<int, int> unplayer;		// Lookup PlayerID by UnitID
 
   map<int, Unit *> units;		// Actual unit container
 

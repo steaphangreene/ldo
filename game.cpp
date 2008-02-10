@@ -209,6 +209,17 @@ int Game::Load(FILE *fl) {
     master[0].my_acts.push_back(UnitAct(unit_ptr->id, 0, 30+unit, 32,
 	ACT_EQUIP, tr));  //Temporary, use REAL starting locations from map
     }
+
+  Uint32 id = 1;
+  for(Uint32 pl=0; pl < plsquads.size(); ++pl) {
+    for(Uint32 sq=0; sq < plsquads[pl].size(); ++sq) {
+      for(Uint32 un=0; un < squnits[plsquads[pl][sq]].size(); ++un) {
+	unplayer[id] = pl;
+	++id;
+	}
+      }
+    }
+
   return 1;
   }
 
@@ -298,6 +309,9 @@ void Game::UpdatePercept(int plnum, int rnd) {
 //	plnum, itr->act, itr->id, rnd);
     if(percept[plnum]->my_units.count(itr->id) > 0) {
       percept[plnum]->my_acts.push_back(*itr);
+      }
+    else {
+      percept[plnum]->other_acts.push_back(*itr);
       }
     }
   }

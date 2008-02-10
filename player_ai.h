@@ -27,7 +27,7 @@
 
 class Player_AI : public Player {
 public:
-  Player_AI(Game *gm, PlayerType tp, int num);
+  Player_AI(Game *gm, PlayerType tp, int num, int c=0);
   virtual ~Player_AI();
   virtual bool Run();
 

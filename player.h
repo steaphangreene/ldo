@@ -42,11 +42,14 @@ enum PlayerType {
 
 class Player {
 public:
-  Player(Game *gm, PlayerType tp, int num);
+  Player(Game *gm, PlayerType tp, int num, int c=0);
   virtual ~Player();
+
+  void SetColor(int c) { color = c; };
 
   PlayerType Type() { return type; };
   int ID() { return id; };
+  int Color() { return color; };
 
   virtual bool Run();
 
@@ -56,6 +59,7 @@ protected:
   Percept percept;
   Orders orders;
   int pround;
+  int color;
   Game *game;
   };
 

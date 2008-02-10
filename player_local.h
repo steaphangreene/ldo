@@ -47,7 +47,7 @@ enum PopPhase {
 
 class Player_Local : public Player {
 public:
-  Player_Local(Game *gm, PlayerType tp, int num);
+  Player_Local(Game *gm, PlayerType tp, int num, int c=0);
   virtual ~Player_Local();
   virtual bool Run();
 

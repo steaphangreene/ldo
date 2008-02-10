@@ -27,6 +27,9 @@
 using namespace std;
 
 #include "world.h"
+#include "game.h"
+
+extern Game *cur_game;
 
 World::World(Percept *per, Orders *ord) {
   percept = per;
@@ -109,13 +112,19 @@ void World::DrawModels(Uint32 offset) {
     unitact.erase(rawact->id);
     unitact.insert(pair<int,UnitAct>(rawact->id, *rawact));
     }
+  rawact = percept->other_acts.begin();
+  for(; rawact != percept->other_acts.end(); ++rawact) {
+    unitact.erase(rawact->id);
+    unitact.insert(pair<int,UnitAct>(rawact->id, *rawact));
+    }
 
   map<int, UnitAct>::const_iterator mapact = unitact.begin();
   for(; mapact != unitact.end(); ++mapact) {
     const UnitAct *act = &(mapact->second);
+    int mod = cur_game->PlayerForUnit(act->id)->Color();
     if(act->time <= offset) {
-      anims[0] = models[1]->LookUpAnimation("LEGS_IDLE");
-      anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
+      anims[0] = models[mod]->LookUpAnimation("LEGS_IDLE");
+      anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
       times[0] = act->time;
       times[1] = act->time;
       float x = act->x * 2 + 1;
@@ -137,7 +146,7 @@ void World::DrawModels(Uint32 offset) {
 	  }
 	else {
 	  Uint32 off = offset - act->time;
-	  anims[0] = models[1]->LookUpAnimation("LEGS_WALK");
+	  anims[0] = models[mod]->LookUpAnimation("LEGS_WALK");
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
 	  x /= duration; y /= duration;
@@ -154,7 +163,7 @@ void World::DrawModels(Uint32 offset) {
 	  }
 	else {
 	  Uint32 off = offset - act->time;
-	  anims[0] = models[1]->LookUpAnimation("LEGS_RUN");
+	  anims[0] = models[mod]->LookUpAnimation("LEGS_RUN");
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
 	  x /= duration; y /= duration;
@@ -166,35 +175,35 @@ void World::DrawModels(Uint32 offset) {
         int dy = act->targ2 - act->y;
 	a = 180.0 * atan2f(dy, dx) / M_PI;
 	if(act->time + 1500 <= offset) {
-	  anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
+	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
 	  }
 	else {
-	  anims[1] = models[1]->LookUpAnimation("TORSO_ATTACK");
+	  anims[1] = models[mod]->LookUpAnimation("TORSO_ATTACK");
 	  }
 	}
       else if(act->act == ACT_EQUIP) {
 	if(act->time + 1500 <= offset) {
-	  anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
+	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
 	  }
 	else if(act->time + 1000 <= offset) {
-	  anims[1] = models[1]->LookUpAnimation("TORSO_RAISE");
+	  anims[1] = models[mod]->LookUpAnimation("TORSO_RAISE");
 	  times[1] += 1000;
 	  }
 	else if(act->time + 500 <= offset) {
-	  anims[1] = models[1]->LookUpAnimation("TORSO_DROP");
+	  anims[1] = models[mod]->LookUpAnimation("TORSO_DROP");
 	  times[1] += 500;
 	  }
 	else {
-	  anims[1] = models[1]->LookUpAnimation("TORSO_STAND");
+	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  }
         }
 //      fprintf(stderr, "Action Time: (%d/%d)\n", act->time, offset);
       glPushMatrix();
       glTranslatef(x, y, 0.0);
       glRotatef(a, 0.0, 0.0, 1.0);
-      models[1]->Render(offset, anims, times);
+      models[mod]->Render(offset, anims, times);
       glPopMatrix();
       }
     else {

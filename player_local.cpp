@@ -34,8 +34,10 @@ int mouse_x = -1, mouse_y = -1;
 #define ZOOM_DELAY 250
 #define ROT_DELAY 500
 
-Player_Local::Player_Local(Game *gm, PlayerType tp, int num)
-	: Player(gm, tp, num) {
+extern Game *cur_game;
+
+Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
+	: Player(gm, tp, num, c) {
   gui = SimpleGUI::Current(); //Yes, this is ok, it's static!
   if(!gui) {
     //FIXME: Initialize GUI myself if it's not already done for me!
@@ -686,6 +688,15 @@ int Player_Local::UnitPresent(int xc, int yc, int &id) {
     if(act->x == xc && act->y == yc) {
       id = act->id;
       return 1;
+      }
+    }
+  act = percept.other_acts.begin();
+  for(; act != percept.other_acts.end(); ++act) {
+    if(act->x == xc && act->y == yc) {
+      id = act->id;
+      if(cur_game->PlayerForUnit(id)->ID() != ID()) {
+	return -1;
+	}
       }
     }
   return 0;     //Nothing there
