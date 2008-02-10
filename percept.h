@@ -72,8 +72,8 @@ public:
   vector<UnitAct> my_acts;	//List of unit actions of my own units
   vector<UnitAct> other_acts;	//List of unit actions of others' units
 
-  // Enemy = -1, Own = 1, None/Neutral = 0
-  int UnitPresent(int xc, int yc, int &id);
+  int UnitPresent(int xc, int yc, int &id);  // Enemy:-1, Own:1, None/Neutral:0
+  int UnitAt(int xc, int yc);
   };
 
 #endif // PERCEPT_H
