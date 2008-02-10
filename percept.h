@@ -34,6 +34,7 @@ using namespace std;
 
 enum Act {	// For Example
   ACT_NONE,
+  ACT_FALL,
   ACT_START,	// Unit just arrived, or just became visible
   ACT_EQUIP,	// Unit needs to be (re)equipped
   ACT_DUCK,
