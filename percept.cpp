@@ -79,3 +79,19 @@ int Percept::UnitPresent(int xc, int yc, int &id) {
     }
   return 0;     //Nothing there
   }
+
+int Percept::UnitAt(int xc, int yc) {
+  vector<UnitAct>::iterator act = my_acts.begin();
+  for(; act != my_acts.end(); ++act) {
+    if(act->x == xc && act->y == yc) {
+      return act->id;
+      }
+    }
+  act = other_acts.begin();
+  for(; act != other_acts.end(); ++act) {
+    if(act->x == xc && act->y == yc) {
+      return act->id;
+      }
+    }
+  return 0;
+  }
