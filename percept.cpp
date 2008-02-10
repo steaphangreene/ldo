@@ -80,7 +80,7 @@ int Percept::UnitPresent(int xc, int yc, int &id) {
     for(; act != unit->second.end(); ++act) {
       if(act->x == xc && act->y == yc) {
 	id = act->id;
-	return 1;
+	return -1;
 	}
       }
     }
