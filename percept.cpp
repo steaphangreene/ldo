@@ -61,3 +61,21 @@ void Percept::Clear() {	//Prepares for next frame - DOES NOT CLEAR my_units
   my_acts.clear();
   other_acts.clear();
   }
+
+int Percept::UnitPresent(int xc, int yc, int &id) {
+  vector<UnitAct>::iterator act = my_acts.begin();
+  for(; act != my_acts.end(); ++act) {
+    if(act->x == xc && act->y == yc) {
+      id = act->id;
+      return 1;
+      }
+    }
+  act = other_acts.begin();
+  for(; act != other_acts.end(); ++act) {
+    if(act->x == xc && act->y == yc) {
+      id = act->id;
+      return -1;
+      }
+    }
+  return 0;     //Nothing there
+  }

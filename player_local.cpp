@@ -368,7 +368,7 @@ int Player_Local::EventHandler() {
 	SDL_mutexV(vid_mut);
 	int s_x = ((int)(x)) / 2;
 	int s_y = ((int)(y)) / 2;
-	if(UnitPresent(s_x, s_y, sel_id) > 0) {
+	if(percept.UnitPresent(s_x, s_y, sel_id) > 0) {
 	  sel_x = s_x;
 	  sel_y = s_y;
 	  dpass->SetMenu(2, mactions[1]);
@@ -506,7 +506,7 @@ bool Player_Local::Run() {
       world->Render((game->CurrentRound()-1)*3000);
 
       int unit;
-      int unitthere = UnitPresent(mouse_x, mouse_y, unit);
+      int unitthere = percept.UnitPresent(mouse_x, mouse_y, unit);
       if(unitthere > 0) world->DrawSelBox(mouse_x, mouse_y, 0.0, 1.0, 0.0);
       else if(unitthere < 0) world->DrawSelBox(mouse_x, mouse_y, 1.0, 0.0, 0.0);
       else world->DrawSelBox(mouse_x, mouse_y, 1.0, 1.0, 0.0);
@@ -679,25 +679,4 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
     rcontrols->Set(playback_speed);
     gui->Unlock();
     }
-  }
-
-//FIXME: Should be in percept
-int Player_Local::UnitPresent(int xc, int yc, int &id) {
-  vector<UnitAct>::iterator act = percept.my_acts.begin();
-  for(; act != percept.my_acts.end(); ++act) {
-    if(act->x == xc && act->y == yc) {
-      id = act->id;
-      return 1;
-      }
-    }
-  act = percept.other_acts.begin();
-  for(; act != percept.other_acts.end(); ++act) {
-    if(act->x == xc && act->y == yc) {
-      id = act->id;
-      if(cur_game->PlayerForUnit(id)->ID() != ID()) {
-	return -1;
-	}
-      }
-    }
-  return 0;     //Nothing there
   }

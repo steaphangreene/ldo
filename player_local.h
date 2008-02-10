@@ -52,9 +52,6 @@ public:
   virtual bool Run();
 
 protected:
-  int UnitPresent(int xc, int yc, int &id);
-	// Enemy = -1, Own = 1, None/Neutral = 0
-
   void UpdateEquipIDs();
 
   Phase phase;			//Current phase of main window GUI
