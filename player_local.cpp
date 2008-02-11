@@ -108,6 +108,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   conts.push_back(">>");
   rcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
   rcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
+  rcontrols->SetAlignment(SG_ALIGN_CENTER);
   wind[PHASE_REPLAY]->AddWidget(rcontrols, 16, 13, 16, 1);
 
   //Define base GUI for Declare phase
