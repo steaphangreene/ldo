@@ -416,20 +416,20 @@ void Game::ResolveRound() {
 	switch(order->order) {
 	  case(ORDER_MOVE): {
 	    master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 1) * 3000 + order->time + offset,
+		(CurrentRound() - 2) * 3000 + order->time + offset,
 		order->targ1, order->targ2, ACT_MOVE, x, y));
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_RUN): {
 	    master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 1) * 3000 + order->time + offset,
+		(CurrentRound() - 2) * 3000 + order->time + offset,
 		order->targ1, order->targ2, ACT_RUN, x, y));
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_EQUIP): {
 	    if(ordered.count(order->id) <= 0) {	// Temporary: Real Resolution
 	      master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 1) * 3000 + order->time + offset, x, y,
+		(CurrentRound() - 2) * 3000 + order->time + offset, x, y,
 		ACT_EQUIP, order->targ1, order->targ2));
 	      }
 	    if(round == 1) {	// Initial Equip is Free
@@ -438,14 +438,14 @@ void Game::ResolveRound() {
 	    }break;
 	  case(ORDER_SHOOT): {
 	    master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 1) * 3000 + order->time + offset, x, y,
+		(CurrentRound() - 2) * 3000 + order->time + offset, x, y,
 		ACT_SHOOT, order->targ1, order->targ2));
 	    ordered.insert(order->id);
 
 	    int hit = master.UnitAt(order->targ1, order->targ2);
 	    if(hit > 0) {
 	      master.my_units[hit].push_back(UnitAct(hit,
-		(CurrentRound() - 1) * 3000 + order->time + 250 + offset,
+		(CurrentRound() - 2) * 3000 + order->time + 250 + offset,
 		order->targ1, order->targ2, ACT_FALL));
 	      ordered.insert(hit);
 	      }
@@ -468,7 +468,7 @@ void Game::ResolveRound() {
 //      for(; prev != master.my_units[master.my_units.size() - 2].my_acts.end(); ++prev) {
 //	if(prev->id == (*unit)) {
 //	  master.my_units[order->id].push_back(UnitAct((*unit),
-//		(CurrentRound() - 1) * 3000, prev->x, prev->y,
+//		(CurrentRound() - 2) * 3000, prev->x, prev->y,
 //		ACT_STAND, prev->x, prev->y));
 //	  }
 //	}

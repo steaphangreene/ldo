@@ -517,7 +517,7 @@ bool Player_Local::Run() {
     gui->RenderStart(cur_time, true);
 
     if(phase == PHASE_DECLARE) {
-      world->Render((game->CurrentRound())*3000);
+      world->Render((game->CurrentRound()-1)*3000);
 
       int unit;
       int unitthere = percept.UnitPresent(mouse_x, mouse_y, unit);
@@ -528,7 +528,7 @@ bool Player_Local::Run() {
       world->DrawSelBox(sel_x, sel_y);
       }
     else if(phase == PHASE_REPLAY) {
-      world->Render((game->CurrentRound()-1)*3000 + offset);
+      world->Render((game->CurrentRound()-2)*3000 + offset);
       }
 
     gui->RenderFinish(cur_time, true);

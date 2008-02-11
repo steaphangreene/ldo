@@ -1,5 +1,4 @@
 -=Errors=-
-Correct Time Base, so Output Really Starts at Zero.
 Need Map class, Game should not also be the map.
 
 -=Codebase=-
