@@ -438,18 +438,31 @@ void Game::ResolveRound() {
 	      }
 	    }break;
 	  case(ORDER_SHOOT): {
-	    master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time + offset, x, y,
-		ACT_SHOOT, order->targ1, order->targ2));
-	    ordered.insert(order->id);
-
-	    int hit = master.UnitAt(order->targ1, order->targ2);
+	    int hit = 0;
+	    if(order->targ1 < 0) {
+	      hit = order->targ2;
+	      }
+	    else {
+	      hit = master.UnitAt(order->targ1, order->targ2);
+	      }
 	    if(hit > 0) {
+	      int tx, ty;
+	      master.GetPos(hit, tx, ty);
 	      master.my_units[hit].push_back(UnitAct(hit,
 		(CurrentRound() - 2) * 3000 + order->time + 250 + offset,
-		order->targ1, order->targ2, ACT_FALL));
+		tx, ty, ACT_FALL));
 	      ordered.insert(hit);
+
+	      master.my_units[order->id].push_back(UnitAct(order->id,
+		(CurrentRound() - 2) * 3000 + order->time + offset, x, y,
+		ACT_SHOOT, tx, ty));
 	      }
+	    else {
+	      master.my_units[order->id].push_back(UnitAct(order->id,
+		(CurrentRound() - 2) * 3000 + order->time + offset, x, y,
+		ACT_SHOOT, order->targ1, order->targ2));
+	      }
+	    ordered.insert(order->id);
 	    }break;
 	  default: {
 	    fprintf(stderr, "WARNING: Got unknown ORDER from Player%d\n", pnum);

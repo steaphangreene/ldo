@@ -129,11 +129,12 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   ractions[1].push_back("Go Here");
   ractions[1].push_back("Run Here");
   ractions[1].push_back("Throw Here");
-  ractions[1].push_back("Attack Here");
-  ractions[2].push_back("Attack");
-  ractions[2].push_back("Throw");
+  ractions[1].push_back("Shoot Here");
+  ractions[2].push_back("Shoot At");
+  ractions[2].push_back("Throw At");
   dpass->SetMenu(2, mactions[maction]);
   dpass->SetMenu(3, ractions[raction]);
+  targ_id = -1;
 
   doptb = new SG_Button("Options");
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 13);
@@ -290,19 +291,19 @@ int Player_Local::EventHandler() {
 	  }
 	else if(*((int*)event.user.data2) == 2 && raction == 1) {
 	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y));
+		UnitOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y));
 	  }
 	else if(*((int*)event.user.data2) == 3 && raction == 1) {
 	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y));
+		UnitOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y));
 	  }
 	else if(*((int*)event.user.data2) == 0 && raction == 2) {
 	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y));
+		UnitOrder(sel_id, 0, ORDER_SHOOT, -1, targ_id));
 	  }
 	else if(*((int*)event.user.data2) == 1 && raction == 2) {
 	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y));
+		UnitOrder(sel_id, 0, ORDER_THROW, -1, targ_id));
 	  }
 //	fprintf(stderr, "Got right-menu event %d\n", *((int*)event.user.data2));
 	}
@@ -421,7 +422,6 @@ int Player_Local::EventHandler() {
 	  }
 	}
       else if(event.user.code == SG_EVENT_MOTION) {
-	int targ_id;
 	double x = ((float*)(event.user.data2))[0];
 	double y = ((float*)(event.user.data2))[1];
 	SDL_mutexP(vid_mut);
@@ -435,6 +435,7 @@ int Player_Local::EventHandler() {
 	  }
 	else if(sel_id > 0) {
 	  raction = 1;
+	  targ_id = -1;
 	  dpass->SetMenu(3, ractions[raction]);
 	  }
 	}

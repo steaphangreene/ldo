@@ -280,6 +280,11 @@ void World::DrawOrders(Uint32 offset) {
       glEnd();
       }
     else if(ord->order == ORDER_SHOOT) {
+      if(ord->targ1 == -1) {
+	percept->GetPos(ord->targ2, xt, yt);
+	xt = xt * 2 + 1; yt = yt * 2 + 1;
+	ang = atan2f(yt - yo, xt - xo);
+	}
       glColor4f(1.0, 0.0, 0.0, 0.25);
       glBegin(GL_QUADS);
       glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, 0.0625);

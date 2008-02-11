@@ -95,6 +95,7 @@ protected:
   SG_TransLabel *dtext;
   SG_PassThrough *dpass;
 
+  int targ_id;			//ID Of Unit Targeted
   int maction, raction;
   vector<string> mactions[3];	//For noselect, friendly, enemy
   vector<string> ractions[3];	//For noselect, friendly, enemy
