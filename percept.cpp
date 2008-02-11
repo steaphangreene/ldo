@@ -109,3 +109,26 @@ int Percept::UnitAt(int xc, int yc) {
     }
   return 0;
   }
+
+void Percept::GetPos(int id, int &x, int &y) {
+  vector<UnitAct>::const_iterator last;
+  if(my_units.count(id) > 0) {
+    last = my_units[id].end();
+    for(; last != my_units[id].begin(); ++last) {
+      last--;
+      x = last->x;
+      y = last->y;
+      return;
+      }
+    }
+  else if (other_units.count(id) > 0) {
+    last = other_units[id].end();
+    for(; last != other_units[id].begin(); ++last) {
+      last--;
+      x = last->x;
+      y = last->y;
+      return;
+      }
+    }
+  }
+

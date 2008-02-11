@@ -74,6 +74,8 @@ public:
 
   int UnitPresent(int xc, int yc, int &id);  // Enemy:-1, Own:1, None/Neutral:0
   int UnitAt(int xc, int yc);
+
+  void GetPos(int id, int &x, int &y);
   };
 
 #endif // PERCEPT_H
