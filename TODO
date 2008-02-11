@@ -2,7 +2,6 @@
 Need Map class, Game should not also be the map.
 
 -=Codebase=-
-Implement the Absolute Time Playback in Player_Local.
 Implement the missing Player_Local popups
 Get screens to delete their widgets on destruction
 
