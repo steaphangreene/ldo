@@ -77,7 +77,7 @@ protected:
   SDL_Surface *gun_icon, *gren_icon;
   SDL_Surface *equip_bg;
 
-
+  unsigned int disround;	//Currently Displayed Round for Playback
   SG_StickyButton *rpastb;
   SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
   SG_TransLabel *rtext, *rstamp;

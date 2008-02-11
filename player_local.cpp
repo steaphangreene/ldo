@@ -491,6 +491,7 @@ bool Player_Local::Run() {
       dtext->SetText(buf);
       sprintf(buf, "Playback Turn (#%d)%c", game->CurrentRound()-1, 0);
       rtext->SetText(buf);
+      disround = game->CurrentRound()-1;
 
       gui->Unlock();
       }
@@ -514,6 +515,15 @@ bool Player_Local::Run() {
       CalcOffset(cur_time);
       sprintf(buf, "%d.%.3d seconds%c", offset / 1000, offset % 1000, 0);
       SDL_mutexV(off_mut);
+
+      unsigned int showround = offset / 3000 + 1;
+      if(showround > game->CurrentRound() - 1)
+	showround = game->CurrentRound() - 1;
+      if(disround != showround) {
+	disround = showround;
+	sprintf(buf, "Playback Turn (#%d)%c", disround, 0);
+	rtext->SetText(buf);
+	}
       rstamp->SetText(buf);
       }
 
