@@ -239,12 +239,64 @@ void World::Render(Uint32 offset) {	// Render for playback
   }
 
 void World::DrawOrders(Uint32 offset) {
+  int xo, yo, xt, yt;
   vector<UnitOrder>::const_iterator ord = orders->orders.begin();
+  glDisable(GL_LIGHTING);
+  glDisable(GL_CULL_FACE);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_BLEND);
   for(; ord != orders->orders.end(); ++ord) {
+    percept->GetPos(ord->id, xo, yo);
+    float ang = atan2f(ord->targ2 - yo, ord->targ1 - xo);
+    xo = xo * 2 + 1; yo = yo * 2 + 1;
+    xt = ord->targ1 * 2 + 1; yt = ord->targ2 * 2 + 1;
     if(ord->order == ORDER_MOVE) {
-      
+      glColor4f(1.0, 1.0, 0.0, 0.25);
+      glBegin(GL_QUADS);
+      glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, 0.0625);
+      glVertex3f(xt + cos(ang + M_PI/2)/2, yt + sin(ang + M_PI/2)/2, 0.0625);
+      glVertex3f(xt + cos(ang - M_PI/2)/2, yt + sin(ang - M_PI/2)/2, 0.0625);
+      glVertex3f(xo + cos(ang - M_PI/2)/2, yo + sin(ang - M_PI/2)/2, 0.0625);
+      glEnd();
+      glBegin(GL_TRIANGLES);
+      glVertex3f(xt + cos(ang + M_PI/2), yt + sin(ang + M_PI/2), 0.0625);
+      glVertex3f(xt + cos(ang), yt + sin(ang), 0.0625);
+      glVertex3f(xt + cos(ang - M_PI/2), yt + sin(ang - M_PI/2), 0.0625);
+      glEnd();
+      }
+    else if(ord->order == ORDER_RUN) {
+      glColor4f(0.0, 1.0, 0.0, 0.25);
+      glBegin(GL_QUADS);
+      glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, 0.0625);
+      glVertex3f(xt + cos(ang + M_PI/2)/2, yt + sin(ang + M_PI/2)/2, 0.0625);
+      glVertex3f(xt + cos(ang - M_PI/2)/2, yt + sin(ang - M_PI/2)/2, 0.0625);
+      glVertex3f(xo + cos(ang - M_PI/2)/2, yo + sin(ang - M_PI/2)/2, 0.0625);
+      glEnd();
+      glBegin(GL_TRIANGLES);
+      glVertex3f(xt + cos(ang + M_PI/2), yt + sin(ang + M_PI/2), 0.0625);
+      glVertex3f(xt + cos(ang), yt + sin(ang), 0.0625);
+      glVertex3f(xt + cos(ang - M_PI/2), yt + sin(ang - M_PI/2), 0.0625);
+      glEnd();
+      }
+    else if(ord->order == ORDER_SHOOT) {
+      glColor4f(1.0, 0.0, 0.0, 0.25);
+      glBegin(GL_QUADS);
+      glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, 0.0625);
+      glVertex3f(xt + cos(ang + M_PI/2)/2, yt + sin(ang + M_PI/2)/2, 0.0625);
+      glVertex3f(xt + cos(ang - M_PI/2)/2, yt + sin(ang - M_PI/2)/2, 0.0625);
+      glVertex3f(xo + cos(ang - M_PI/2)/2, yo + sin(ang - M_PI/2)/2, 0.0625);
+      glEnd();
+      glBegin(GL_TRIANGLES);
+      glVertex3f(xt + cos(ang + M_PI/2), yt + sin(ang + M_PI/2), 0.0625);
+      glVertex3f(xt + cos(ang), yt + sin(ang), 0.0625);
+      glVertex3f(xt + cos(ang - M_PI/2), yt + sin(ang - M_PI/2), 0.0625);
+      glEnd();
       }
     }
+  glDisable(GL_BLEND);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_LIGHTING);
   }
 
 void World::DrawSelBox(int sel_x, int sel_y, float r, float g, float b) {
