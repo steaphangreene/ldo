@@ -58,7 +58,7 @@ protected:
   PlayerType type;
   Percept percept;
   Orders orders;
-  int pround;
+  unsigned int pround;
   int color;
   Game *game;
   };

@@ -289,7 +289,7 @@ void Game::SetPercept(int plnum, Percept *prcpt) {
   percept[plnum] = prcpt;
   }
 
-void Game::UpdatePercept(int plnum, int rnd) {
+void Game::UpdatePercept(int plnum, unsigned int rnd) {
   if(rnd < 1 || rnd > round) {
     fprintf(stderr, "ERROR: Percept requested in future or pre-start!\n");
     exit(1);

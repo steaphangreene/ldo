@@ -263,7 +263,7 @@ int Player_Local::EventHandler() {
 	  SDL_mutexP(off_mut);
 	  nextphase = PHASE_REPLAY;
 	  last_time = SDL_GetTicks();
-	  last_offset = 0;
+	  last_offset = (game->CurrentRound() - 2) * 3000;
 	  playback_speed = 5; //Default is play
 	  gui->Lock();
 	  rcontrols->Set(playback_speed);
@@ -343,13 +343,21 @@ int Player_Local::EventHandler() {
 	else if(event.user.data1 == (void*)(rcontrols)) {
 	  SDL_mutexP(off_mut);
 	  Uint32 cur_time = SDL_GetTicks();
-	  if(offset == 3000 && playback_speed == 3	//Re-play
-		&& *((int*)(event.user.data2)) > 3) {
-	    offset = 0;
+	  if((!past) && offset == (game->CurrentRound() - 1) * 3000
+		&& playback_speed == 3 && *((int*)(event.user.data2)) > 3) {
+	    offset = (game->CurrentRound() - 2) * 3000;		//Re-Play
 	    }
-	  else if(offset == 0 && playback_speed == 3	//Re-reverse
-		&& *((int*)(event.user.data2)) < 3) {
-	    offset = 3000;
+	  else if((!past) && offset == (game->CurrentRound() - 2) * 3000
+		&& playback_speed == 3 && *((int*)(event.user.data2)) < 3) {
+	    offset = (game->CurrentRound() - 1) * 3000;		//Re-Reverse
+	    }
+	  else if(past && offset == (game->CurrentRound() - 1) * 3000
+		&& playback_speed == 3 && *((int*)(event.user.data2)) > 3) {
+	    offset = 0;						//Re-Play All
+	    }
+	  else if(past && offset == 0
+		&& playback_speed == 3 && *((int*)(event.user.data2)) < 3) {
+	    offset = (game->CurrentRound() - 1) * 3000;		//Re-Rev All
 	    }
 	  else {
 	    CalcOffset(cur_time);
@@ -504,8 +512,7 @@ bool Player_Local::Run() {
     if(phase == PHASE_REPLAY) {
       SDL_mutexP(off_mut);
       CalcOffset(cur_time);
-      sprintf(buf, "%d.%.3d seconds%c",
-	(game->CurrentRound()-2)*3 + offset / 1000, offset % 1000, 0);
+      sprintf(buf, "%d.%.3d seconds%c", offset / 1000, offset % 1000, 0);
       SDL_mutexV(off_mut);
       rstamp->SetText(buf);
       }
@@ -528,7 +535,7 @@ bool Player_Local::Run() {
       world->DrawSelBox(sel_x, sel_y);
       }
     else if(phase == PHASE_REPLAY) {
-      world->Render((game->CurrentRound()-2)*3000 + offset);
+      world->Render(offset);
       }
 
     gui->RenderFinish(cur_time, true);
@@ -649,7 +656,7 @@ void Player_Local::UpdateEquipIDs() {
       SDL_mutexP(off_mut);
       nextphase = PHASE_REPLAY;
       last_time = SDL_GetTicks();
-      last_offset = 0;
+      last_offset = (game->CurrentRound() - 2) * 3000;
       playback_speed = 5; //Default is play
       gui->Lock();
       rcontrols->Set(playback_speed);
@@ -689,14 +696,26 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
       }break;
     }
   if(offset > 2147483647U) {	//Compare to INT_MAX, since is unsigned
-    offset = 0;
+    if(past) {
+      offset = 0;
+      }
+    else {
+      offset = (game->CurrentRound() - 2) * 3000;
+      }
     playback_speed = 3; //Auto-stop
     gui->Lock();
     rcontrols->Set(playback_speed);
     gui->Unlock();
     }
-  else if(offset > 3000) {
-    offset = 3000;
+  else if((!past) && offset < (game->CurrentRound() - 2) * 3000) {
+    offset = (game->CurrentRound() - 2) * 3000;
+    playback_speed = 3; //Auto-stop
+    gui->Lock();
+    rcontrols->Set(playback_speed);
+    gui->Unlock();
+    }
+  else if(offset > (game->CurrentRound() - 1) * 3000) {
+    offset = (game->CurrentRound() - 1) * 3000;
     playback_speed = 3; //Auto-stop
     gui->Lock();
     rcontrols->Set(playback_speed);

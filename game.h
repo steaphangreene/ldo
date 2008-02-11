@@ -68,9 +68,9 @@ public:
 
   void SetOrders(int plnum, Orders *ord);
   void SetPercept(int plnum, Percept *prcpt);
-  void UpdatePercept(int plnum, int rnd);
+  void UpdatePercept(int plnum, unsigned int rnd);
 
-  int CurrentRound() { return round; };
+  unsigned int CurrentRound() { return round; };
   PlayResult Play();
 
   int PlayerIDForUnit(const int unitid) { return unplayer[unitid]; };
@@ -106,7 +106,7 @@ private:
 
   map<int, Unit *> units;		// Actual unit container
 
-  int round;				// Current Round #
+  unsigned int round;			// Current Round #
   Percept master;			// Master game percept
   map<int, Percept *> percept;		// Percept for each player
   map<int, Orders *> orders;		// Orders from each player
