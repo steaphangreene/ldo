@@ -117,20 +117,23 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   wind[PHASE_DECLARE]->SetBackground(dpass);
   dpass->SetSendMotion();
 
+  maction = 0;
   mactions[0].push_back("View");
   mactions[0].push_back("Stats");
   mactions[1].push_back("View");
   mactions[1].push_back("Stats");
   mactions[2].push_back("View");
   mactions[2].push_back("Stats");
+  raction = 0;
   ractions[0].push_back("<No Unit Selected>");
   ractions[1].push_back("Go Here");
   ractions[1].push_back("Run Here");
-  ractions[1].push_back("Attack Here");
   ractions[1].push_back("Throw Here");
-  ractions[2].push_back("<Enemy Selected>");
-  dpass->SetMenu(2, mactions[0]);
-  dpass->SetMenu(3, ractions[0]);
+  ractions[1].push_back("Attack Here");
+  ractions[2].push_back("Attack");
+  ractions[2].push_back("Throw");
+  dpass->SetMenu(2, mactions[maction]);
+  dpass->SetMenu(3, ractions[raction]);
 
   doptb = new SG_Button("Options");
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 13);
@@ -277,19 +280,27 @@ int Player_Local::EventHandler() {
 	}
 
       else if(event.user.code == SG_EVENT_MENU + 3) {
-	if(*((int*)event.user.data2) == 0) {
+	if(*((int*)event.user.data2) == 0 && raction == 1) {
 	  orders.orders.push_back(
 		UnitOrder(sel_id, 0, ORDER_MOVE, mouse_x, mouse_y));
 	  }
-	else if(*((int*)event.user.data2) == 1) {
+	else if(*((int*)event.user.data2) == 1 && raction == 1) {
 	  orders.orders.push_back(
 		UnitOrder(sel_id, 0, ORDER_RUN, mouse_x, mouse_y));
 	  }
-	else if(*((int*)event.user.data2) == 2) {
+	else if(*((int*)event.user.data2) == 2 && raction == 1) {
 	  orders.orders.push_back(
 		UnitOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y));
 	  }
-	else if(*((int*)event.user.data2) == 3) {
+	else if(*((int*)event.user.data2) == 3 && raction == 1) {
+	  orders.orders.push_back(
+		UnitOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y));
+	  }
+	else if(*((int*)event.user.data2) == 0 && raction == 2) {
+	  orders.orders.push_back(
+		UnitOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y));
+	  }
+	else if(*((int*)event.user.data2) == 1 && raction == 2) {
 	  orders.orders.push_back(
 		UnitOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y));
 	  }
@@ -394,18 +405,23 @@ int Player_Local::EventHandler() {
 	if(percept.UnitPresent(s_x, s_y, sel_id) > 0) {
 	  sel_x = s_x;
 	  sel_y = s_y;
-	  dpass->SetMenu(2, mactions[1]);
-	  dpass->SetMenu(3, ractions[1]);
+	  maction = 1;
+	  raction = 1;
+	  dpass->SetMenu(2, mactions[maction]);
+	  dpass->SetMenu(3, ractions[raction]);
 	  }
 	else {
 	  sel_id = -1;
 	  sel_x = -1;
 	  sel_y = -1;
-	  dpass->SetMenu(2, mactions[0]);
-	  dpass->SetMenu(3, ractions[0]);
+	  maction = 0;
+	  raction = 0;
+	  dpass->SetMenu(2, mactions[maction]);
+	  dpass->SetMenu(3, ractions[raction]);
 	  }
 	}
       else if(event.user.code == SG_EVENT_MOTION) {
+	int targ_id;
 	double x = ((float*)(event.user.data2))[0];
 	double y = ((float*)(event.user.data2))[1];
 	SDL_mutexP(vid_mut);
@@ -413,6 +429,14 @@ int Player_Local::EventHandler() {
 	SDL_mutexV(vid_mut);
 	mouse_x = ((int)(x)) / 2;
 	mouse_y = ((int)(y)) / 2;
+	if(sel_id > 0 && percept.UnitPresent(mouse_x, mouse_y, targ_id) < 0) {
+	  raction = 2;
+	  dpass->SetMenu(3, ractions[raction]);
+	  }
+	else if(sel_id > 0) {
+	  raction = 1;
+	  dpass->SetMenu(3, ractions[raction]);
+	  }
 	}
       else if(event.user.code == SG_EVENT_DND) {
 	int *vars = (int*)(event.user.data2);
