@@ -404,6 +404,10 @@ void Game::ResolveRound() {
 //	fprintf(stderr, "ORDER[Player%d], %d do %d at %d to (%d,%d)\n", pnum,
 //		order->id, order->order, order->time,
 //		order->targ1, order->targ2);
+	if(master.my_units[order->id].back().act == ACT_FALL) {
+	  continue;
+	  }
+
 	int x=0, y=0;
 	master.GetPos(order->id, x, y);
 	int offset = (rand() % 500) + 500;
