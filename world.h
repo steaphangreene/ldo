@@ -46,6 +46,7 @@ public:
 protected:
   void DrawMap();
   void DrawModels(Uint32 offset);
+  void DrawOrders(Uint32 offset);
 
   Percept *percept;
   Orders *orders;

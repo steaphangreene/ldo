@@ -405,13 +405,7 @@ void Game::ResolveRound() {
 //		order->id, order->order, order->time,
 //		order->targ1, order->targ2);
 	int x=0, y=0;
-	vector<UnitAct>::const_iterator prev = master.my_units[order->id].begin();
-	for(; prev != master.my_units[order->id].end(); ++prev) {
-	  if(prev->id == order->id) {
-	    x = prev->x;
-	    y = prev->y;
-	    }
-	  }
+	master.GetPos(order->id, x, y);
 	int offset = (rand() % 500) + 500;
 	switch(order->order) {
 	  case(ORDER_MOVE): {
@@ -427,13 +421,20 @@ void Game::ResolveRound() {
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_EQUIP): {
-	    if(ordered.count(order->id) <= 0) {	// Temporary: Real Resolution
-	      master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time + offset, x, y,
-		ACT_EQUIP, order->targ1, order->targ2));
+	    if(round != 1 || order->time != 0) {	// Not Initial EQUIP
+	      if(ordered.count(order->id) <= 0) {
+		master.my_units[order->id].push_back(UnitAct(order->id,
+			(CurrentRound() - 2) * 3000 + order->time + offset,
+			x, y, ACT_EQUIP, order->targ1, order->targ2));
+		ordered.insert(order->id);
+		}
 	      }
-	    if(round == 1) {	// Initial Equip is Free
-	      ordered.insert(order->id);
+	    else {				// Initial Equip is Free
+	      if(ordered.count(order->id) <= 0) {
+		master.my_units[order->id].push_back(UnitAct(order->id, 0,
+			x, y, ACT_EQUIP, order->targ1, order->targ2));
+		ordered.insert(order->id);
+		}
 	      }
 	    }break;
 	  case(ORDER_SHOOT): {

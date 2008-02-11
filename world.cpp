@@ -201,7 +201,7 @@ void World::DrawModels(Uint32 offset) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_ATTACK");
 	  }
 	}
-      else if(act->act == ACT_EQUIP) {
+      else if(act->act == ACT_EQUIP && act->time > 0) {	// First EQUIP Free
 	if(act->time + 1500 <= offset) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
@@ -235,6 +235,16 @@ void World::DrawModels(Uint32 offset) {
 void World::Render(Uint32 offset) {	// Render for playback
   DrawMap();
   DrawModels(offset);
+  DrawOrders(offset);
+  }
+
+void World::DrawOrders(Uint32 offset) {
+  vector<UnitOrder>::const_iterator ord = orders->orders.begin();
+  for(; ord != orders->orders.end(); ++ord) {
+    if(ord->order == ORDER_MOVE) {
+      
+      }
+    }
   }
 
 void World::DrawSelBox(int sel_x, int sel_y, float r, float g, float b) {

@@ -40,7 +40,7 @@ bool Player_AI::Run() {
       game->UpdatePercept(id, pround);
       SDL_Delay(10);
 
-      if(pround == 1) {
+      if(pround == 0) {
 	map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
 	for(; unit != percept.my_units.end(); ++unit) {
 	  if(unit->second.back().act == ACT_EQUIP) {
