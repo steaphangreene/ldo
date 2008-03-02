@@ -47,6 +47,10 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   if(!video) {
     //FIXME: Initialize video myself if it's not already done for me!
     }
+  scene = SimpleScene::Current(); //Yes, this is ok, it's static!
+  if(!scene) {
+    scene = new SimpleScene();
+    }
   audio = SimpleAudio::Current(); //Yes, this is ok, it's static!
   if(!audio) {
     //FIXME: Initialize audio myself if it's not already done for me!
@@ -268,7 +272,7 @@ int Player_Local::EventHandler() {
 	  SDL_mutexP(off_mut);
 	  nextphase = PHASE_REPLAY;
 	  last_time = SDL_GetTicks();
-	  last_offset = (game->CurrentRound() - 2) * 3000;
+	  last_offset = (pround - 2) * 3000;
 	  playback_speed = 5; //Default is play
 	  gui->Lock();
 	  rcontrols->Set(playback_speed);
@@ -356,21 +360,21 @@ int Player_Local::EventHandler() {
 	else if(event.user.data1 == (void*)(rcontrols)) {
 	  SDL_mutexP(off_mut);
 	  Uint32 cur_time = SDL_GetTicks();
-	  if((!past) && offset == (game->CurrentRound() - 1) * 3000
+	  if((!past) && offset == (pround - 1) * 3000
 		&& playback_speed == 3 && *((int*)(event.user.data2)) > 3) {
-	    offset = (game->CurrentRound() - 2) * 3000;		//Re-Play
+	    offset = (pround - 2) * 3000;		//Re-Play
 	    }
-	  else if((!past) && offset == (game->CurrentRound() - 2) * 3000
+	  else if((!past) && offset == (pround - 2) * 3000
 		&& playback_speed == 3 && *((int*)(event.user.data2)) < 3) {
-	    offset = (game->CurrentRound() - 1) * 3000;		//Re-Reverse
+	    offset = (pround - 1) * 3000;		//Re-Reverse
 	    }
-	  else if(past && offset == (game->CurrentRound() - 1) * 3000
+	  else if(past && offset == (pround - 1) * 3000
 		&& playback_speed == 3 && *((int*)(event.user.data2)) > 3) {
 	    offset = 0;						//Re-Play All
 	    }
 	  else if(past && offset == 0
 		&& playback_speed == 3 && *((int*)(event.user.data2)) < 3) {
-	    offset = (game->CurrentRound() - 1) * 3000;		//Re-Rev All
+	    offset = (pround - 1) * 3000;		//Re-Rev All
 	    }
 	  else {
 	    CalcOffset(cur_time);
@@ -513,11 +517,11 @@ bool Player_Local::Run() {
 
       UpdateEquipIDs();	 // See if we need to do the Equip thing again
 
-      sprintf(buf, "Declare Turn (#%d)%c", game->CurrentRound(), 0);
+      sprintf(buf, "Declare Turn (#%d)%c", pround, 0);
       dtext->SetText(buf);
-      sprintf(buf, "Playback Turn (#%d)%c", game->CurrentRound()-1, 0);
+      sprintf(buf, "Playback Turn (#%d)%c", pround-1, 0);
       rtext->SetText(buf);
-      disround = game->CurrentRound()-1;
+      disround = pround-1;
 
       gui->Unlock();
       }
@@ -543,8 +547,8 @@ bool Player_Local::Run() {
       SDL_mutexV(off_mut);
 
       unsigned int showround = offset / 3000 + 1;
-      if(showround > game->CurrentRound() - 1)
-	showround = game->CurrentRound() - 1;
+      if(showround > pround - 1)
+	showround = pround - 1;
       if(disround != showround) {
 	disround = showround;
 	sprintf(buf, "Playback Turn (#%d)%c", disround, 0);
@@ -560,7 +564,7 @@ bool Player_Local::Run() {
     gui->RenderStart(cur_time, true);
 
     if(phase == PHASE_DECLARE) {
-      world->Render((game->CurrentRound()-1)*3000);
+      world->Render((pround-1)*3000);
 
       int unit;
       int unitthere = percept.UnitPresent(mouse_x, mouse_y, unit);
@@ -569,9 +573,12 @@ bool Player_Local::Run() {
       else world->DrawSelBox(mouse_x, mouse_y, 1.0, 1.0, 0.0);
 
       world->DrawSelBox(sel_x, sel_y);
+
+      scene->Render((pround-1)*3000);
       }
     else if(phase == PHASE_REPLAY) {
       world->Render(offset);
+      scene->Render(offset);
       }
 
     gui->RenderFinish(cur_time, true);
@@ -602,7 +609,7 @@ bool Player_Local::Run() {
 
 	//Note: gui_mut must be locked before calling this function!
 void Player_Local::UpdateEquipIDs() {
-  Uint32 start_time = (game->CurrentRound()-1)*3000;
+  Uint32 start_time = (pround-1)*3000;
   set<int> eqtmp;	//Temporary set of ids for eq
   eqid.clear();
 
@@ -687,12 +694,12 @@ void Player_Local::UpdateEquipIDs() {
       ednd = NULL;
       dnds.clear();
       }
-    if(game->CurrentRound() == 1) nextphase = PHASE_DECLARE;
+    if(pround == 1) nextphase = PHASE_DECLARE;
     else {
       SDL_mutexP(off_mut);
       nextphase = PHASE_REPLAY;
       last_time = SDL_GetTicks();
-      last_offset = (game->CurrentRound() - 2) * 3000;
+      last_offset = (pround - 2) * 3000;
       playback_speed = 5; //Default is play
       gui->Lock();
       rcontrols->Set(playback_speed);
@@ -736,22 +743,22 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
       offset = 0;
       }
     else {
-      offset = (game->CurrentRound() - 2) * 3000;
+      offset = (pround - 2) * 3000;
       }
     playback_speed = 3; //Auto-stop
     gui->Lock();
     rcontrols->Set(playback_speed);
     gui->Unlock();
     }
-  else if((!past) && offset < (game->CurrentRound() - 2) * 3000) {
-    offset = (game->CurrentRound() - 2) * 3000;
+  else if((!past) && offset < (pround - 2) * 3000) {
+    offset = (pround - 2) * 3000;
     playback_speed = 3; //Auto-stop
     gui->Lock();
     rcontrols->Set(playback_speed);
     gui->Unlock();
     }
-  else if(offset > (game->CurrentRound() - 1) * 3000) {
-    offset = (game->CurrentRound() - 1) * 3000;
+  else if(offset > (pround - 1) * 3000) {
+    offset = (pround - 1) * 3000;
     playback_speed = 3; //Auto-stop
     gui->Lock();
     rcontrols->Set(playback_speed);

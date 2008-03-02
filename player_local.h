@@ -30,6 +30,7 @@
 #include "SDL_thread.h"
 #include "simplegui.h"
 #include "simplevideo.h"
+#include "simplescene.h"
 #include "simpleaudio.h"
 
 enum Phase {
@@ -61,6 +62,7 @@ protected:
 
   SimpleGUI *gui;
   SimpleVideo *video;
+  SimpleScene *scene;
   SimpleAudio *audio;
   World *world;
 
