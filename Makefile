@@ -27,10 +27,10 @@ CXX=	g++
 LIBS=	`simple-config --libs`
 
 #PRODUCTION OPTIONS
-#CXXFLAGS=	-s -O2 -Wall `simple-config --cflags`
+CXXFLAGS=	-s -O2 -Wall `simple-config --cflags`
 
 #DEGUGGING OPTIONS
-CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `simple-config --cflags`
+#CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `simple-config --cflags`
 
 OBJS:=	screens.o percept.o orders.o world.o \
 	game.o unit.o player.o main.o \

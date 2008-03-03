@@ -46,6 +46,8 @@ World::World(Percept *per, Orders *ord) {
   models.back()->AttachSubmodel("tag_weapon", weap);
 
   textures.push_back(new SimpleTexture("graphics/wall.png"));
+  textures.push_back(new SimpleTexture("graphics/fence1.png"));
+  textures.push_back(new SimpleTexture("graphics/fence2.png"));
   }
 
 World::~World() {
@@ -71,6 +73,9 @@ void World::DrawMap() {
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_BLEND);
+
   glPushMatrix();
   glBindTexture(GL_TEXTURE_2D, textures[0]->GLTexture());
   glColor3f(1.0, 1.0, 1.0);
@@ -93,29 +98,47 @@ void World::DrawMap() {
       }
     else if(obj->type == WALL_EASTWEST) {
       glNormal3d(0.0, 1.0, 0.0);
+      if(obj->which == 30) {
+	glBindTexture(GL_TEXTURE_2D, textures[1]->GLTexture());
+	}
+      else if(obj->which == 29) {
+	glBindTexture(GL_TEXTURE_2D, textures[2]->GLTexture());
+	}
       glBegin(GL_QUADS);
-      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos);
-      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
+      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
+      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
+      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
+      glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
+      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
       glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos);
       glEnd();
+      if(obj->which == 29 || obj->which == 30) {
+	glBindTexture(GL_TEXTURE_2D, textures[0]->GLTexture());
+	}
       }
     else if(obj->type == WALL_NORTHSOUTH) {
       glNormal3d(1.0, 0.0, 0.0);
+      if(obj->which == 26) {
+	glBindTexture(GL_TEXTURE_2D, textures[1]->GLTexture());
+	}
+      else if(obj->which == 25) {
+	glBindTexture(GL_TEXTURE_2D, textures[2]->GLTexture());
+	}
       glBegin(GL_QUADS);
-      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
-      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0 + SEL_HEIGHT);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0 + SEL_HEIGHT);
+      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
+      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0 + SEL_HEIGHT);
+      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
+      glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0 + SEL_HEIGHT);
+      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
       glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0);
       glEnd();
+      if(obj->which == 25 || obj->which == 26) {
+	glBindTexture(GL_TEXTURE_2D, textures[0]->GLTexture());
+	}
       }
     else if(obj->type == OBJECT_MISC) {
       glNormal3d(1.0, 0.0, 0.0);
@@ -169,6 +192,7 @@ void World::DrawMap() {
     }
 
   glPopMatrix();
+  glDisable(GL_BLEND);
   glEnable(GL_CULL_FACE);
   }
 

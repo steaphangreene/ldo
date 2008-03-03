@@ -44,6 +44,7 @@ enum ObjectType {
 struct MapObject {
   ObjectType type;
   int xpos, ypos, zpos;
+  int which;
   };
 
 enum Act {	// For Example

@@ -193,19 +193,27 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
       for(y = 0; y < mapys; ++y) {
 	for(x = 0; x < mapxs; ++x) {
 	  if(map_data[z][y][x][0] > 0) {
-	    MapObject obj = { GROUND_FLOOR, x, mapys-1-y, mapzs-1-z };
+	    MapObject obj = {
+		GROUND_FLOOR, x, mapys-1-y, mapzs-1-z, map_data[z][y][x][0]
+		};
 	    master.objects.push_back(obj);
 	    }
 	  if(map_data[z][y][x][1] > 0) {
-	    MapObject obj = { WALL_NORTHSOUTH, x, mapys-1-y, mapzs-1-z };
+	    MapObject obj = {
+		WALL_NORTHSOUTH, x, mapys-1-y, mapzs-1-z, map_data[z][y][x][1]
+		};
 	    master.objects.push_back(obj);
 	    }
 	  if(map_data[z][y][x][2] > 0) {
-	    MapObject obj = { WALL_EASTWEST, x, mapys-y, mapzs-1-z };
+	    MapObject obj = {
+		WALL_EASTWEST, x, mapys-y, mapzs-1-z, map_data[z][y][x][2]
+		};
 	    master.objects.push_back(obj);
 	    }
 	  if(map_data[z][y][x][3] > 0) {
-	    MapObject obj = { OBJECT_MISC, x, mapys-1-y, mapzs-1-z };
+	    MapObject obj = {
+		OBJECT_MISC, x, mapys-1-y, mapzs-1-z, map_data[z][y][x][3]
+		};
 	    master.objects.push_back(obj);
 	    }
 	  }
