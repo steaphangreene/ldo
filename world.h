@@ -55,6 +55,7 @@ protected:
   float pointx, pointy;
 
   vector<SimpleModel *> models;
+  vector<SimpleTexture *> textures;
   };
 
 #endif // WORLD_H
