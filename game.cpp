@@ -116,13 +116,22 @@ bool Game::ShouldTerm() {
 static char buf[BUF_LEN];
 
 int Game::Load(const string &filename) {
-  FILE *fl = fopen(filename.c_str(), "r");
-  if(!fl) return 0;
-
-  Clear();
-  int ret = Load(fl);
-
-  fclose(fl);
+  int ret = 0;
+  FILE *fl = NULL;
+  fl = fopen((filename + "/wglob.dat").c_str(), "rb");
+  if(fl != NULL) {
+    Clear();
+    ret = LoadXCom(fl, filename);
+    fclose(fl);
+    }
+  else {
+    fl = fopen(filename.c_str(), "r");
+    if(fl) {
+      Clear();
+      ret = Load(fl);
+      fclose(fl);
+      }
+    }
   return ret;
   }
 
@@ -165,6 +174,48 @@ int Game::Load(vector< vector<int> > &vec, FILE *fl) {
   return 1;
   }
 
+int Game::LoadXCom(FILE *fl, const string &dir) {
+  Uint8 buf[64];
+
+  fread(buf, 2, 22, fl);
+
+  mapxs = (int(Sint8(buf[5])) << 8) + int(buf[4]);
+  mapys = (int(Sint8(buf[7])) << 8) + int(buf[6]);
+  mapzs = (int(Sint8(buf[9])) << 8) + int(buf[8]);
+//  printf("%dx%dx%d\n", mapxs, mapys, mapzs);
+
+  FILE *map = fopen((dir + "/map.dat").c_str(), "rb");
+  if(map) {
+    Uint8 map_data[mapzs][mapys][mapxs][4];
+    fread(map_data, 4, 4*mapxs*mapys, map);
+    int x, y, z;
+    for(z = 0; z < mapzs; ++z) {
+      for(y = 0; y < mapys; ++y) {
+	for(x = 0; x < mapxs; ++x) {
+	  if(map_data[z][y][x][0] > 0) {
+	    MapObject obj = { GROUND_FLOOR, x, mapys-y, mapzs-1-z };
+	    master.objects.push_back(obj);
+	    }
+	  if(map_data[z][y][x][1] > 0) {
+	    MapObject obj = { WALL_NORTHSOUTH, x, mapys-1-y, mapzs-1-z };
+	    master.objects.push_back(obj);
+	    }
+	  if(map_data[z][y][x][2] > 0) {
+	    MapObject obj = { WALL_EASTWEST, x, mapys-y, mapzs-1-z };
+	    master.objects.push_back(obj);
+	    }
+	  if(map_data[z][y][x][3] > 0) {
+	    MapObject obj = { OBJECT_MISC, x, mapys-y, mapzs-1-z };
+	    master.objects.push_back(obj);
+	    }
+	  }
+	}
+      }
+    fclose(map);
+    }
+  return Load("temp.map");	// TEMPORARY!
+  }
+
 int Game::Load(FILE *fl) {
   unsigned int num, ver;
   round = 1;
@@ -203,9 +254,9 @@ int Game::Load(FILE *fl) {
     //TODO: Do a Real Initial Equip of Items Here
     //TODO: Equip Requested EQUIP Items
     master.my_units[unit_ptr->id].push_back(UnitAct(
-	unit_ptr->id, 0, 30+unit, 32, ACT_START));
+	unit_ptr->id, 0, 20+unit, 32, ACT_START));
     master.my_units[unit_ptr->id].push_back(UnitAct(
-	unit_ptr->id, 0, 30+unit, 32, ACT_EQUIP, 0, 1));
+	unit_ptr->id, 0, 20+unit, 32, ACT_EQUIP, 0, 1));
     }
 
   Uint32 id = 1;
@@ -218,6 +269,13 @@ int Game::Load(FILE *fl) {
       }
     }
 
+  //Temporary, flat map with no features
+  for(int y=0; y < 50; ++y) {
+    for(int x=0; x < 50; ++x) {
+      MapObject obj = { GROUND_FLOOR, x, y, 0 };
+      master.objects.push_back(obj);
+      }
+    }
   return 1;
   }
 
@@ -311,6 +369,8 @@ void Game::UpdatePercept(int plnum, unsigned int rnd) {
       percept[plnum]->other_units.insert(*itr);
       }
     }
+  //Temporary!
+  percept[plnum]->objects = master.objects;
   }
 
 //Thread Stuff

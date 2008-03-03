@@ -54,6 +54,7 @@ public:
   int Load(const string &filename);
   int Save(const string &filename);
   int Load(FILE *fl);
+  int LoadXCom(FILE *fl, const string &dir);
   int Save(FILE *fl);
   static int Load(vector< vector<int> > &vec, FILE *fl);
   static int Save(const vector< vector<int> > &vec, FILE *fl);
@@ -93,7 +94,7 @@ private:
 
   void Clear();
 
-  int mapxs, mapys;
+  int mapxs, mapys, mapzs;
   string mapname, mapdesc;
 
   vector< vector<int> > sides;		// List of all player ids per side

@@ -32,6 +32,20 @@ using namespace std;
 
 #include "unit.h"
 
+enum ObjectType {
+  OBJECT_NONE,
+  GROUND_FLOOR,
+  WALL_EASTWEST,
+  WALL_NORTHSOUTH,
+  OBJECT_MISC,
+  OBJECT_MAX
+  };
+
+struct MapObject {
+  ObjectType type;
+  int xpos, ypos, zpos;
+  };
+
 enum Act {	// For Example
   ACT_NONE,
   ACT_FALL,
@@ -71,6 +85,7 @@ public:
   //List of all of unit ids and actions for own and others
   map<int, vector<UnitAct> > my_units;
   map<int, vector<UnitAct> > other_units;
+  vector<MapObject> objects;
 
   int UnitPresent(int xc, int yc, int &id);  // Enemy:-1, Own:1, None/Neutral:0
   int UnitAt(int xc, int yc);
