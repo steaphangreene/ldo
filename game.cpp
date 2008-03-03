@@ -193,7 +193,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
       for(y = 0; y < mapys; ++y) {
 	for(x = 0; x < mapxs; ++x) {
 	  if(map_data[z][y][x][0] > 0) {
-	    MapObject obj = { GROUND_FLOOR, x, mapys-y, mapzs-1-z };
+	    MapObject obj = { GROUND_FLOOR, x, mapys-1-y, mapzs-1-z };
 	    master.objects.push_back(obj);
 	    }
 	  if(map_data[z][y][x][1] > 0) {
