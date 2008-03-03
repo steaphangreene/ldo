@@ -77,7 +77,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
     1.0, 0.2, 0.0, 1.0,
     0.0, 0.0, 10.0,
     1.0, 0.5,
-    100
+    250
     };
   int fire = scene->AddParticleType(fire_type);
   for(Uint32 start = 1000; start < 20000; start += 250) {
