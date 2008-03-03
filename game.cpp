@@ -205,7 +205,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	    master.objects.push_back(obj);
 	    }
 	  if(map_data[z][y][x][3] > 0) {
-	    MapObject obj = { OBJECT_MISC, x, mapys-y, mapzs-1-z };
+	    MapObject obj = { OBJECT_MISC, x, mapys-1-y, mapzs-1-z };
 	    master.objects.push_back(obj);
 	    }
 	  }
