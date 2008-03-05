@@ -44,6 +44,8 @@ World::World(Percept *per, Orders *ord) {
   models.back()->AttachSubmodel("tag_weapon", weap);
   models.push_back(SM_LoadModel("models/players/trooper", "red"));
   models.back()->AttachSubmodel("tag_weapon", weap);
+  models.push_back(SM_LoadModel("models/fence1.obj"));
+  models.push_back(SM_LoadModel("models/fence2.obj"));
 
   textures.push_back(new SimpleTexture("graphics/wall.png"));
   textures.push_back(new SimpleTexture("graphics/fence1.png"));
@@ -73,7 +75,7 @@ void World::DrawMap() {
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
 
   glPushMatrix();
@@ -97,94 +99,106 @@ void World::DrawMap() {
       glEnd();
       }
     else if(obj->type == WALL_EASTWEST) {
-      glNormal3d(0.0, 1.0, 0.0);
-      if(obj->which == 30) {
-	glBindTexture(GL_TEXTURE_2D, textures[1]->GLTexture());
+      if(obj->which == 29) {
+	glPushMatrix();
+	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
+	models[3]->Render(0);
+	glPopMatrix();
 	}
-      else if(obj->which == 29) {
-	glBindTexture(GL_TEXTURE_2D, textures[2]->GLTexture());
+      else if(obj->which == 30) {
+	glPushMatrix();
+	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
+	models[4]->Render(0);
+	glPopMatrix();
 	}
-      glBegin(GL_QUADS);
-      glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos);
-      glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
-      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
-      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos);
-      glEnd();
-      if(obj->which == 29 || obj->which == 30) {
-	glBindTexture(GL_TEXTURE_2D, textures[0]->GLTexture());
+      else {
+	glNormal3d(0.0, 1.0, 0.0);
+	glBegin(GL_QUADS);
+	glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
+	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos);
+	glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
+	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
+	glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
+	glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
+	glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
+	glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos);
+	glEnd();
 	}
       }
     else if(obj->type == WALL_NORTHSOUTH) {
-      glNormal3d(1.0, 0.0, 0.0);
-      if(obj->which == 26) {
-	glBindTexture(GL_TEXTURE_2D, textures[1]->GLTexture());
+      if(obj->which == 25) {
+	glPushMatrix();
+	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
+	glRotatef(90.0, 0.0, 0.0, 1.0);
+	models[3]->Render(0);
+	glPopMatrix();
 	}
-      else if(obj->which == 25) {
-	glBindTexture(GL_TEXTURE_2D, textures[2]->GLTexture());
+      else if(obj->which == 26) {
+	glPushMatrix();
+	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
+	glRotatef(90.0, 0.0, 0.0, 1.0);
+	models[4]->Render(0);
+	glPopMatrix();
 	}
-      glBegin(GL_QUADS);
-      glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
-      glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0 + SEL_HEIGHT);
-      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0 + SEL_HEIGHT);
-      glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0);
-      glEnd();
-      if(obj->which == 25 || obj->which == 26) {
-	glBindTexture(GL_TEXTURE_2D, textures[0]->GLTexture());
+      else {
+	glNormal3d(1.0, 0.0, 0.0);
+	glBegin(GL_QUADS);
+	glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
+	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
+	glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
+	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0 + SEL_HEIGHT);
+	glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
+	glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0 + SEL_HEIGHT);
+	glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
+	glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0);
+	glEnd();
 	}
       }
     else if(obj->type == OBJECT_MISC) {
       glNormal3d(1.0, 0.0, 0.0);
       glBegin(GL_QUADS);
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
 
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
       glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0);
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
       glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0);
 
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
       glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0);
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
       glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0);
 
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
       glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0);
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
       glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0);
 
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(0.0));
       glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0);
       glTexCoord2f(textures[0]->ScaleX(0.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0+2.0);
+      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
       glTexCoord2f(textures[0]->ScaleX(1.0), textures[0]->ScaleY(0.0));
       glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0);
       glEnd();
