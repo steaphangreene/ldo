@@ -38,8 +38,13 @@ World::World(Percept *per, Orders *ord) {
   pointx = 0.0;
   pointy = 0.0;
   SimpleModel *weap = SM_LoadModel("models/weapons2/machinegun/machinegun.md3");
+
   models.push_back(SM_LoadModel("models/players/trooper"));
   models.back()->AttachSubmodel("tag_weapon", weap);
+
+  SimpleModel::AddSourceFile("models");
+  models.push_back(SM_LoadModel("grey/tris.md2"));
+
   models.push_back(SM_LoadModel("models/players/trooper", "blue"));
   models.back()->AttachSubmodel("tag_weapon", weap);
   models.push_back(SM_LoadModel("models/players/trooper", "red"));
@@ -264,6 +269,10 @@ void World::DrawModels(Uint32 offset) {
     if(act->time <= offset) {
       anims[0] = models[mod]->LookUpAnimation("LEGS_IDLE");
       anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
+      if(anims[0] == 0) {
+	anims[0] = models[mod]->LookUpAnimation("STAND");
+	anims[1] = models[mod]->LookUpAnimation("STAND");
+	}
       times[0] = act->time;
       times[1] = act->time;
       float x = act->x * 2 + 1;
@@ -280,12 +289,16 @@ void World::DrawModels(Uint32 offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
 	  if(act->time + 1000 <= offset) {
-	    anims[0] = models[mod]->LookUpAnimation("BOTH_DEAD1");
-	    anims[1] = models[mod]->LookUpAnimation("BOTH_DEAD1");
+	    int anim = models[mod]->LookUpAnimation("BOTH_DEAD1");
+	    if(anim == 0) anim = models[mod]->LookUpAnimation("DEATH3");
+	    anims[0] = anim;
+	    anims[1] = anim;
 	    }
 	  else {
-	    anims[0] = models[mod]->LookUpAnimation("BOTH_DEATH1");
-	    anims[1] = models[mod]->LookUpAnimation("BOTH_DEATH1");
+	    int anim = models[mod]->LookUpAnimation("BOTH_DEATH1");
+	    if(anim == 0) anim = models[mod]->LookUpAnimation("DEATH3");
+	    anims[0] = anim;
+	    anims[1] = anim;
 	    }
 	  }
 	}
@@ -299,7 +312,10 @@ void World::DrawModels(Uint32 offset) {
 	  }
 	else {
 	  Uint32 off = offset - act->time;
-	  anims[0] = models[mod]->LookUpAnimation("LEGS_WALK");
+	  int anim = models[mod]->LookUpAnimation("LEGS_WALK");
+	  if(anim == 0) anim = models[mod]->LookUpAnimation("WALK");
+	  if(anim == 0) anim = models[mod]->LookUpAnimation("RUN");
+	  anims[0] = anim;
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
 	  x /= duration; y /= duration;
@@ -316,7 +332,9 @@ void World::DrawModels(Uint32 offset) {
 	  }
 	else {
 	  Uint32 off = offset - act->time;
-	  anims[0] = models[mod]->LookUpAnimation("LEGS_RUN");
+	  int anim = models[mod]->LookUpAnimation("LEGS_RUN");
+	  if(anim == 0) anim = models[mod]->LookUpAnimation("RUN");
+	  if(anim == 0) anim = models[mod]->LookUpAnimation("WALK");
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
 	  x /= duration; y /= duration;
