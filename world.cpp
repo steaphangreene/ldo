@@ -51,10 +51,10 @@ World::World(Percept *per, Orders *ord) {
   models.back()->AttachSubmodel("tag_weapon", weap);
 
   modmap[25] = models.size();
-  modmap[26] = models.size();
+  modmap[29] = models.size();
   models.push_back(SM_LoadModel("models/fence1.obj"));
 
-  modmap[29] = models.size();
+  modmap[26] = models.size();
   modmap[30] = models.size();
   models.push_back(SM_LoadModel("models/fence2.obj"));
 
@@ -74,6 +74,10 @@ World::World(Percept *per, Orders *ord) {
     sprintf(name, "graphics/util/test%.3d.png%c", n, 0);
     textures.push_back(new SimpleTexture(name));
     }
+
+  texmap[16] = textures.size();
+  texmap[17] = textures.size();
+  textures.push_back(new SimpleTexture("models/stone.png"));
   }
 
 World::~World() {
@@ -120,10 +124,17 @@ void World::DrawMap() {
       }
     else if(obj->type == WALL_EASTWEST) {
       if(modmap.count(obj->which) > 0) {
+	if(texmap.count(obj->which) > 0) {
+	  glColor3f(1.0, 1.0, 1.0);
+	  glBindTexture(GL_TEXTURE_2D, textures[texmap[obj->which]]->GLTexture());
+	  }
 	glPushMatrix();
 	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
 	models[modmap[obj->which]]->Render(0);
 	glPopMatrix();
+	if(texmap.count(obj->which) > 0) {
+	  glBindTexture(GL_TEXTURE_2D, 0);
+	  }
 	}
       else {
 	glBindTexture(GL_TEXTURE_2D, textures[obj->which]->GLTexture());
