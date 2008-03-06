@@ -44,15 +44,31 @@ World::World(Percept *per, Orders *ord) {
   models.back()->AttachSubmodel("tag_weapon", weap);
   models.push_back(SM_LoadModel("models/players/trooper", "red"));
   models.back()->AttachSubmodel("tag_weapon", weap);
+
+  modmap[25] = models.size();
+  modmap[26] = models.size();
   models.push_back(SM_LoadModel("models/fence1.obj"));
+
+  modmap[29] = models.size();
+  modmap[30] = models.size();
   models.push_back(SM_LoadModel("models/fence2.obj"));
 
-  for(int n=0; n < 1000; ++n) {
+  modmap[16] = models.size();
+  modmap[17] = models.size();
+  modmap[20] = models.size();
+  modmap[21] = models.size();
+  models.push_back(SM_LoadModel("models/wall_low.obj"));
+
+  modmap[18] = models.size();
+  modmap[19] = models.size();
+  models.push_back(SM_LoadModel("models/wall_high.obj"));
+
+  textures.push_back(new SimpleTexture("graphics/wall.png"));
+  for(int n=1; n < 1000; ++n) {
     char name[64];
     sprintf(name, "graphics/util/test%.3d.png%c", n, 0);
     textures.push_back(new SimpleTexture(name));
     }
-  textures.push_back(new SimpleTexture("graphics/wall.png"));
   }
 
 World::~World() {
@@ -98,16 +114,10 @@ void World::DrawMap() {
       glEnd();
       }
     else if(obj->type == WALL_EASTWEST) {
-      if(obj->which == 29) {
+      if(modmap.count(obj->which) > 0) {
 	glPushMatrix();
 	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
-	models[3]->Render(0);
-	glPopMatrix();
-	}
-      else if(obj->which == 30) {
-	glPushMatrix();
-	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
-	models[4]->Render(0);
+	models[modmap[obj->which]]->Render(0);
 	glPopMatrix();
 	}
       else {
@@ -135,18 +145,11 @@ void World::DrawMap() {
 	}
       }
     else if(obj->type == WALL_NORTHSOUTH) {
-      if(obj->which == 25) {
+      if(modmap.count(obj->which) > 0) {
 	glPushMatrix();
 	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
 	glRotatef(90.0, 0.0, 0.0, 1.0);
-	models[3]->Render(0);
-	glPopMatrix();
-	}
-      else if(obj->which == 26) {
-	glPushMatrix();
-	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
-	glRotatef(90.0, 0.0, 0.0, 1.0);
-	models[4]->Render(0);
+	models[modmap[obj->which]]->Render(0);
 	glPopMatrix();
 	}
       else {

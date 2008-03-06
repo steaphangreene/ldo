@@ -56,6 +56,8 @@ protected:
 
   vector<SimpleModel *> models;
   vector<SimpleTexture *> textures;
+  map<Uint8, unsigned int> modmap;
+  map<Uint8, unsigned int> texmap;
   };
 
 #endif // WORLD_H
