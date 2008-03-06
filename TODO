@@ -1,5 +1,4 @@
 -=Errors=-
-Need Map class, Game should not also be the map.
 Stop the World Moving after Exit to Menu.
 Remove SelBox after turn is declared.
 
