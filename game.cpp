@@ -241,7 +241,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
     for(int unit = 0; unit < 80; ++unit) { // FIXME: How do I tell what's real?
       if((unit_data[unit][1] |  unit_data[unit][0] | unit_data[unit][2]) != 0) {
 	sidecount[unit_data[unit][9]] ++;
-	squnits[unit_data[unit][9]].push_back(int(unit));
+	squnits[unit_data[unit][9]].push_back(int(unit)+1);
 
 	Unit *unit_ptr;
 	int x, y, z;
@@ -249,10 +249,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	y = master.mapys - 1 - int(unit_data[unit][0]);
 	z = master.mapzs - 1 - int(unit_data[unit][2]);
 	unit_ptr = new Unit;
-	unit_ptr->id = unit;
+	unit_ptr->id = int(unit) + 1;
 	unit_ptr->troop = unit_data[unit][9];
 	unit_ptr->name = "Bob, Joe";	//FIXME!
-	unplayer[unit] = unit_data[unit][9];
+	unplayer[int(unit)+1] = unit_data[unit][9];
 	master.my_units[unit_ptr->id].push_back(UnitAct(unit_ptr->id, 0,
 		x, y, z, ACT_START));
 	master.my_units[unit_ptr->id].push_back(UnitAct(unit_ptr->id, 0,
