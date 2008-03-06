@@ -370,7 +370,7 @@ void World::Render(Uint32 offset) {	// Render for playback
   }
 
 void World::DrawOrders(Uint32 offset) {
-  int xo, yo, xt, yt;
+  int xo, yo, zo, xt, yt, zt;
   vector<UnitOrder>::const_iterator ord = orders->orders.begin();
   glDisable(GL_LIGHTING);
   glDisable(GL_CULL_FACE);
@@ -378,7 +378,7 @@ void World::DrawOrders(Uint32 offset) {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable(GL_BLEND);
   for(; ord != orders->orders.end(); ++ord) {
-    percept->GetPos(ord->id, xo, yo);
+    percept->GetPos(ord->id, xo, yo, zo);
     float ang = atan2f(ord->targ2 - yo, ord->targ1 - xo);
     xo = xo * 2 + 1; yo = yo * 2 + 1;
     xt = ord->targ1 * 2 + 1; yt = ord->targ2 * 2 + 1;
@@ -412,7 +412,7 @@ void World::DrawOrders(Uint32 offset) {
       }
     else if(ord->order == ORDER_SHOOT) {
       if(ord->targ1 == -1) {
-	percept->GetPos(ord->targ2, xt, yt);
+	percept->GetPos(ord->targ2, xt, yt, zt);
 	xt = xt * 2 + 1; yt = yt * 2 + 1;
 	ang = atan2f(yt - yo, xt - xo);
 	}

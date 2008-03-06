@@ -182,12 +182,15 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
   master.mapxs = (int(Sint8(buf[5])) << 8) + int(buf[4]);
   master.mapys = (int(Sint8(buf[7])) << 8) + int(buf[6]);
   master.mapzs = (int(Sint8(buf[9])) << 8) + int(buf[8]);
-//  printf("%dx%dx%d\n", master.mapxs, master.mapys, master.mapzs);
 
+  master.mapname = "X-Com Map";
+  master.mapdesc = "Loaded from an X-Com tactical save.";
+  round = 1;	//FIXME, load from map
   FILE *map = fopen((dir + "/map.dat").c_str(), "rb");
   if(map) {
     Uint8 map_data[master.mapzs][master.mapys][master.mapxs][4];
     fread(map_data, 4, 4*master.mapxs*master.mapys, map);
+    fclose(map);
     int x, y, z;
     for(z = 0; z < master.mapzs; ++z) {
       for(y = 0; y < master.mapys; ++y) {
@@ -219,9 +222,57 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	  }
 	}
       }
-    fclose(map);
     }
-  return Load("temp.map");	// TEMPORARY!
+  sides.resize(3);
+  sides[0].push_back(0);
+  sides[1].push_back(1);
+  sides[2].push_back(2);
+  plsquads.resize(3);
+  plsquads[0].push_back(0);
+  plsquads[1].push_back(1);
+  plsquads[2].push_back(2);
+  squnits.resize(3);
+  FILE *units = fopen((dir + "/unitpos.dat").c_str(), "rb");
+  if(units) {
+    Uint8 unit_data[80][14];
+    fread(unit_data, 14, 80, units);
+    fclose(units);
+    int sidecount[3] = {0, 0, 0};
+    for(int unit = 0; unit < 80; ++unit) { // FIXME: How do I tell what's real?
+      if((unit_data[unit][1] |  unit_data[unit][0] | unit_data[unit][2]) != 0) {
+	sidecount[unit_data[unit][9]] ++;
+	squnits[unit_data[unit][9]].push_back(int(unit));
+
+	Unit *unit_ptr;
+	int x, y, z;
+	x = int(unit_data[unit][1]);
+	y = master.mapys - int(unit_data[unit][0]);
+	z = master.mapzs - int(unit_data[unit][2]);
+	unit_ptr = new Unit;
+	unit_ptr->id = unit;
+	unit_ptr->troop = unit_data[unit][9];
+	unit_ptr->name = "Bob, Joe";	//FIXME!
+	unplayer[unit] = unit_data[unit][9];
+	master.my_units[unit_ptr->id].push_back(UnitAct(unit_ptr->id, 0,
+		x, y, z, ACT_START));
+	master.my_units[unit_ptr->id].push_back(UnitAct(unit_ptr->id, 0,
+		x, y, z, ACT_EQUIP, 0, 1));
+//	printf("Unit at %dx%dx%d\t[%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X]\n",
+//		unit_data[unit][1], unit_data[unit][0], unit_data[unit][2],
+//		unit_data[unit][3], unit_data[unit][4], unit_data[unit][5],
+//		unit_data[unit][6], unit_data[unit][7], unit_data[unit][8],
+//		unit_data[unit][9], unit_data[unit][10], unit_data[unit][11],
+//		unit_data[unit][12], unit_data[unit][13]
+//		);
+	}
+      }
+    if(sidecount[2] < 1) {
+      sides.pop_back();
+      plsquads.pop_back();
+      }
+    }
+//  return Load("temp.map");	// TEMPORARY!
+  return true;
   }
 
 int Game::Load(FILE *fl) {
@@ -262,9 +313,9 @@ int Game::Load(FILE *fl) {
     //TODO: Do a Real Initial Equip of Items Here
     //TODO: Equip Requested EQUIP Items
     master.my_units[unit_ptr->id].push_back(UnitAct(
-	unit_ptr->id, 0, 20+unit, 32, ACT_START));
+	unit_ptr->id, 0, 20+unit, 32, 0, ACT_START));
     master.my_units[unit_ptr->id].push_back(UnitAct(
-	unit_ptr->id, 0, 20+unit, 32, ACT_EQUIP, 0, 1));
+	unit_ptr->id, 0, 20+unit, 32, 0, ACT_EQUIP, 0, 1));
     }
 
   Uint32 id = 1;
@@ -476,20 +527,20 @@ void Game::ResolveRound() {
 	  continue;
 	  }
 
-	int x=0, y=0;
-	master.GetPos(order->id, x, y);
+	int x=0, y=0, z=0;
+	master.GetPos(order->id, x, y, z);
 	int offset = (rand() % 500) + 500;
 	switch(order->order) {
 	  case(ORDER_MOVE): {
 	    master.my_units[order->id].push_back(UnitAct(order->id,
 		(CurrentRound() - 2) * 3000 + order->time + offset,
-		order->targ1, order->targ2, ACT_MOVE, x, y));
+		order->targ1, order->targ2, order->targ3, ACT_MOVE, x, y, z));
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_RUN): {
 	    master.my_units[order->id].push_back(UnitAct(order->id,
 		(CurrentRound() - 2) * 3000 + order->time + offset,
-		order->targ1, order->targ2, ACT_RUN, x, y));
+		order->targ1, order->targ2, order->targ3, ACT_RUN, x, y, z));
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_EQUIP): {
@@ -497,14 +548,16 @@ void Game::ResolveRound() {
 	      if(ordered.count(order->id) <= 0) {
 		master.my_units[order->id].push_back(UnitAct(order->id,
 			(CurrentRound() - 2) * 3000 + order->time + offset,
-			x, y, ACT_EQUIP, order->targ1, order->targ2));
+			x, y, z, ACT_EQUIP,
+			order->targ1, order->targ2, order->targ3));
 		ordered.insert(order->id);
 		}
 	      }
 	    else {				// Initial Equip is Free
 	      if(ordered.count(order->id) <= 0) {
 		master.my_units[order->id].push_back(UnitAct(order->id, 0,
-			x, y, ACT_EQUIP, order->targ1, order->targ2));
+			x, y, z, ACT_EQUIP,
+			order->targ1, order->targ2, order->targ3));
 		ordered.insert(order->id);
 		}
 	      }
@@ -518,21 +571,21 @@ void Game::ResolveRound() {
 	      hit = master.UnitAt(order->targ1, order->targ2);
 	      }
 	    if(hit > 0) {
-	      int tx, ty;
-	      master.GetPos(hit, tx, ty);
+	      int tx, ty, tz;
+	      master.GetPos(hit, tx, ty, tz);
 	      master.my_units[hit].push_back(UnitAct(hit,
 		(CurrentRound() - 2) * 3000 + order->time + 250 + offset,
-		tx, ty, ACT_FALL));
+		tx, ty, tz, ACT_FALL));
 	      ordered.insert(hit);
 
 	      master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time + offset, x, y,
-		ACT_SHOOT, tx, ty));
+		(CurrentRound() - 2) * 3000 + order->time + offset, x, y, z,
+		ACT_SHOOT, tx, ty, tz));
 	      }
 	    else {
 	      master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time + offset, x, y,
-		ACT_SHOOT, order->targ1, order->targ2));
+		(CurrentRound() - 2) * 3000 + order->time + offset, x, y, z,
+		ACT_SHOOT, order->targ1, order->targ2, order->targ3));
 	      }
 	    ordered.insert(order->id);
 	    }break;
@@ -554,8 +607,8 @@ void Game::ResolveRound() {
 //      for(; prev != master.my_units[master.my_units.size() - 2].my_acts.end(); ++prev) {
 //	if(prev->id == (*unit)) {
 //	  master.my_units[order->id].push_back(UnitAct((*unit),
-//		(CurrentRound() - 2) * 3000, prev->x, prev->y,
-//		ACT_STAND, prev->x, prev->y));
+//		(CurrentRound() - 2) * 3000, prev->x, prev->y, prev->z,
+//		ACT_STAND, prev->x, prev->y, prev->z));
 //	  }
 //	}
 //      }

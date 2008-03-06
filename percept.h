@@ -63,14 +63,21 @@ enum Act {	// For Example
 
 struct UnitAct {
 public:
-  UnitAct(int i, int t, int xp, int yp, Act a, int t1 = 0, int t2 = 0)
-        { id = i; time = t; x = xp; y = yp; act = a; targ1 = t1, targ2 = t2; };
+  UnitAct(int i, int t,
+	int xp, int yp, int zp,
+	Act a, int t1 = 0, int t2 = 0, int t3 = 0
+	) {
+    id = i; time = t;
+    x = xp; y = yp; z = zp;
+    act = a; targ1 = t1, targ2 = t2; targ3 = t3;
+    };
   int id;
   Uint32 time;
-  int x, y;	//X/Y position of the unit when it does this
+  int x, y, z;	//X/Y/Z position of the unit when it does this
   Act act;
-  int targ1;    //Depending on action, may be a unit id, or x coord, or unused
-  int targ2;    //Depending on action, may be a unit id, or y coord, or unused
+  int targ1;	//Depending on action, may be a unit id, or x coord, or unused
+  int targ2;	//Depending on action, may be a unit id, or y coord, or unused
+  int targ3;	//Depending on action, may be a unit id, or z coord, or unused
   };
 
 class Percept {
@@ -95,7 +102,7 @@ public:
   int UnitPresent(int xc, int yc, int &id);  // Enemy:-1, Own:1, None/Neutral:0
   int UnitAt(int xc, int yc);
 
-  void GetPos(int id, int &x, int &y);
+  void GetPos(int id, int &x, int &y, int &z);
   };
 
 #endif // PERCEPT_H
