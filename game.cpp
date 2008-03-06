@@ -246,8 +246,8 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	Unit *unit_ptr;
 	int x, y, z;
 	x = int(unit_data[unit][1]);
-	y = master.mapys - int(unit_data[unit][0]);
-	z = master.mapzs - int(unit_data[unit][2]);
+	y = master.mapys - 1 - int(unit_data[unit][0]);
+	z = master.mapzs - 1 - int(unit_data[unit][2]);
 	unit_ptr = new Unit;
 	unit_ptr->id = unit;
 	unit_ptr->troop = unit_data[unit][9];
