@@ -78,9 +78,6 @@ void World::DrawMap() {
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 
-//  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_BLEND);
-
   glPushMatrix();
   glColor3f(1.0, 1.0, 1.0);
   vector<MapObject>::const_iterator obj = percept->objects.begin();
@@ -229,8 +226,6 @@ void World::DrawMap() {
     }
 
   glPopMatrix();
-  glDisable(GL_BLEND);
-  glEnable(GL_CULL_FACE);
   }
 
 void World::DrawModels(Uint32 offset) {
