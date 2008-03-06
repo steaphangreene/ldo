@@ -63,6 +63,7 @@ World::World(Percept *per, Orders *ord) {
   modmap[20] = models.size();
   modmap[21] = models.size();
   models.push_back(SM_LoadModel("models/wall_low.obj"));
+  models.push_back(SM_LoadModel("models/wall_med.obj"));
 
   modmap[18] = models.size();
   modmap[19] = models.size();
@@ -104,12 +105,22 @@ void World::DrawMap() {
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 
   glPushMatrix();
-  glColor3f(1.0, 1.0, 1.0);
   vector<MapObject>::const_iterator obj = percept->objects.begin();
   for(; obj != percept->objects.end(); ++obj) {
-    glColor3f(obj->xpos/float(50), 0.5, obj->ypos/float(50));
-    if(obj->type == GROUND_FLOOR) {
+    int tex = -1, mod = -1;
+    if(modmap.count(obj->which) > 0) mod = modmap[obj->which];
+    if(texmap.count(obj->which) > 0) tex = texmap[obj->which];
+
+    if(tex >= 0) {
+      glColor3f(1.0, 1.0, 1.0);
+      glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
+      }
+    else {
+      glColor3f(obj->xpos/float(50), 0.5, obj->ypos/float(50));
       glBindTexture(GL_TEXTURE_2D, textures[obj->which]->GLTexture());
+      }
+
+    if(obj->type == GROUND_FLOOR) {
       glNormal3d(0.0, 0.0, 1.0);
       glBegin(GL_QUADS);
       glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
@@ -123,21 +134,13 @@ void World::DrawMap() {
       glEnd();
       }
     else if(obj->type == WALL_EASTWEST) {
-      if(modmap.count(obj->which) > 0) {
-	if(texmap.count(obj->which) > 0) {
-	  glColor3f(1.0, 1.0, 1.0);
-	  glBindTexture(GL_TEXTURE_2D, textures[texmap[obj->which]]->GLTexture());
-	  }
+      if(mod >= 0) {
 	glPushMatrix();
 	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
-	models[modmap[obj->which]]->Render(0);
+	models[mod]->Render(0);
 	glPopMatrix();
-	if(texmap.count(obj->which) > 0) {
-	  glBindTexture(GL_TEXTURE_2D, 0);
-	  }
 	}
       else {
-	glBindTexture(GL_TEXTURE_2D, textures[obj->which]->GLTexture());
 	glNormal3d(0.0, 1.0, 0.0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
@@ -161,15 +164,14 @@ void World::DrawMap() {
 	}
       }
     else if(obj->type == WALL_NORTHSOUTH) {
-      if(modmap.count(obj->which) > 0) {
+      if(mod >= 0) {
 	glPushMatrix();
 	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
 	glRotatef(90.0, 0.0, 0.0, 1.0);
-	models[modmap[obj->which]]->Render(0);
+	models[mod]->Render(0);
 	glPopMatrix();
 	}
       else {
-	glBindTexture(GL_TEXTURE_2D, textures[obj->which]->GLTexture());
 	glNormal3d(1.0, 0.0, 0.0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
@@ -193,7 +195,6 @@ void World::DrawMap() {
 	}
       }
     else if(obj->type == OBJECT_MISC) {
-      glBindTexture(GL_TEXTURE_2D, textures[obj->which]->GLTexture());
       glNormal3d(1.0, 0.0, 0.0);
       glBegin(GL_QUADS);
       glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
