@@ -61,8 +61,8 @@ public:
 
   const Unit *UnitRef(int id);	//Temporary!
 
-  const string &MapName() { return mapname; };
-  const string &MapDesc() { return mapdesc; };
+  const string &MapName() { return master.mapname; };
+  const string &MapDesc() { return master.mapdesc; };
   int MapNumPlayers() { return int(plsquads.size()); };
   int MapNumSides() { return int(sides.size()); };
   int MapNumSidePlayers(int sd) { return int(sides[sd].size()); };
@@ -93,9 +93,6 @@ private:
   void ResolveRound();
 
   void Clear();
-
-  int mapxs, mapys, mapzs;
-  string mapname, mapdesc;
 
   vector< vector<int> > sides;		// List of all player ids per side
 

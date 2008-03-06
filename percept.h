@@ -83,6 +83,10 @@ public:
 
   void Clear();
 
+  //Basic map info
+  int mapxs, mapys, mapzs;
+  string mapname, mapdesc;
+
   //List of all of unit ids and actions for own and others
   map<int, vector<UnitAct> > my_units;
   map<int, vector<UnitAct> > other_units;

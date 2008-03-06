@@ -179,40 +179,40 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 
   fread(buf, 2, 22, fl);
 
-  mapxs = (int(Sint8(buf[5])) << 8) + int(buf[4]);
-  mapys = (int(Sint8(buf[7])) << 8) + int(buf[6]);
-  mapzs = (int(Sint8(buf[9])) << 8) + int(buf[8]);
-//  printf("%dx%dx%d\n", mapxs, mapys, mapzs);
+  master.mapxs = (int(Sint8(buf[5])) << 8) + int(buf[4]);
+  master.mapys = (int(Sint8(buf[7])) << 8) + int(buf[6]);
+  master.mapzs = (int(Sint8(buf[9])) << 8) + int(buf[8]);
+//  printf("%dx%dx%d\n", master.mapxs, master.mapys, master.mapzs);
 
   FILE *map = fopen((dir + "/map.dat").c_str(), "rb");
   if(map) {
-    Uint8 map_data[mapzs][mapys][mapxs][4];
-    fread(map_data, 4, 4*mapxs*mapys, map);
+    Uint8 map_data[master.mapzs][master.mapys][master.mapxs][4];
+    fread(map_data, 4, 4*master.mapxs*master.mapys, map);
     int x, y, z;
-    for(z = 0; z < mapzs; ++z) {
-      for(y = 0; y < mapys; ++y) {
-	for(x = 0; x < mapxs; ++x) {
+    for(z = 0; z < master.mapzs; ++z) {
+      for(y = 0; y < master.mapys; ++y) {
+	for(x = 0; x < master.mapxs; ++x) {
 	  if(map_data[z][y][x][0] > 0) {
 	    MapObject obj = {
-		GROUND_FLOOR, x, mapys-1-y, mapzs-1-z, map_data[z][y][x][0]
+		GROUND_FLOOR, x, master.mapys-1-y, master.mapzs-1-z, map_data[z][y][x][0]
 		};
 	    master.objects.push_back(obj);
 	    }
 	  if(map_data[z][y][x][1] > 0) {
 	    MapObject obj = {
-		WALL_NORTHSOUTH, x, mapys-1-y, mapzs-1-z, map_data[z][y][x][1]
+		WALL_NORTHSOUTH, x, master.mapys-1-y, master.mapzs-1-z, map_data[z][y][x][1]
 		};
 	    master.objects.push_back(obj);
 	    }
 	  if(map_data[z][y][x][2] > 0) {
 	    MapObject obj = {
-		WALL_EASTWEST, x, mapys-y, mapzs-1-z, map_data[z][y][x][2]
+		WALL_EASTWEST, x, master.mapys-y, master.mapzs-1-z, map_data[z][y][x][2]
 		};
 	    master.objects.push_back(obj);
 	    }
 	  if(map_data[z][y][x][3] > 0) {
 	    MapObject obj = {
-		OBJECT_MISC, x, mapys-1-y, mapzs-1-z, map_data[z][y][x][3]
+		OBJECT_MISC, x, master.mapys-1-y, master.mapzs-1-z, map_data[z][y][x][3]
 		};
 	    master.objects.push_back(obj);
 	    }
@@ -237,11 +237,11 @@ int Game::Load(FILE *fl) {
 
   memset(buf, 0, BUF_LEN);
   if(fscanf(fl, "%[^\n;];\n", buf) < 1) return 0;
-  mapname = buf;
+  master.mapname = buf;
 
   memset(buf, 0, BUF_LEN);
   if(fscanf(fl, "%[^\n;];\n", buf) < 1) return 0;
-  mapdesc = buf;
+  master.mapdesc = buf;
 
   if(!Load(sides, fl)) return 0;
   if(!Load(plsquads, fl)) return 0;
@@ -293,9 +293,9 @@ int Game::Save(FILE *fl) {
 
   if(fprintf(fl, "0x%.8X\n", SAVEFILE_VERSION) < 11) return 0;
 
-  if(fprintf(fl, "%s;\n", mapname.c_str()) < (int)(mapname.length())) return 0;
+  if(fprintf(fl, "%s;\n", master.mapname.c_str()) < (int)(master.mapname.length())) return 0;
 
-  if(fprintf(fl, "%s;\n", mapdesc.c_str()) < (int)(mapdesc.length())) return 0;
+  if(fprintf(fl, "%s;\n", master.mapdesc.c_str()) < (int)(master.mapdesc.length())) return 0;
 
   if(!Save(sides, fl)) return 0;
   if(!Save(plsquads, fl)) return 0;
