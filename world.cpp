@@ -92,6 +92,18 @@ World::World(Percept *per, Orders *ord) {
   texmap[21] = textures.size();
   textures.push_back(new SimpleTexture("models/hedge.png"));
 
+  texmap[2] = textures.size();
+  textures.push_back(new SimpleTexture("models/grass.png"));
+
+  texmap[4] = textures.size();
+  textures.push_back(new SimpleTexture("models/dirt.png"));
+
+  texmap[5] = textures.size();
+  textures.push_back(new SimpleTexture("models/reaped.png"));
+
+  texmap[9] = textures.size();
+  textures.push_back(new SimpleTexture("models/cabbage.png"));
+
   texmap[32] = 0;	//Broken Fence
   }
 
@@ -124,6 +136,10 @@ void World::DrawMap() {
     int tex = -1, mod = -1;
     if(modmap.count(obj->which) > 0) mod = modmap[obj->which];
     if(texmap.count(obj->which) > 0) tex = texmap[obj->which];
+
+    if(obj->zpos > 0) {
+      continue;
+      }
 
     if(tex == 0) {
       continue;	//Nothing to show
