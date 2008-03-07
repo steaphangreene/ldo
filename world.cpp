@@ -91,6 +91,8 @@ World::World(Percept *per, Orders *ord) {
   texmap[20] = textures.size();
   texmap[21] = textures.size();
   textures.push_back(new SimpleTexture("models/hedge.png"));
+
+  texmap[32] = 0;	//Broken Fence
   }
 
 World::~World() {
@@ -123,7 +125,10 @@ void World::DrawMap() {
     if(modmap.count(obj->which) > 0) mod = modmap[obj->which];
     if(texmap.count(obj->which) > 0) tex = texmap[obj->which];
 
-    if(tex >= 0) {
+    if(tex == 0) {
+      continue;	//Nothing to show
+      }
+    else if(tex > 0) {
       glColor3f(1.0, 1.0, 1.0);
       glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
       }
