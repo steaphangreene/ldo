@@ -76,6 +76,12 @@ World::World(Percept *per, Orders *ord) {
     textures.push_back(new SimpleTexture(name));
     }
 
+  texmap[25] = textures.size();
+  texmap[26] = textures.size();
+  texmap[29] = textures.size();
+  texmap[30] = textures.size();
+  textures.push_back(new SimpleTexture("models/wood.png"));
+
   texmap[16] = textures.size();
   texmap[17] = textures.size();
   textures.push_back(new SimpleTexture("models/stone.png"));
