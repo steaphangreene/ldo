@@ -134,3 +134,34 @@ void Percept::GetPos(int id, int &x, int &y, int &z) {
     }
   }
 
+vector<Coord> Percept::GetPath(const Coord &start, const Coord &end) {
+  vector<Coord> ret;
+  Coord cur = start;
+  ret.push_back(cur);
+  while(cur.x != end.x || cur.y != end.y || cur.z != end.z) {
+    if(cur.x < end.x) cur.x ++;
+    else if(cur.x > end.x) cur.x --;
+    if(cur.y < end.y) cur.y ++;
+    else if(cur.y > end.y) cur.y --;
+    if(cur.z < end.z) cur.z ++;
+    else if(cur.z > end.z) cur.z --;
+    ret.push_back(cur);
+    }
+  return ret;
+  }
+
+vector<Coord> Percept::GetPath2x2(const Coord &start, const Coord &end) {
+  vector<Coord> ret;
+  Coord cur = start;
+  ret.push_back(cur);
+  while(cur.x != end.x || cur.y != end.y || cur.z != end.z) {
+    if(cur.x < end.x) cur.x ++;
+    else if(cur.x > end.x) cur.x --;
+    if(cur.y < end.y) cur.y ++;
+    else if(cur.y > end.y) cur.y --;
+    if(cur.z < end.z) cur.z ++;
+    else if(cur.z > end.z) cur.z --;
+    ret.push_back(cur);
+    }
+  return ret;
+  }

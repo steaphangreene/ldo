@@ -80,6 +80,10 @@ public:
   int targ3;	//Depending on action, may be a unit id, or z coord, or unused
   };
 
+struct Coord {
+  int x, y, z;
+  };
+
 class Percept {
 public:
   Percept();
@@ -103,6 +107,8 @@ public:
   int UnitAt(int xc, int yc);
 
   void GetPos(int id, int &x, int &y, int &z);
+  vector<Coord> GetPath(const Coord &start, const Coord &end);
+  vector<Coord> GetPath2x2(const Coord &start, const Coord &end);
   };
 
 #endif // PERCEPT_H

@@ -531,16 +531,29 @@ void Game::ResolveRound() {
 	master.GetPos(order->id, x, y, z);
 	int offset = (rand() % 500) + 500;
 	switch(order->order) {
+	  case(ORDER_RUN):
 	  case(ORDER_MOVE): {
-	    master.my_units[order->id].push_back(UnitAct(order->id,
+	    Act act = ACT_MOVE;
+	    int step = 500;
+	    if(order->order == ORDER_RUN) {
+	      act = ACT_RUN;
+	      step = 300;
+	      }
+	    Coord start = { x, y, z };
+	    Coord end = { order->targ1, order->targ2, order->targ3 };
+	    vector<Coord> path = master.GetPath(start, end);
+	    if(path.size() > 1) {
+	      vector<Coord>::const_iterator pt = path.begin();
+	      vector<Coord>::const_iterator lpt = pt;
+	      ++pt;
+	      for(; pt != path.end(); ++pt) {
+		master.my_units[order->id].push_back(UnitAct(order->id,
 		(CurrentRound() - 2) * 3000 + order->time + offset,
-		order->targ1, order->targ2, order->targ3, ACT_MOVE, x, y, z));
-	    ordered.insert(order->id);
-	    }break;
-	  case(ORDER_RUN): {
-	    master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time + offset,
-		order->targ1, order->targ2, order->targ3, ACT_RUN, x, y, z));
+		pt->x, pt->y, pt->z, act, lpt->x, lpt->y, lpt->z));
+		offset += step;
+		lpt = pt;
+		}
+	      }
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_EQUIP): {
