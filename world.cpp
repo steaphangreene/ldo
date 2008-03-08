@@ -101,6 +101,9 @@ World::World(Percept *per, Orders *ord) {
   texmap[5] = textures.size();
   textures.push_back(new SimpleTexture("models/reaped.png"));
 
+  texmap[6] = textures.size();
+  textures.push_back(new SimpleTexture("models/wheat.png"));
+
   texmap[9] = textures.size();
   textures.push_back(new SimpleTexture("models/cabbage.png"));
 
@@ -314,7 +317,7 @@ void World::DrawModels(Uint32 offset) {
     if(act->time <= offset) {
       anims[0] = models[mod]->LookUpAnimation("LEGS_IDLE");
       anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
-      if(anims[0] == 0) {
+      if(anims[0] < 0) {
 	anims[0] = models[mod]->LookUpAnimation("STAND");
 	anims[1] = models[mod]->LookUpAnimation("STAND");
 	}
@@ -335,13 +338,13 @@ void World::DrawModels(Uint32 offset) {
 	  y = act->y * 2 + 1;
 	  if(act->time + 1000 <= offset) {
 	    int anim = models[mod]->LookUpAnimation("BOTH_DEAD1");
-	    if(anim == 0) anim = models[mod]->LookUpAnimation("DEATH3");
+	    if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
 	    anims[0] = anim;
 	    anims[1] = anim;
 	    }
 	  else {
 	    int anim = models[mod]->LookUpAnimation("BOTH_DEATH1");
-	    if(anim == 0) anim = models[mod]->LookUpAnimation("DEATH3");
+	    if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
 	    anims[0] = anim;
 	    anims[1] = anim;
 	    }
@@ -358,8 +361,8 @@ void World::DrawModels(Uint32 offset) {
 	else {
 	  Uint32 off = offset - act->time;
 	  int anim = models[mod]->LookUpAnimation("LEGS_WALK");
-	  if(anim == 0) anim = models[mod]->LookUpAnimation("WALK");
-	  if(anim == 0) anim = models[mod]->LookUpAnimation("RUN");
+	  if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
+	  if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
 	  anims[0] = anim;
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
@@ -378,8 +381,9 @@ void World::DrawModels(Uint32 offset) {
 	else {
 	  Uint32 off = offset - act->time;
 	  int anim = models[mod]->LookUpAnimation("LEGS_RUN");
-	  if(anim == 0) anim = models[mod]->LookUpAnimation("RUN");
-	  if(anim == 0) anim = models[mod]->LookUpAnimation("WALK");
+	  if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
+	  if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
+	  anims[0] = anim;
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
 	  x /= duration; y /= duration;
