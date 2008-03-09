@@ -180,22 +180,22 @@ void World::DrawMap() {
 	glNormal3d(0.0, 1.0, 0.0);
 	glBegin(GL_QUADS);
 	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z);
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0);
 	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z + SEL_HEIGHT);
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0 + SEL_HEIGHT);
 	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z + SEL_HEIGHT);
+	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*4.0 + SEL_HEIGHT);
 	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z);
+	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*4.0);
 
 	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z + SEL_HEIGHT);
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0 + SEL_HEIGHT);
 	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z);
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0);
 	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z);
+	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*4.0);
 	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z + SEL_HEIGHT);
+	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*4.0 + SEL_HEIGHT);
 	glEnd();
 	}
       }
