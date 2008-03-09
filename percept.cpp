@@ -144,15 +144,79 @@ bool MapCoord::operator < (const MapCoord &other) const {
 	|| (y == other.y && x < other.x))));
   }
 
-int Percept::RDist(const MapCoord &first, const MapCoord &second) {
-  int base = HDist(first, second);
-  return base;
+int Percept::RDist(const MapCoord &start, const MapCoord &end) {
+  int ret = 0;
+  int dx = end.x - start.x;
+  int dy = end.y - start.y;
+  int dz = end.z - start.z;
+  if(dx == 0 && dy == 0 && dz == 0) {
+    ret = -1;		// No self-links
+    }
+  else if(dz != 0) {
+    ret = -1;		// No vertical movement yet
+    }
+  else if(dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1) {
+    ret = -1;		// Not Adjacent
+    }
+  else {	// Need Floors, Can't go through walls
+    multimap<MapCoord, MapObject>::const_iterator obj = objects.find(end);
+    if(obj != objects.end()) {
+      for(; obj != objects.upper_bound(end); ++obj) {
+	if(obj->second.type == GROUND_FLOOR) {
+	  ret = HDist(start, end);
+	  }
+	}
+      }
+    if(ret > 0 && (dy == -1 || dy == 1)) {		// Moving North/South
+      MapCoord tmp = { start.x, start.y, start.z };
+      if(dy == 1) { ++(tmp.y); }			// Moving South
+      obj = objects.find(tmp);
+      if(obj != objects.end()) {
+	for(; obj != objects.upper_bound(tmp); ++obj) {
+	  if(obj->second.type == WALL_EASTWEST) {
+	    ret = -1;
+	    }
+	  }
+	}
+      tmp.x += dx;
+      obj = objects.find(tmp);
+      if(dx != 0 && obj != objects.end()) {
+	for(; obj != objects.upper_bound(tmp); ++obj) {
+	  if(obj->second.type == WALL_EASTWEST) {
+	    ret = -1;
+	    }
+	  }
+	}
+      }
+    if(ret > 0 && (dx == -1 || dx == 1)) {		// Moving West/East
+      MapCoord tmp = { start.x, start.y, start.z };
+      if(dx == 1) { ++(tmp.x); }			// Moving East
+      obj = objects.find(tmp);
+      if(obj != objects.end()) {
+	for(; obj != objects.upper_bound(tmp); ++obj) {
+	  if(obj->second.type == WALL_NORTHSOUTH) {
+	    ret = -1;
+	    }
+	  }
+	}
+      tmp.y += dy;
+      obj = objects.find(tmp);
+      if(dy != 0 && obj != objects.end()) {
+	for(; obj != objects.upper_bound(tmp); ++obj) {
+	  if(obj->second.type == WALL_NORTHSOUTH) {
+	    ret = -1;
+	    }
+	  }
+	}
+      }
+    }
+  return ret;
   }
 
-int Percept::HDist(const MapCoord &first, const MapCoord &second) {
-  int xd = (second.x - first.x)*128;
-  int yd = (second.y - first.y)*128;
-  int zd = (second.z - first.z)*128;
+int Percept::HDist(const MapCoord &start, const MapCoord &end) {
+  int xd = (end.x - start.x)*128;
+  int yd = (end.y - start.y)*128;
+  int zd = (end.z - start.z)*128;
   return int(sqrt(xd*xd + yd*yd + zd*zd));
   }
 
@@ -183,17 +247,20 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
 	    if(tmp.z >= 0 && tmp.z < mapzs && tmp.y >= 0
 			&& tmp.y < mapys && tmp.x >= 0 && tmp.x < mapxs
 			&& closed.count(tmp) == 0) {
-	      int gd = gdist[cur] + HDist(cur, tmp);
-	      int td = gd + HDist(tmp, end);
-	      if(open.count(tmp) == 0 || open[tmp] > td) {
+	      int rd = RDist(cur, tmp);
+	      if(rd > 0) {
+		int gd = gdist[cur] + rd;
+		int td = gd + HDist(tmp, end);
+		if(open.count(tmp) == 0 || open[tmp] > td) {
 // FIXME: How do I do this right?
-//		if(open.count(tmp) > 0) {
-//		  openlist.erase(pair<int, MapCoord>(open[tmp], tmp));
-//		  }
-		gdist[tmp] = gd;
-		open[tmp] = td;
-		prev[tmp] = cur;
-		openlist.insert(pair<int, MapCoord>(open[tmp], tmp));
+//		  if(open.count(tmp) > 0) {
+//		    openlist.erase(pair<int, MapCoord>(open[tmp], tmp));
+//		    }
+		  gdist[tmp] = gd;
+		  open[tmp] = td;
+		  prev[tmp] = cur;
+		  openlist.insert(pair<int, MapCoord>(open[tmp], tmp));
+		  }
 		}
 	      }
 	    }
