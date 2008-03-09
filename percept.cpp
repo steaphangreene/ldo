@@ -24,6 +24,10 @@
 #include "unit.h"
 #include "defs.h"
 
+#include <set>
+#include <cmath>
+using namespace std;
+
 Percept::Percept() {
   }
 
@@ -134,19 +138,72 @@ void Percept::GetPos(int id, int &x, int &y, int &z) {
     }
   }
 
+//This is so set<> and map<> can sort by these.
+static bool operator < (const Coord &first, const Coord &second) {
+  return (first.z < second.z || (first.z == second.z &&
+	(first.y < second.y || (first.y == second.y && first.x < second.x))));
+  }
+
+static int dist(const Coord &first, const Coord &second) {
+  int xd = (second.x - first.x)*128;
+  int yd = (second.y - first.y)*128;
+  int zd = (second.z - first.z)*128;
+  return int(sqrt(xd*xd + yd*yd + zd*zd));
+  }
+
 vector<Coord> Percept::GetPath(const Coord &start, const Coord &end) {
-  vector<Coord> ret;
-  Coord cur = start;
-  ret.push_back(cur);
-  while(cur.x != end.x || cur.y != end.y || cur.z != end.z) {
-    if(cur.x < end.x) cur.x ++;
-    else if(cur.x > end.x) cur.x --;
-    if(cur.y < end.y) cur.y ++;
-    else if(cur.y > end.y) cur.y --;
-    if(cur.z < end.z) cur.z ++;
-    else if(cur.z > end.z) cur.z --;
-    ret.push_back(cur);
+  set<Coord> closed;
+  map<Coord, int> open;
+  map<Coord, Coord> prev;
+  map<Coord, int> gdist;
+  multimap<int, Coord> openlist;
+
+  prev[start] = start;
+  gdist[start] = 0;
+  open[start] = dist(start, end);
+  openlist.insert(pair<int, Coord>(open[start], start));
+  while(openlist.size() > 0 && closed.count(openlist.begin()->second) > 0) {
+    openlist.erase(openlist.begin());
     }
+  while(closed.count(end) == 0 && openlist.size() > 0) {
+    Coord cur = openlist.begin()->second;
+    openlist.erase(openlist.begin());
+    open.erase(cur);
+    closed.insert(cur);
+    if(cur.x != end.x || cur.y != end.y || cur.z != end.z) {
+      for(int zo = -1; zo < 2; zo++) {
+	for(int yo = -1; yo < 2; yo++) {
+	  for(int xo = -1; xo < 2; xo++) {
+	    Coord tmp = { cur.x + xo, cur.y + yo, cur.z + zo };
+	    if(tmp.z >= 0 && tmp.z < mapzs && tmp.y >= 0
+			&& tmp.y < mapys && tmp.x >= 0 && tmp.x < mapxs
+			&& closed.count(tmp) == 0) {
+	      int gd = gdist[cur] + dist(cur, tmp);
+	      int td = gd + dist(tmp, end);
+	      if(open.count(tmp) == 0 || open[tmp] > td) {
+// FIXME: How do I do this right?
+//		if(open.count(tmp) > 0) {
+//		  openlist.erase(pair<int, Coord>(open[tmp], tmp));
+//		  }
+		gdist[tmp] = gd;
+		open[tmp] = td;
+		prev[tmp] = cur;
+		openlist.insert(pair<int, Coord>(open[tmp], tmp));
+		}
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  vector<Coord> ret;
+  Coord cur = end;
+  while(prev[cur] < cur || cur < prev[cur]) {	// Is != without != operator
+    ret.push_back(cur);
+    cur = prev[cur];
+    }
+  ret.push_back(cur);
+  reverse(ret.begin(), ret.end());
   return ret;
   }
 

@@ -507,8 +507,6 @@ int Game::ThreadHandler() {
   }
 
 void Game::ResolveRound() {
-  round++;
-
   set<int> ordered;
   vector<Player *>::const_iterator itrp = player.begin();
   for(; itrp != player.end(); ++itrp) {
@@ -548,7 +546,7 @@ void Game::ResolveRound() {
 	      ++pt;
 	      for(; pt != path.end(); ++pt) {
 		master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time + offset,
+		(CurrentRound() - 1) * 3000 + order->time + offset,
 		pt->x, pt->y, pt->z, act, lpt->x, lpt->y, lpt->z));
 		offset += step;
 		lpt = pt;
@@ -557,10 +555,10 @@ void Game::ResolveRound() {
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_EQUIP): {
-	    if(round != 1 || order->time != 0) {	// Not Initial EQUIP
+	    if(round != 0 || order->time != 0) {	// Not Initial EQUIP
 	      if(ordered.count(order->id) <= 0) {
 		master.my_units[order->id].push_back(UnitAct(order->id,
-			(CurrentRound() - 2) * 3000 + order->time + offset,
+			(CurrentRound() - 1) * 3000 + order->time + offset,
 			x, y, z, ACT_EQUIP,
 			order->targ1, order->targ2, order->targ3));
 		ordered.insert(order->id);
@@ -587,17 +585,17 @@ void Game::ResolveRound() {
 	      int tx, ty, tz;
 	      master.GetPos(hit, tx, ty, tz);
 	      master.my_units[hit].push_back(UnitAct(hit,
-		(CurrentRound() - 2) * 3000 + order->time + 250 + offset,
+		(CurrentRound() - 1) * 3000 + order->time + 250 + offset,
 		tx, ty, tz, ACT_FALL));
 	      ordered.insert(hit);
 
 	      master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time + offset, x, y, z,
+		(CurrentRound() - 1) * 3000 + order->time + offset, x, y, z,
 		ACT_SHOOT, tx, ty, tz));
 	      }
 	    else {
 	      master.my_units[order->id].push_back(UnitAct(order->id,
-		(CurrentRound() - 2) * 3000 + order->time + offset, x, y, z,
+		(CurrentRound() - 1) * 3000 + order->time + offset, x, y, z,
 		ACT_SHOOT, order->targ1, order->targ2, order->targ3));
 	      }
 	    ordered.insert(order->id);
@@ -610,20 +608,5 @@ void Game::ResolveRound() {
       }
     orders[pnum]->Clear();
     }
-
-//  //Create STAND orders for all units not given other orders
-//  set<int>::const_iterator unit = master.my_units.begin();
-//  for(; unit != master.my_units.end(); ++unit) {
-//    if(ordered.count(*unit) == 0) {
-//      vector<UnitAct>::const_iterator prev =
-//		master.my_units[master.my_units.size() - 2].my_acts.begin();
-//      for(; prev != master.my_units[master.my_units.size() - 2].my_acts.end(); ++prev) {
-//	if(prev->id == (*unit)) {
-//	  master.my_units[order->id].push_back(UnitAct((*unit),
-//		(CurrentRound() - 2) * 3000, prev->x, prev->y, prev->z,
-//		ACT_STAND, prev->x, prev->y, prev->z));
-//	  }
-//	}
-//      }
-//    }
+  round++;
   }
