@@ -109,6 +109,10 @@ public:
   void GetPos(int id, int &x, int &y, int &z);
   vector<Coord> GetPath(const Coord &start, const Coord &end);
   vector<Coord> GetPath2x2(const Coord &start, const Coord &end);
+
+private:	//Utility Functions
+  int RDist(const Coord &first, const Coord &second);
+  int HDist(const Coord &first, const Coord &second);
   };
 
 #endif // PERCEPT_H

@@ -144,7 +144,11 @@ static bool operator < (const Coord &first, const Coord &second) {
 	(first.y < second.y || (first.y == second.y && first.x < second.x))));
   }
 
-static int dist(const Coord &first, const Coord &second) {
+int Percept::RDist(const Coord &first, const Coord &second) {
+  return 0;
+  }
+
+int Percept::HDist(const Coord &first, const Coord &second) {
   int xd = (second.x - first.x)*128;
   int yd = (second.y - first.y)*128;
   int zd = (second.z - first.z)*128;
@@ -160,7 +164,7 @@ vector<Coord> Percept::GetPath(const Coord &start, const Coord &end) {
 
   prev[start] = start;
   gdist[start] = 0;
-  open[start] = dist(start, end);
+  open[start] = HDist(start, end);
   openlist.insert(pair<int, Coord>(open[start], start));
   while(openlist.size() > 0 && closed.count(openlist.begin()->second) > 0) {
     openlist.erase(openlist.begin());
@@ -178,8 +182,8 @@ vector<Coord> Percept::GetPath(const Coord &start, const Coord &end) {
 	    if(tmp.z >= 0 && tmp.z < mapzs && tmp.y >= 0
 			&& tmp.y < mapys && tmp.x >= 0 && tmp.x < mapxs
 			&& closed.count(tmp) == 0) {
-	      int gd = gdist[cur] + dist(cur, tmp);
-	      int td = gd + dist(tmp, end);
+	      int gd = gdist[cur] + HDist(cur, tmp);
+	      int td = gd + HDist(tmp, end);
 	      if(open.count(tmp) == 0 || open[tmp] > td) {
 // FIXME: How do I do this right?
 //		if(open.count(tmp) > 0) {
