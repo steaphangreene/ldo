@@ -139,38 +139,39 @@ void Percept::GetPos(int id, int &x, int &y, int &z) {
   }
 
 //This is so set<> and map<> can sort by these.
-static bool operator < (const Coord &first, const Coord &second) {
-  return (first.z < second.z || (first.z == second.z &&
-	(first.y < second.y || (first.y == second.y && first.x < second.x))));
+bool MapCoord::operator < (const MapCoord &other) const {
+  return (z < other.z || (z == other.z && (y < other.y
+	|| (y == other.y && x < other.x))));
   }
 
-int Percept::RDist(const Coord &first, const Coord &second) {
-  return 0;
+int Percept::RDist(const MapCoord &first, const MapCoord &second) {
+  int base = HDist(first, second);
+  return base;
   }
 
-int Percept::HDist(const Coord &first, const Coord &second) {
+int Percept::HDist(const MapCoord &first, const MapCoord &second) {
   int xd = (second.x - first.x)*128;
   int yd = (second.y - first.y)*128;
   int zd = (second.z - first.z)*128;
   return int(sqrt(xd*xd + yd*yd + zd*zd));
   }
 
-vector<Coord> Percept::GetPath(const Coord &start, const Coord &end) {
-  set<Coord> closed;
-  map<Coord, int> open;
-  map<Coord, Coord> prev;
-  map<Coord, int> gdist;
-  multimap<int, Coord> openlist;
+vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
+  set<MapCoord> closed;
+  map<MapCoord, int> open;
+  map<MapCoord, MapCoord> prev;
+  map<MapCoord, int> gdist;
+  multimap<int, MapCoord> openlist;
 
   prev[start] = start;
   gdist[start] = 0;
   open[start] = HDist(start, end);
-  openlist.insert(pair<int, Coord>(open[start], start));
+  openlist.insert(pair<int, MapCoord>(open[start], start));
   while(openlist.size() > 0 && closed.count(openlist.begin()->second) > 0) {
     openlist.erase(openlist.begin());
     }
   while(closed.count(end) == 0 && openlist.size() > 0) {
-    Coord cur = openlist.begin()->second;
+    MapCoord cur = openlist.begin()->second;
     openlist.erase(openlist.begin());
     open.erase(cur);
     closed.insert(cur);
@@ -178,7 +179,7 @@ vector<Coord> Percept::GetPath(const Coord &start, const Coord &end) {
       for(int zo = -1; zo < 2; zo++) {
 	for(int yo = -1; yo < 2; yo++) {
 	  for(int xo = -1; xo < 2; xo++) {
-	    Coord tmp = { cur.x + xo, cur.y + yo, cur.z + zo };
+	    MapCoord tmp = { cur.x + xo, cur.y + yo, cur.z + zo };
 	    if(tmp.z >= 0 && tmp.z < mapzs && tmp.y >= 0
 			&& tmp.y < mapys && tmp.x >= 0 && tmp.x < mapxs
 			&& closed.count(tmp) == 0) {
@@ -187,12 +188,12 @@ vector<Coord> Percept::GetPath(const Coord &start, const Coord &end) {
 	      if(open.count(tmp) == 0 || open[tmp] > td) {
 // FIXME: How do I do this right?
 //		if(open.count(tmp) > 0) {
-//		  openlist.erase(pair<int, Coord>(open[tmp], tmp));
+//		  openlist.erase(pair<int, MapCoord>(open[tmp], tmp));
 //		  }
 		gdist[tmp] = gd;
 		open[tmp] = td;
 		prev[tmp] = cur;
-		openlist.insert(pair<int, Coord>(open[tmp], tmp));
+		openlist.insert(pair<int, MapCoord>(open[tmp], tmp));
 		}
 	      }
 	    }
@@ -200,8 +201,8 @@ vector<Coord> Percept::GetPath(const Coord &start, const Coord &end) {
 	}
       }
     }
-  vector<Coord> ret;
-  Coord cur = end;
+  vector<MapCoord> ret;
+  MapCoord cur = end;
   while(prev[cur] < cur || cur < prev[cur]) {	// Is != without != operator
     ret.push_back(cur);
     cur = prev[cur];
@@ -211,9 +212,9 @@ vector<Coord> Percept::GetPath(const Coord &start, const Coord &end) {
   return ret;
   }
 
-vector<Coord> Percept::GetPath2x2(const Coord &start, const Coord &end) {
-  vector<Coord> ret;
-  Coord cur = start;
+vector<MapCoord> Percept::GetPath2x2(const MapCoord &start, const MapCoord &end) {
+  vector<MapCoord> ret;
+  MapCoord cur = start;
   ret.push_back(cur);
   while(cur.x != end.x || cur.y != end.y || cur.z != end.z) {
     if(cur.x < end.x) cur.x ++;

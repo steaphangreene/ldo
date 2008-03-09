@@ -41,9 +41,13 @@ enum ObjectType {
   OBJECT_MAX
   };
 
+struct MapCoord {
+  int x, y, z;
+  bool operator < (const MapCoord &) const;
+  };
+
 struct MapObject {
   ObjectType type;
-  int xpos, ypos, zpos;
   int which;
   };
 
@@ -80,10 +84,6 @@ public:
   int targ3;	//Depending on action, may be a unit id, or z coord, or unused
   };
 
-struct Coord {
-  int x, y, z;
-  };
-
 class Percept {
 public:
   Percept();
@@ -101,18 +101,18 @@ public:
   //List of all of unit ids and actions for own and others
   map<int, vector<UnitAct> > my_units;
   map<int, vector<UnitAct> > other_units;
-  vector<MapObject> objects;
+  multimap<MapCoord, MapObject> objects;
 
   int UnitPresent(int xc, int yc, int &id);  // Enemy:-1, Own:1, None/Neutral:0
   int UnitAt(int xc, int yc);
 
   void GetPos(int id, int &x, int &y, int &z);
-  vector<Coord> GetPath(const Coord &start, const Coord &end);
-  vector<Coord> GetPath2x2(const Coord &start, const Coord &end);
+  vector<MapCoord> GetPath(const MapCoord &start, const MapCoord &end);
+  vector<MapCoord> GetPath2x2(const MapCoord &start, const MapCoord &end);
 
 private:	//Utility Functions
-  int RDist(const Coord &first, const Coord &second);
-  int HDist(const Coord &first, const Coord &second);
+  int RDist(const MapCoord &first, const MapCoord &second);
+  int HDist(const MapCoord &first, const MapCoord &second);
   };
 
 #endif // PERCEPT_H

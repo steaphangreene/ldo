@@ -196,28 +196,24 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
       for(y = 0; y < master.mapys; ++y) {
 	for(x = 0; x < master.mapxs; ++x) {
 	  if(map_data[z][y][x][0] > 0) {
-	    MapObject obj = {
-		GROUND_FLOOR, x, master.mapys-1-y, master.mapzs-1-z, map_data[z][y][x][0]
-		};
-	    master.objects.push_back(obj);
+	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
+	    MapObject obj = { GROUND_FLOOR, map_data[z][y][x][0] };
+	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][1] > 0) {
-	    MapObject obj = {
-		WALL_NORTHSOUTH, x, master.mapys-1-y, master.mapzs-1-z, map_data[z][y][x][1]
-		};
-	    master.objects.push_back(obj);
+	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
+	    MapObject obj = { WALL_NORTHSOUTH, map_data[z][y][x][1] };
+	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][2] > 0) {
-	    MapObject obj = {
-		WALL_EASTWEST, x, master.mapys-y, master.mapzs-1-z, map_data[z][y][x][2]
-		};
-	    master.objects.push_back(obj);
+	    MapCoord pos = { x, master.mapys-y, master.mapzs-1-z };
+	    MapObject obj = { WALL_EASTWEST, map_data[z][y][x][2] };
+	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][3] > 0) {
-	    MapObject obj = {
-		OBJECT_MISC, x, master.mapys-1-y, master.mapzs-1-z, map_data[z][y][x][3]
-		};
-	    master.objects.push_back(obj);
+	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
+	    MapObject obj = { OBJECT_MISC, map_data[z][y][x][3] };
+	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  }
 	}
@@ -331,8 +327,9 @@ int Game::Load(FILE *fl) {
   //Temporary, flat map with no features
   for(int y=0; y < 50; ++y) {
     for(int x=0; x < 50; ++x) {
-      MapObject obj = { GROUND_FLOOR, x, y, 0 };
-      master.objects.push_back(obj);
+      MapCoord pos = { x, y, 0 };
+      MapObject obj = { GROUND_FLOOR, 0 };
+      master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
       }
     }
   return 1;
@@ -537,12 +534,12 @@ void Game::ResolveRound() {
 	      act = ACT_RUN;
 	      step = 300;
 	      }
-	    Coord start = { x, y, z };
-	    Coord end = { order->targ1, order->targ2, order->targ3 };
-	    vector<Coord> path = master.GetPath(start, end);
+	    MapCoord start = { x, y, z };
+	    MapCoord end = { order->targ1, order->targ2, order->targ3 };
+	    vector<MapCoord> path = master.GetPath(start, end);
 	    if(path.size() > 1) {
-	      vector<Coord>::const_iterator pt = path.begin();
-	      vector<Coord>::const_iterator lpt = pt;
+	      vector<MapCoord>::const_iterator pt = path.begin();
+	      vector<MapCoord>::const_iterator lpt = pt;
 	      ++pt;
 	      for(; pt != path.end(); ++pt) {
 		master.my_units[order->id].push_back(UnitAct(order->id,

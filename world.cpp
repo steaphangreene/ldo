@@ -134,14 +134,14 @@ void World::DrawMap() {
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
 
   glPushMatrix();
-  vector<MapObject>::const_iterator obj = percept->objects.begin();
+  map<MapCoord, MapObject>::const_iterator obj = percept->objects.begin();
   for(; obj != percept->objects.end(); ++obj) {
     int tex = -1, mod = -1;
-    if(modmap.count(obj->which) > 0) mod = modmap[obj->which];
-    if(texmap.count(obj->which) > 0) tex = texmap[obj->which];
+    if(modmap.count(obj->second.which) > 0) mod = modmap[obj->second.which];
+    if(texmap.count(obj->second.which) > 0) tex = texmap[obj->second.which];
 
-    if(obj->zpos > 0) {
-      continue;
+    if(obj->first.z > 0) {
+//      continue;
       }
 
     if(tex == 0) {
@@ -152,57 +152,57 @@ void World::DrawMap() {
       glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
       }
     else {
-      glColor3f(obj->xpos/float(50), 0.5, obj->ypos/float(50));
-      glBindTexture(GL_TEXTURE_2D, textures[obj->which]->GLTexture());
+      glColor3f(obj->first.x/float(50), 0.5, obj->first.y/float(50));
+      glBindTexture(GL_TEXTURE_2D, textures[obj->second.which]->GLTexture());
       }
 
-    if(obj->type == GROUND_FLOOR) {
+    if(obj->second.type == GROUND_FLOOR) {
       glNormal3d(0.0, 0.0, 1.0);
       glBegin(GL_QUADS);
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.0, obj->ypos*2.0+0.0, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0+0.0, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0+2.0, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.0, obj->ypos*2.0+2.0, obj->zpos*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+0.0, obj->first.y*2.0+0.0, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0+0.0, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0+2.0, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+0.0, obj->first.y*2.0+2.0, obj->first.z*4.0);
       glEnd();
       }
-    else if(obj->type == WALL_EASTWEST) {
+    else if(obj->second.type == WALL_EASTWEST) {
       if(mod >= 0) {
 	glPushMatrix();
-	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
+	glTranslatef(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0);
 	models[mod]->Render(0);
 	glPopMatrix();
 	}
       else {
 	glNormal3d(0.0, 1.0, 0.0);
 	glBegin(GL_QUADS);
-	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos);
-	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
-	glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-	glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
-	glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-	glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z + SEL_HEIGHT);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z + SEL_HEIGHT);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z);
 
-	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
-	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos);
-	glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-	glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos);
-	glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-	glVertex3f(obj->xpos*2.0+2.0, obj->ypos*2.0, obj->zpos + SEL_HEIGHT);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z + SEL_HEIGHT);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z + SEL_HEIGHT);
 	glEnd();
 	}
       }
-    else if(obj->type == WALL_NORTHSOUTH) {
+    else if(obj->second.type == WALL_NORTHSOUTH) {
       if(mod >= 0) {
 	glPushMatrix();
-	glTranslatef(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
+	glTranslatef(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0);
 	glRotatef(90.0, 0.0, 0.0, 1.0);
 	models[mod]->Render(0);
 	glPopMatrix();
@@ -210,73 +210,73 @@ void World::DrawMap() {
       else {
 	glNormal3d(1.0, 0.0, 0.0);
 	glBegin(GL_QUADS);
-	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
-	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0 + SEL_HEIGHT);
-	glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0 + SEL_HEIGHT);
-	glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0 + SEL_HEIGHT);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*4.0 + SEL_HEIGHT);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*4.0);
 
-	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0 + SEL_HEIGHT);
-	glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0, obj->zpos*4.0);
-	glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0);
-	glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-	glVertex3f(obj->xpos*2.0, obj->ypos*2.0+2.0, obj->zpos*4.0 + SEL_HEIGHT);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0 + SEL_HEIGHT);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*4.0);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*4.0);
+	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*4.0 + SEL_HEIGHT);
 	glEnd();
 	}
       }
-    else if(obj->type == OBJECT_MISC) {
+    else if(obj->second.type == OBJECT_MISC) {
       glNormal3d(1.0, 0.0, 0.0);
       glBegin(GL_QUADS);
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*4.0+1.0);
 
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*4.0+1.0);
 
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*4.0+1.0);
 
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+0.2, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+0.2, obj->zpos*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*4.0+1.0);
 
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(0.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+1.8, obj->ypos*2.0+1.8, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(1.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0);
-      glTexCoord2f(textures[obj->which]->ScaleX(1.0), textures[obj->which]->ScaleY(0.0));
-      glVertex3f(obj->xpos*2.0+0.2, obj->ypos*2.0+1.8, obj->zpos*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*4.0+1.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*4.0);
+      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+      glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*4.0+1.0);
       glEnd();
       }
     }
