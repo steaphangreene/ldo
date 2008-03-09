@@ -119,6 +119,7 @@ int Game::Load(const string &filename) {
   int ret = 0;
   FILE *fl = NULL;
   fl = fopen((filename + "/wglob.dat").c_str(), "rb");
+  if(fl == NULL) fl = fopen((filename + "/WGLOB.DAT").c_str(), "rb");
   if(fl != NULL) {
     Clear();
     ret = LoadXCom(fl, filename);
@@ -187,6 +188,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
   master.mapdesc = "Loaded from an X-Com tactical save.";
   round = 1;	//FIXME, load from map
   FILE *map = fopen((dir + "/map.dat").c_str(), "rb");
+  if(map == NULL) map = fopen((dir + "/MAP.DAT").c_str(), "rb");
   if(map) {
     Uint8 map_data[master.mapzs][master.mapys][master.mapxs][4];
     fread(map_data, 4, 4*master.mapxs*master.mapys, map);
@@ -229,6 +231,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
   plsquads[2].push_back(2);
   squnits.resize(3);
   FILE *units = fopen((dir + "/unitpos.dat").c_str(), "rb");
+  if(units == NULL) units = fopen((dir + "/UNITPOS.DAT").c_str(), "rb");
   if(units) {
     Uint8 unit_data[80][14];
     fread(unit_data, 14, 80, units);
