@@ -159,16 +159,28 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
     ret = -1;		// Not Adjacent
     }
   else {	// Need Floors, Can't go through walls, Can't climb tall objects
-    multimap<MapCoord, MapObject>::const_iterator obj = objects.find(end);
+    float height = 0.0, height2 = 0.0;
+    multimap<MapCoord, MapObject>::const_iterator obj = objects.find(start);
     if(obj != objects.end()) {
-      for(; obj != objects.upper_bound(end) && ret >= 0; ++obj) {
+      for(; obj != objects.upper_bound(start); ++obj) {
+	if(obj->second.type == OBJECT_MISC) {
+	  height = obj->second.height;
+	  }
+	}
+      }
+    obj = objects.find(end);
+    if(obj != objects.end()) {
+      for(; ret >= 0 && obj != objects.upper_bound(end); ++obj) {
 	if(obj->second.type == GROUND_FLOOR && obj->second.height == 0.0) {
 	  ret = HDist(start, end);
 	  }
-	if(obj->second.type == OBJECT_MISC && obj->second.height > 1.0) {
-	  ret = -1;
+	else if(obj->second.type == OBJECT_MISC) {
+	  height2 = obj->second.height;
 	  }
 	}
+      }
+    if(fabsf(height2 - height) > 1.0) {
+      ret = -1;	// Too big a step
       }
     if(ret > 0 && (dy == -1 || dy == 1)) {		// Moving North/South
       MapCoord tmp = { start.x, start.y, start.z };
