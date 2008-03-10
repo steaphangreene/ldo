@@ -49,6 +49,7 @@ struct MapCoord {
 struct MapObject {
   ObjectType type;
   int which;
+  float height;
   };
 
 enum Act {	// For Example

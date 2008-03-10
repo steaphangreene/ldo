@@ -199,22 +199,22 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	for(x = 0; x < master.mapxs; ++x) {
 	  if(map_data[z][y][x][0] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
-	    MapObject obj = { GROUND_FLOOR, map_data[z][y][x][0] };
+	    MapObject obj = { GROUND_FLOOR, map_data[z][y][x][0], 0.0 };
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][1] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
-	    MapObject obj = { WALL_NORTHSOUTH, map_data[z][y][x][1] };
+	    MapObject obj = { WALL_NORTHSOUTH, map_data[z][y][x][1], 3.0 };
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][2] > 0) {
 	    MapCoord pos = { x, master.mapys-y, master.mapzs-1-z };
-	    MapObject obj = { WALL_EASTWEST, map_data[z][y][x][2] };
+	    MapObject obj = { WALL_EASTWEST, map_data[z][y][x][2], 3.0 };
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][3] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
-	    MapObject obj = { OBJECT_MISC, map_data[z][y][x][3] };
+	    MapObject obj = { OBJECT_MISC, map_data[z][y][x][3], 0.0 };
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  }
@@ -331,7 +331,7 @@ int Game::Load(FILE *fl) {
   for(int y=0; y < 50; ++y) {
     for(int x=0; x < 50; ++x) {
       MapCoord pos = { x, y, 0 };
-      MapObject obj = { GROUND_FLOOR, 0 };
+      MapObject obj = { GROUND_FLOOR, 0, 0.0 };
       master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
       }
     }
