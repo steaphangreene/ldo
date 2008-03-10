@@ -350,9 +350,10 @@ void World::DrawMap(Uint32 offset) {
 	}
       }
     else if(obj->second.type == EFFECT_FIRE) {
-      if(obj->second.which >= effectsto && obj->second.which <= offset) {
+      if(obj->second.which >= (int)(effectsto)
+		&& obj->second.which <= (int)(offset)) {
 	for(Uint32 start = obj->second.which;
-		start < obj->second.which + 20000; start += 10) {
+		(int)(start) < obj->second.which + 20000; start += 10) {
 	  scene->AddParticle(fire,
 		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
 		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
@@ -361,9 +362,10 @@ void World::DrawMap(Uint32 offset) {
 	}
       }
     else if(obj->second.type == EFFECT_FIRE || obj->second.type == EFFECT_SMOKE) {
-      if(obj->second.which >= effectsto && obj->second.which <= offset) {
+      if(obj->second.which >= (int)(effectsto)
+		&& obj->second.which <= (int)(offset)) {
 	for(Uint32 start = obj->second.which;
-		start < obj->second.which + 20000; start += 250) {
+		(int)(start) < obj->second.which + 20000; start += 250) {
 	  scene->AddParticle(smoke,
 		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
 		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
