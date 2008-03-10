@@ -110,6 +110,7 @@ public:
   int UnitPresent(int xc, int yc, int zc, int &id);
   int UnitAt(int xc, int yc, int zc);
 
+  float HeightAt(const MapCoord &pos);
   void GetPos(int id, int &x, int &y, int &z);
   vector<MapCoord> GetPath(const MapCoord &start, const MapCoord &end);
   vector<MapCoord> GetPath2x2(const MapCoord &start, const MapCoord &end);

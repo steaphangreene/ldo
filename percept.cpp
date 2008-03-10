@@ -140,6 +140,19 @@ bool MapCoord::operator < (const MapCoord &other) const {
 	|| (y == other.y && x < other.x))));
   }
 
+float Percept::HeightAt(const MapCoord &pos) {
+  float height = 0.0;
+  multimap<MapCoord, MapObject>::const_iterator obj = objects.find(pos);
+  if(obj != objects.end()) {
+    for(; obj != objects.upper_bound(pos); ++obj) {
+      if(obj->second.type == OBJECT_MISC) {
+	height = obj->second.height;
+	}
+      }
+    }
+  return height;
+  }
+
 int Percept::RDist(const MapCoord &start, const MapCoord &end) {
   int ret = 0;
   int dx = end.x - start.x;
@@ -152,16 +165,9 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
     ret = -1;		// Not Adjacent
     }
   else {	// Need Floors, Can't go through walls, Can't climb tall objects
-    float height = 0.0, height2 = 0.0;
-    multimap<MapCoord, MapObject>::const_iterator obj = objects.find(start);
-    if(obj != objects.end()) {
-      for(; obj != objects.upper_bound(start); ++obj) {
-	if(obj->second.type == OBJECT_MISC) {
-	  height = obj->second.height;
-	  }
-	}
-      }
-    obj = objects.find(end);
+    float height, height2;
+    height = HeightAt(start);
+    multimap<MapCoord, MapObject>::const_iterator obj = objects.find(end);
     if(obj != objects.end()) {
       for(; ret >= 0 && obj != objects.upper_bound(end); ++obj) {
 	if(obj->second.type == GROUND_FLOOR && obj->second.height == 0.0) {
