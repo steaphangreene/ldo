@@ -20,7 +20,7 @@
 //  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 // *************************************************************************
 
-#define BOX_BASE 0.0625
+#define OFF_BASE 0.0625
 
 #include <cmath>
 using namespace std;
@@ -476,6 +476,7 @@ void World::Render(Uint32 offset) {	// Render for playback
 
 void World::DrawOrders(Uint32 offset) {
   int xo, yo, zo, xt, yt, zt;
+  float zof, ztf;
   vector<UnitOrder>::const_iterator ord = orders->orders.begin();
   glDisable(GL_LIGHTING);
   glDisable(GL_CULL_FACE);
@@ -485,53 +486,59 @@ void World::DrawOrders(Uint32 offset) {
   for(; ord != orders->orders.end(); ++ord) {
     percept->GetPos(ord->id, xo, yo, zo);
     float ang = atan2f(ord->targ2 - yo, ord->targ1 - xo);
-    xo = xo * 2 + 1; yo = yo * 2 + 1;
-    xt = ord->targ1 * 2 + 1; yt = ord->targ2 * 2 + 1;
+    xo = xo * 2 + 1;
+    yo = yo * 2 + 1;
+    zof = zo * CELL_HEIGHT + OFF_BASE;
+    xt = ord->targ1 * 2 + 1;
+    yt = ord->targ2 * 2 + 1;
+    ztf = ord->targ3 * CELL_HEIGHT + OFF_BASE;
     if(ord->order == ORDER_MOVE) {
       glColor4f(1.0, 1.0, 0.0, 0.25);
       glBegin(GL_QUADS);
-      glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, 0.0625);
-      glVertex3f(xt + cos(ang + M_PI/2)/2, yt + sin(ang + M_PI/2)/2, 0.0625);
-      glVertex3f(xt + cos(ang - M_PI/2)/2, yt + sin(ang - M_PI/2)/2, 0.0625);
-      glVertex3f(xo + cos(ang - M_PI/2)/2, yo + sin(ang - M_PI/2)/2, 0.0625);
+      glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, zof);
+      glVertex3f(xt + cos(ang + M_PI/2)/2, yt + sin(ang + M_PI/2)/2, ztf);
+      glVertex3f(xt + cos(ang - M_PI/2)/2, yt + sin(ang - M_PI/2)/2, ztf);
+      glVertex3f(xo + cos(ang - M_PI/2)/2, yo + sin(ang - M_PI/2)/2, zof);
       glEnd();
       glBegin(GL_TRIANGLES);
-      glVertex3f(xt + cos(ang + M_PI/2), yt + sin(ang + M_PI/2), 0.0625);
-      glVertex3f(xt + cos(ang), yt + sin(ang), 0.0625);
-      glVertex3f(xt + cos(ang - M_PI/2), yt + sin(ang - M_PI/2), 0.0625);
+      glVertex3f(xt + cos(ang + M_PI/2), yt + sin(ang + M_PI/2), ztf);
+      glVertex3f(xt + cos(ang), yt + sin(ang), ztf);
+      glVertex3f(xt + cos(ang - M_PI/2), yt + sin(ang - M_PI/2), ztf);
       glEnd();
       }
     else if(ord->order == ORDER_RUN) {
       glColor4f(0.0, 1.0, 0.0, 0.25);
       glBegin(GL_QUADS);
-      glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, 0.0625);
-      glVertex3f(xt + cos(ang + M_PI/2)/2, yt + sin(ang + M_PI/2)/2, 0.0625);
-      glVertex3f(xt + cos(ang - M_PI/2)/2, yt + sin(ang - M_PI/2)/2, 0.0625);
-      glVertex3f(xo + cos(ang - M_PI/2)/2, yo + sin(ang - M_PI/2)/2, 0.0625);
+      glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, zof);
+      glVertex3f(xt + cos(ang + M_PI/2)/2, yt + sin(ang + M_PI/2)/2, ztf);
+      glVertex3f(xt + cos(ang - M_PI/2)/2, yt + sin(ang - M_PI/2)/2, ztf);
+      glVertex3f(xo + cos(ang - M_PI/2)/2, yo + sin(ang - M_PI/2)/2, zof);
       glEnd();
       glBegin(GL_TRIANGLES);
-      glVertex3f(xt + cos(ang + M_PI/2), yt + sin(ang + M_PI/2), 0.0625);
-      glVertex3f(xt + cos(ang), yt + sin(ang), 0.0625);
-      glVertex3f(xt + cos(ang - M_PI/2), yt + sin(ang - M_PI/2), 0.0625);
+      glVertex3f(xt + cos(ang + M_PI/2), yt + sin(ang + M_PI/2), ztf);
+      glVertex3f(xt + cos(ang), yt + sin(ang), ztf);
+      glVertex3f(xt + cos(ang - M_PI/2), yt + sin(ang - M_PI/2), ztf);
       glEnd();
       }
     else if(ord->order == ORDER_SHOOT) {
       if(ord->targ1 == -1) {
 	percept->GetPos(ord->targ2, xt, yt, zt);
-	xt = xt * 2 + 1; yt = yt * 2 + 1;
+	xt = xt * 2 + 1;
+	yt = yt * 2 + 1;
+	ztf = zt * CELL_HEIGHT + OFF_BASE;
 	ang = atan2f(yt - yo, xt - xo);
 	}
       glColor4f(1.0, 0.0, 0.0, 0.25);
       glBegin(GL_QUADS);
-      glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, 0.0625);
-      glVertex3f(xt + cos(ang + M_PI/2)/2, yt + sin(ang + M_PI/2)/2, 0.0625);
-      glVertex3f(xt + cos(ang - M_PI/2)/2, yt + sin(ang - M_PI/2)/2, 0.0625);
-      glVertex3f(xo + cos(ang - M_PI/2)/2, yo + sin(ang - M_PI/2)/2, 0.0625);
+      glVertex3f(xo + cos(ang + M_PI/2)/2, yo + sin(ang + M_PI/2)/2, zof);
+      glVertex3f(xt + cos(ang + M_PI/2)/2, yt + sin(ang + M_PI/2)/2, ztf);
+      glVertex3f(xt + cos(ang - M_PI/2)/2, yt + sin(ang - M_PI/2)/2, ztf);
+      glVertex3f(xo + cos(ang - M_PI/2)/2, yo + sin(ang - M_PI/2)/2, zof);
       glEnd();
       glBegin(GL_TRIANGLES);
-      glVertex3f(xt + cos(ang + M_PI/2), yt + sin(ang + M_PI/2), 0.0625);
-      glVertex3f(xt + cos(ang), yt + sin(ang), 0.0625);
-      glVertex3f(xt + cos(ang - M_PI/2), yt + sin(ang - M_PI/2), 0.0625);
+      glVertex3f(xt + cos(ang + M_PI/2), yt + sin(ang + M_PI/2), ztf);
+      glVertex3f(xt + cos(ang), yt + sin(ang), ztf);
+      glVertex3f(xt + cos(ang - M_PI/2), yt + sin(ang - M_PI/2), ztf);
       glEnd();
       }
     }
@@ -557,17 +564,17 @@ void World::DrawSelBox(int sel_x, int sel_y, int sel_z, float r, float g, float 
 
   glBegin(GL_LINES);
 
-  glVertex3f(-1.0, -1.0, BOX_BASE);
-  glVertex3f(-1.0,  1.0, BOX_BASE);
+  glVertex3f(-1.0, -1.0, OFF_BASE);
+  glVertex3f(-1.0,  1.0, OFF_BASE);
 
-  glVertex3f(-1.0,  1.0, BOX_BASE);
-  glVertex3f( 1.0,  1.0, BOX_BASE);
+  glVertex3f(-1.0,  1.0, OFF_BASE);
+  glVertex3f( 1.0,  1.0, OFF_BASE);
 
-  glVertex3f( 1.0,  1.0, BOX_BASE);
-  glVertex3f( 1.0, -1.0, BOX_BASE);
+  glVertex3f( 1.0,  1.0, OFF_BASE);
+  glVertex3f( 1.0, -1.0, OFF_BASE);
 
-  glVertex3f( 1.0, -1.0, BOX_BASE);
-  glVertex3f(-1.0, -1.0, BOX_BASE);
+  glVertex3f( 1.0, -1.0, OFF_BASE);
+  glVertex3f(-1.0, -1.0, OFF_BASE);
 
   glVertex3f(-1.0, -1.0, CELL_HEIGHT);
   glVertex3f(-1.0,  1.0, CELL_HEIGHT);
@@ -581,16 +588,16 @@ void World::DrawSelBox(int sel_x, int sel_y, int sel_z, float r, float g, float 
   glVertex3f( 1.0, -1.0, CELL_HEIGHT);
   glVertex3f(-1.0, -1.0, CELL_HEIGHT);
 
-  glVertex3f(-1.0, -1.0, BOX_BASE);
+  glVertex3f(-1.0, -1.0, OFF_BASE);
   glVertex3f(-1.0, -1.0, CELL_HEIGHT);
 
-  glVertex3f(-1.0,  1.0, BOX_BASE);
+  glVertex3f(-1.0,  1.0, OFF_BASE);
   glVertex3f(-1.0,  1.0, CELL_HEIGHT);
 
-  glVertex3f( 1.0,  1.0, BOX_BASE);
+  glVertex3f( 1.0,  1.0, OFF_BASE);
   glVertex3f( 1.0,  1.0, CELL_HEIGHT);
 
-  glVertex3f( 1.0, -1.0, BOX_BASE);
+  glVertex3f( 1.0, -1.0, OFF_BASE);
   glVertex3f( 1.0, -1.0, CELL_HEIGHT);
 
   glEnd();
