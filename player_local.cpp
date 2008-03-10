@@ -63,38 +63,6 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
 
   world = new World(&percept, &orders);
 
-  SimpleTexture *smoke_tex = new SimpleTexture("graphics/smoke.png");
-  SimpleScene_ParticleType smoke_type = {
-    smoke_tex,
-    0.8, 0.8, 0.8, 1.0,
-    0.2, 0.2, 0.2, 0.0,
-    0.0, 0.0, 1.0,
-    0.5, 3.0,
-    10000
-    };
-  int smoke = scene->AddParticleType(smoke_type);
-  SimpleScene_ParticleType fire_type = {
-    smoke_tex,
-    1.0, 0.7, 0.2, 1.0,
-    1.0, 0.2, 0.0, 1.0,
-    0.0, 0.0, 10.0,
-    1.0, 0.5,
-    250
-    };
-  int fire = scene->AddParticleType(fire_type);
-  for(Uint32 start = 1000; start < 20000; start += 250) {
-    scene->AddParticle(smoke,
-	60.0 + float(rand()) / RAND_MAX / 2.0,
-	60.0 + float(rand()) / RAND_MAX / 2.0,
-	0.0, start);
-    }
-  for(Uint32 start = 1000; start < 20000; start += 10) {
-    scene->AddParticle(fire,
-	60.0 + float(rand()) / RAND_MAX / 2.0,
-	60.0 + float(rand()) / RAND_MAX / 2.0,
-	0.0, start);
-    }
-
   music = audio->LoadMusic("music/iconoclasm.ogg");
   cur_music = -1;
   past = 0;
