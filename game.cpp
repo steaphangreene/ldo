@@ -230,6 +230,27 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	}
       }
     }
+
+  FILE *effects = fopen((dir + "/smokref.dat").c_str(), "rb");
+  if(effects == NULL) effects = fopen((dir + "/SMOKREF.DAT").c_str(), "rb");
+  if(effects) {
+    Uint8 effect_data[400][9];
+    fread(effect_data, 9, 400, effects);
+    fclose(effects);
+    for(int effect=0; effect < 400; ++effect) {
+      if(effect_data[effect][6] > 0) {	// FIXME: Is this really the test?
+	int x, y, z;
+	x = int(effect_data[effect][1]);
+	y = master.mapys - 1 - int(effect_data[effect][0]);
+	z = master.mapzs - 1 - int(effect_data[effect][2]);
+	MapCoord pos = { x, y, z };
+	MapObject obj = { EFFECT_SMOKE, 0, 0.0 };
+	if(effect_data[effect][6] == 1) obj.type = EFFECT_FIRE;
+	master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
+	}
+      }
+    }
+
   sides.resize(3);
   sides[0].push_back(0);
   sides[1].push_back(1);
@@ -279,7 +300,6 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
       plsquads.pop_back();
       }
     }
-//  return Load("temp.map");	// TEMPORARY!
   return true;
   }
 
