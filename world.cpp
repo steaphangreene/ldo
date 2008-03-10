@@ -119,6 +119,28 @@ World::World(Percept *per, Orders *ord) {
   texmap[9] = textures.size();
   textures.push_back(new SimpleTexture("models/cabbage.png"));
 
+  texmap[44] = textures.size();
+  texmap[45] = textures.size();
+  textures.push_back(new SimpleTexture("models/boards.png"));
+
+  texmap[46] = textures.size();	//FIXME: Window LOS!
+  texmap[47] = textures.size();	//FIXME: Window LOS!
+  textures.push_back(new SimpleTexture("models/boards_window.png"));
+
+  texmap[56] = textures.size();	//FIXME: Door Open/Close!
+  texmap[57] = textures.size();	//FIXME: Door Open/Close!
+  textures.push_back(new SimpleTexture("models/door.png"));
+
+  texmap[49] = textures.size();
+  texmap[50] = textures.size();
+  textures.push_back(new SimpleTexture("models/brick.png"));
+
+  texmap[58] = textures.size();
+  textures.push_back(new SimpleTexture("models/pavers.png"));
+
+  texmap[41] = textures.size();
+  textures.push_back(new SimpleTexture("models/metalroof.png"));
+
   //Items that aren't drawn
   modmap[32] = -2;	//Broken Fence
   }
