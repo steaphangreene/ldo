@@ -70,22 +70,20 @@ int Percept::UnitPresent(int xc, int yc, int zc, int &id) {
   map<int, vector<UnitAct> >::iterator unit;
   unit = my_units.begin();
   for(; unit != my_units.end(); ++unit) {
-    vector<UnitAct>::iterator act = unit->second.begin();
-    for(; act != unit->second.end(); ++act) {
-      if(act->x == xc && act->y == yc && act->z == zc) {
-	id = act->id;
-	return 1;
-	}
+    vector<UnitAct>::iterator act = unit->second.end();
+    --act;
+    if(act->x == xc && act->y == yc && act->z == zc) {
+      id = act->id;
+      return 1;
       }
     }
   unit = other_units.begin();
   for(; unit != other_units.end(); ++unit) {
-    vector<UnitAct>::iterator act = unit->second.begin();
-    for(; act != unit->second.end(); ++act) {
-      if(act->x == xc && act->y == yc && act->z == zc) {
-	id = act->id;
-	return -1;
-	}
+    vector<UnitAct>::iterator act = unit->second.end();
+    --act;
+    if(act->x == xc && act->y == yc && act->z == zc) {
+      id = act->id;
+      return -1;
       }
     }
   return 0;     //Nothing there
@@ -95,20 +93,18 @@ int Percept::UnitAt(int xc, int yc, int zc) {
   map<int, vector<UnitAct> >::iterator unit;
   unit = my_units.begin();
   for(; unit != my_units.end(); ++unit) {
-    vector<UnitAct>::iterator act = unit->second.begin();
-    for(; act != unit->second.end(); ++act) {
-      if(act->x == xc && act->y == yc && act->z == zc) {
-	return act->id;
-	}
+    vector<UnitAct>::iterator act = unit->second.end();
+    --act;
+    if(act->x == xc && act->y == yc && act->z == zc) {
+      return act->id;
       }
     }
   unit = other_units.begin();
   for(; unit != other_units.end(); ++unit) {
     vector<UnitAct>::iterator act = unit->second.begin();
-    for(; act != unit->second.end(); ++act) {
-      if(act->x == xc && act->y == yc && act->z == zc) {
-	return act->id;
-	}
+    --act;
+    if(act->x == xc && act->y == yc && act->z == zc) {
+      return act->id;
       }
     }
   return 0;
