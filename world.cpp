@@ -21,7 +21,6 @@
 // *************************************************************************
 
 #define BOX_BASE 0.0625
-#define CELL_HEIGHT 3.0
 
 #include <cmath>
 using namespace std;
@@ -541,7 +540,7 @@ void World::DrawOrders(Uint32 offset) {
   glEnable(GL_LIGHTING);
   }
 
-void World::DrawSelBox(int sel_x, int sel_y, float r, float g, float b) {
+void World::DrawSelBox(int sel_x, int sel_y, int sel_z, float r, float g, float b) {
         //FIXME: Use REAL map x and y size for limits
   if(sel_x < 0 || sel_y < 0 || sel_x >= 64 || sel_y >= 64) return;
 
@@ -550,7 +549,7 @@ void World::DrawSelBox(int sel_x, int sel_y, float r, float g, float b) {
   glDisable(GL_LIGHTING);
   glPushMatrix();
 
-  glTranslatef(sel_x*2.0+1.0, sel_y*2.0+1.0, 0.0);
+  glTranslatef(sel_x*2.0+1.0, sel_y*2.0+1.0, sel_z*CELL_HEIGHT);
 
   glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -597,4 +596,8 @@ void World::DrawSelBox(int sel_x, int sel_y, float r, float g, float b) {
   glEnd();
 
   glPopMatrix();
+
+  if(sel_z > 0) {	//Recursive!
+    DrawSelBox(sel_x, sel_y, sel_z-1, 0.0, 0.0, 0.0);
+    }
   }

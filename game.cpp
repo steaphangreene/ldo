@@ -589,7 +589,7 @@ void Game::ResolveRound() {
 	      hit = order->targ2;
 	      }
 	    else {
-	      hit = master.UnitAt(order->targ1, order->targ2);
+	      hit = master.UnitAt(order->targ1, order->targ2, order->targ3);
 	      }
 	    if(hit > 0) {
 	      int tx, ty, tz;

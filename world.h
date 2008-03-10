@@ -31,6 +31,8 @@
 #include "percept.h"
 #include "orders.h"
 
+#define CELL_HEIGHT 3.0
+
 class World {
 public:
   World(Percept *per, Orders *ord);
@@ -41,7 +43,8 @@ public:
   void SetViewPoint(float xv, float yv);
   void SetViewAngle(int ang);
 
-  void DrawSelBox(int sel_x, int sel_y, float r=1.0, float g=1.0, float b=1.0);
+  void DrawSelBox(int sel_x, int sel_y, int sel_z,
+	float r=1.0, float g=1.0, float b=1.0);
 
 protected:
   void DrawMap();

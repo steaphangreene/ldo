@@ -27,7 +27,7 @@ using namespace std;
 
 double cur_zoom = 16.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
 int cur_zpos = 0;
-int sel_x = -1, sel_y = -1, sel_id = -1;
+int sel_x = -1, sel_y = -1, sel_z = -1, sel_id = -1;
 int mouse_x = -1, mouse_y = -1;
 
 #include "player_local.h"
@@ -268,7 +268,7 @@ int Player_Local::EventHandler() {
 	if(cur_zpos >= percept.mapzs) --cur_zpos;
 	else {
 	  SDL_mutexP(vid_mut);
-	  video->SetZPosition(3.0*cur_zpos, MOVE_DELAY);
+	  video->SetZPosition(CELL_HEIGHT*cur_zpos, MOVE_DELAY);
 	  SDL_mutexV(vid_mut);
 	  }
 	}
@@ -277,7 +277,7 @@ int Player_Local::EventHandler() {
 	if(cur_zpos < 0) ++cur_zpos;
 	else {
 	  SDL_mutexP(vid_mut);
-	  video->SetZPosition(3.0*cur_zpos, MOVE_DELAY);
+	  video->SetZPosition(CELL_HEIGHT*cur_zpos, MOVE_DELAY);
 	  SDL_mutexV(vid_mut);
 	  }
 	}
@@ -458,13 +458,14 @@ int Player_Local::EventHandler() {
 	double x = ((float*)(event.user.data2))[0];
 	double y = ((float*)(event.user.data2))[1];
 	SDL_mutexP(vid_mut);
-	video->ScreenToMap(x, y, 0.0);
+	video->ScreenToMap(x, y, cur_zpos*CELL_HEIGHT);
 	SDL_mutexV(vid_mut);
 	int s_x = ((int)(x)) / 2;
 	int s_y = ((int)(y)) / 2;
-	if(percept.UnitPresent(s_x, s_y, sel_id) > 0) {
+	if(percept.UnitPresent(s_x, s_y, cur_zpos, sel_id) > 0) {
 	  sel_x = s_x;
 	  sel_y = s_y;
+	  sel_z = cur_zpos;
 	  maction = 1;
 	  raction = 1;
 	  dpass->SetMenu(2, mactions[maction]);
@@ -474,6 +475,7 @@ int Player_Local::EventHandler() {
 	  sel_id = -1;
 	  sel_x = -1;
 	  sel_y = -1;
+	  sel_z = -1;
 	  maction = 0;
 	  raction = 0;
 	  dpass->SetMenu(2, mactions[maction]);
@@ -484,11 +486,11 @@ int Player_Local::EventHandler() {
 	double x = ((float*)(event.user.data2))[0];
 	double y = ((float*)(event.user.data2))[1];
 	SDL_mutexP(vid_mut);
-	video->ScreenToMap(x, y, 0.0);
+	video->ScreenToMap(x, y, cur_zpos*CELL_HEIGHT);
 	SDL_mutexV(vid_mut);
 	mouse_x = ((int)(x)) / 2;
 	mouse_y = ((int)(y)) / 2;
-	if(sel_id > 0 && percept.UnitPresent(mouse_x, mouse_y, targ_id) < 0) {
+	if(sel_id > 0 && percept.UnitPresent(mouse_x, mouse_y, cur_zpos, targ_id) < 0) {
 	  raction = 2;
 	  dpass->SetMenu(3, ractions[raction]);
 	  }
@@ -622,12 +624,18 @@ bool Player_Local::Run() {
       world->Render((pround-1)*3000);
 
       int unit;
-      int unitthere = percept.UnitPresent(mouse_x, mouse_y, unit);
-      if(unitthere > 0) world->DrawSelBox(mouse_x, mouse_y, 0.0, 1.0, 0.0);
-      else if(unitthere < 0) world->DrawSelBox(mouse_x, mouse_y, 1.0, 0.0, 0.0);
-      else world->DrawSelBox(mouse_x, mouse_y, 1.0, 1.0, 0.0);
+      int unitthere = percept.UnitPresent(mouse_x, mouse_y, cur_zpos, unit);
+      if(unitthere > 0) {
+	world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 0.0, 1.0, 0.0);
+	}
+      else if(unitthere < 0) {
+	world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 0.0, 0.0);
+	}
+      else {
+	world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 1.0, 0.0);
+	}
 
-      world->DrawSelBox(sel_x, sel_y);
+      world->DrawSelBox(sel_x, sel_y, sel_z);
 
       scene->Render((pround-1)*3000);
       }

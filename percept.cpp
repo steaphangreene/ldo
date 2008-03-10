@@ -66,13 +66,13 @@ void Percept::Clear() {	//Prepares for next frame - DOES NOT CLEAR my_units
   other_units.clear();
   }
 
-int Percept::UnitPresent(int xc, int yc, int &id) {
+int Percept::UnitPresent(int xc, int yc, int zc, int &id) {
   map<int, vector<UnitAct> >::iterator unit;
   unit = my_units.begin();
   for(; unit != my_units.end(); ++unit) {
     vector<UnitAct>::iterator act = unit->second.begin();
     for(; act != unit->second.end(); ++act) {
-      if(act->x == xc && act->y == yc) {
+      if(act->x == xc && act->y == yc && act->z == zc) {
 	id = act->id;
 	return 1;
 	}
@@ -82,7 +82,7 @@ int Percept::UnitPresent(int xc, int yc, int &id) {
   for(; unit != other_units.end(); ++unit) {
     vector<UnitAct>::iterator act = unit->second.begin();
     for(; act != unit->second.end(); ++act) {
-      if(act->x == xc && act->y == yc) {
+      if(act->x == xc && act->y == yc && act->z == zc) {
 	id = act->id;
 	return -1;
 	}
@@ -91,13 +91,13 @@ int Percept::UnitPresent(int xc, int yc, int &id) {
   return 0;     //Nothing there
   }
 
-int Percept::UnitAt(int xc, int yc) {
+int Percept::UnitAt(int xc, int yc, int zc) {
   map<int, vector<UnitAct> >::iterator unit;
   unit = my_units.begin();
   for(; unit != my_units.end(); ++unit) {
     vector<UnitAct>::iterator act = unit->second.begin();
     for(; act != unit->second.end(); ++act) {
-      if(act->x == xc && act->y == yc) {
+      if(act->x == xc && act->y == yc && act->z == zc) {
 	return act->id;
 	}
       }
@@ -106,7 +106,7 @@ int Percept::UnitAt(int xc, int yc) {
   for(; unit != other_units.end(); ++unit) {
     vector<UnitAct>::iterator act = unit->second.begin();
     for(; act != unit->second.end(); ++act) {
-      if(act->x == xc && act->y == yc) {
+      if(act->x == xc && act->y == yc && act->z == zc) {
 	return act->id;
 	}
       }
@@ -272,13 +272,15 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
       }
     }
   vector<MapCoord> ret;
-  MapCoord cur = end;
-  while(prev[cur] < cur || cur < prev[cur]) {	// Is != without != operator
+  if(closed.count(end) > 0) {	// Only return a path if I can get there
+    MapCoord cur = end;
+    while(prev[cur] < cur || cur < prev[cur]) {	// Is != without != operator
+      ret.push_back(cur);
+      cur = prev[cur];
+      }
     ret.push_back(cur);
-    cur = prev[cur];
+    reverse(ret.begin(), ret.end());
     }
-  ret.push_back(cur);
-  reverse(ret.begin(), ret.end());
   return ret;
   }
 

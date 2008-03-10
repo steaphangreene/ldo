@@ -104,8 +104,9 @@ public:
   map<int, vector<UnitAct> > other_units;
   multimap<MapCoord, MapObject> objects;
 
-  int UnitPresent(int xc, int yc, int &id);  // Enemy:-1, Own:1, None/Neutral:0
-  int UnitAt(int xc, int yc);
+  // Enemy:-1, Own:1, None/Neutral:0
+  int UnitPresent(int xc, int yc, int zc, int &id);
+  int UnitAt(int xc, int yc, int zc);
 
   void GetPos(int id, int &x, int &y, int &z);
   vector<MapCoord> GetPath(const MapCoord &start, const MapCoord &end);
