@@ -158,12 +158,15 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
   else if(dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1) {
     ret = -1;		// Not Adjacent
     }
-  else {	// Need Floors, Can't go through walls
+  else {	// Need Floors, Can't go through walls, Can't climb tall objects
     multimap<MapCoord, MapObject>::const_iterator obj = objects.find(end);
     if(obj != objects.end()) {
-      for(; obj != objects.upper_bound(end); ++obj) {
-	if(obj->second.type == GROUND_FLOOR) {
+      for(; obj != objects.upper_bound(end) && ret >= 0; ++obj) {
+	if(obj->second.type == GROUND_FLOOR && obj->second.height == 0.0) {
 	  ret = HDist(start, end);
+	  }
+	if(obj->second.type == OBJECT_MISC && obj->second.height > 1.0) {
+	  ret = -1;
 	  }
 	}
       }
@@ -173,7 +176,7 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
       obj = objects.find(tmp);
       if(obj != objects.end()) {
 	for(; obj != objects.upper_bound(tmp); ++obj) {
-	  if(obj->second.type == WALL_EASTWEST) {
+	  if(obj->second.type == WALL_EASTWEST && obj->second.height > 0.0) {
 	    ret = -1;
 	    }
 	  }
@@ -182,7 +185,7 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
       obj = objects.find(tmp);
       if(dx != 0 && obj != objects.end()) {
 	for(; obj != objects.upper_bound(tmp); ++obj) {
-	  if(obj->second.type == WALL_EASTWEST) {
+	  if(obj->second.type == WALL_EASTWEST && obj->second.height > 0.0) {
 	    ret = -1;
 	    }
 	  }
@@ -194,7 +197,7 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
       obj = objects.find(tmp);
       if(obj != objects.end()) {
 	for(; obj != objects.upper_bound(tmp); ++obj) {
-	  if(obj->second.type == WALL_NORTHSOUTH) {
+	  if(obj->second.type == WALL_NORTHSOUTH && obj->second.height > 0.0) {
 	    ret = -1;
 	    }
 	  }
@@ -203,7 +206,7 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
       obj = objects.find(tmp);
       if(dy != 0 && obj != objects.end()) {
 	for(; obj != objects.upper_bound(tmp); ++obj) {
-	  if(obj->second.type == WALL_NORTHSOUTH) {
+	  if(obj->second.type == WALL_NORTHSOUTH && obj->second.height > 0.0) {
 	    ret = -1;
 	    }
 	  }

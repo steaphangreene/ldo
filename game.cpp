@@ -177,6 +177,11 @@ int Game::Load(vector< vector<int> > &vec, FILE *fl) {
 
 int Game::LoadXCom(FILE *fl, const string &dir) {
   Uint8 buf[64];
+  map<Uint8, float> height;	// All Non-Default Height Objects
+  height[32] = 0.0;	// Broken Fence
+  height[130] = 2.25;	// Top of Ramp
+  height[131] = 1.5;	// Middle of Ramp
+  height[132] = 0.75;	// Bottom of Ramp
 
   fread(buf, 2, 22, fl);
 
@@ -200,21 +205,25 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	  if(map_data[z][y][x][0] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
 	    MapObject obj = { GROUND_FLOOR, map_data[z][y][x][0], 0.0 };
+	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][1] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
 	    MapObject obj = { WALL_NORTHSOUTH, map_data[z][y][x][1], 3.0 };
+	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][2] > 0) {
 	    MapCoord pos = { x, master.mapys-y, master.mapzs-1-z };
 	    MapObject obj = { WALL_EASTWEST, map_data[z][y][x][2], 3.0 };
+	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][3] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
-	    MapObject obj = { OBJECT_MISC, map_data[z][y][x][3], 0.0 };
+	    MapObject obj = { OBJECT_MISC, map_data[z][y][x][3], 1.0 };
+	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  }
