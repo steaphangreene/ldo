@@ -337,6 +337,9 @@ int Game::Load(FILE *fl) {
     }
 
   //Temporary, flat map with no features
+  master.mapxs = 50;
+  master.mapys = 50;
+  master.mapzs = 1;
   for(int y=0; y < 50; ++y) {
     for(int x=0; x < 50; ++x) {
       MapCoord pos = { x, y, 0 };

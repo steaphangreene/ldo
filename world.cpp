@@ -406,7 +406,7 @@ void World::DrawModels(Uint32 offset) {
 	if((unsigned int)(act->time + duration) <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
-	  z = act->y * CELL_HEIGHT;
+	  z = act->z * CELL_HEIGHT;
 	  }
 	else {
 	  Uint32 off = offset - act->time;
