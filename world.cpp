@@ -30,6 +30,7 @@ using namespace std;
 #include "game.h"
 
 extern Game *cur_game;
+extern int cur_zpos;
 
 World::World(Percept *per, Orders *ord) {
   percept = per;
@@ -149,8 +150,8 @@ void World::DrawMap() {
     if(modmap.count(obj->second.which) > 0) mod = modmap[obj->second.which];
     if(texmap.count(obj->second.which) > 0) tex = texmap[obj->second.which];
 
-    if(obj->first.z > 0) {
-//      continue;
+    if(obj->first.z > cur_zpos) {
+      continue;
       }
 
     if(tex == 0) {
@@ -342,17 +343,20 @@ void World::DrawModels(Uint32 offset) {
       times[1] = act->time;
       float x = act->x * 2 + 1;
       float y = act->y * 2 + 1;
+      float z = act->z * CELL_HEIGHT;
       float a = 0.0;
       if(act->act == ACT_STAND) {
 	if(act->time + 0 <= offset) {
 	  x = act->targ1 * 2 + 1;
 	  y = act->targ2 * 2 + 1;
+	  z = act->targ3 * CELL_HEIGHT;
 	  }
 	}
       else if(act->act == ACT_FALL) {
 	if(act->time + 0 <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
+	  z = act->z * CELL_HEIGHT;
 	  if(act->time + 1000 <= offset) {
 	    int anim = models[mod]->LookUpAnimation("BOTH_DEAD1");
 	    if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
@@ -370,10 +374,12 @@ void World::DrawModels(Uint32 offset) {
       else if(act->act == ACT_MOVE) {
         int dx = act->x - act->targ1;
         int dy = act->y - act->targ2;
-	float duration = sqrt(dx*dx + dy*dy) * 333.33333333;
+        int dz = act->z - act->targ3;
+	float duration = sqrt(dx*dx + dy*dy + dz*dz) * 333.33333333;
 	if((unsigned int)(act->time + duration) <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
+	  z = act->z * CELL_HEIGHT;
 	  }
 	else {
 	  Uint32 off = offset - act->time;
@@ -383,17 +389,20 @@ void World::DrawModels(Uint32 offset) {
 	  anims[0] = anim;
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
-	  x /= duration; y /= duration;
+	  z = (act->targ3 * CELL_HEIGHT) * (duration - off) + (act->z * CELL_HEIGHT) * off;
+	  x /= duration; y /= duration; z /= duration;
 	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	}
       else if(act->act == ACT_RUN) {
         int dx = act->x - act->targ1;
         int dy = act->y - act->targ2;
-	float duration = sqrt(dx*dx + dy*dy) * 166.66666666;
+        int dz = act->z - act->targ3;
+	float duration = sqrt(dx*dx + dy*dy + dz*dz) * 166.66666666;
 	if((unsigned int)(act->time + duration) <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
+	  z = act->y * CELL_HEIGHT;
 	  }
 	else {
 	  Uint32 off = offset - act->time;
@@ -403,13 +412,15 @@ void World::DrawModels(Uint32 offset) {
 	  anims[0] = anim;
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
-	  x /= duration; y /= duration;
+	  z = (act->targ3 * CELL_HEIGHT) * (duration - off) + (act->z * CELL_HEIGHT) * off;
+	  x /= duration; y /= duration; z /= duration;
 	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	}
       else if(act->act == ACT_SHOOT) {
         int dx = act->targ1 - act->x;
         int dy = act->targ2 - act->y;
+        //int dz = act->targ3 - act->z;
 	a = 180.0 * atan2f(dy, dx) / M_PI;
 	if(act->time + 1500 <= offset) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
@@ -438,7 +449,7 @@ void World::DrawModels(Uint32 offset) {
         }
 //      fprintf(stderr, "Action Time: (%d/%d)\n", act->time, offset);
       glPushMatrix();
-      glTranslatef(x, y, 0.0);
+      glTranslatef(x, y, z);
       glRotatef(a, 0.0, 0.0, 1.0);
       glScalef(0.75, 0.75, 0.75);
       models[mod]->Render(offset, anims, times);

@@ -26,6 +26,7 @@ using namespace std;
 #include "SDL_image.h"
 
 double cur_zoom = 16.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
+int cur_zpos = 0;
 int sel_x = -1, sel_y = -1, sel_id = -1;
 int mouse_x = -1, mouse_y = -1;
 
@@ -34,6 +35,7 @@ int mouse_x = -1, mouse_y = -1;
 #include "game.h"
 
 #define MOVE_SPEED 10.0	//Cells-per-second
+#define MOVE_DELAY 250
 #define ZOOM_DELAY 250
 #define ROT_DELAY 500
 
@@ -261,6 +263,24 @@ int Player_Local::EventHandler() {
 	video->SetAngle(cur_ang, ROT_DELAY);
 	SDL_mutexV(vid_mut);
 	}
+      else if(event.key.keysym.sym == SDLK_KP_MINUS) {
+	++cur_zpos;
+	if(cur_zpos >= percept.mapzs) --cur_zpos;
+	else {
+	  SDL_mutexP(vid_mut);
+	  video->SetZPosition(3.0*cur_zpos, MOVE_DELAY);
+	  SDL_mutexV(vid_mut);
+	  }
+	}
+      else if(event.key.keysym.sym == SDLK_KP_PLUS) {
+	--cur_zpos;
+	if(cur_zpos < 0) ++cur_zpos;
+	else {
+	  SDL_mutexP(vid_mut);
+	  video->SetZPosition(3.0*cur_zpos, MOVE_DELAY);
+	  SDL_mutexV(vid_mut);
+	  }
+	}
       }
     else if(event.type == SDL_KEYUP) {
       if(event.key.keysym.sym == SDLK_RIGHT) {
@@ -322,19 +342,19 @@ int Player_Local::EventHandler() {
       else if(event.user.code == SG_EVENT_MENU + 3) {
 	if(*((int*)event.user.data2) == 0 && raction == 1) {
 	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_MOVE, mouse_x, mouse_y));
+		UnitOrder(sel_id, 0, ORDER_MOVE, mouse_x, mouse_y, cur_zpos));
 	  }
 	else if(*((int*)event.user.data2) == 1 && raction == 1) {
 	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_RUN, mouse_x, mouse_y));
+		UnitOrder(sel_id, 0, ORDER_RUN, mouse_x, mouse_y, cur_zpos));
 	  }
 	else if(*((int*)event.user.data2) == 2 && raction == 1) {
 	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y));
+		UnitOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y, cur_zpos));
 	  }
 	else if(*((int*)event.user.data2) == 3 && raction == 1) {
 	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y));
+		UnitOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y, cur_zpos));
 	  }
 	else if(*((int*)event.user.data2) == 0 && raction == 2) {
 	  orders.orders.push_back(
@@ -532,7 +552,7 @@ bool Player_Local::Run() {
   video->SetOrtho();
 //  video->SetPerspective(45.0);	//Just for testing
   video->SetSubscreen(-1.0, -1.0, 1.0, 1.0);
-  video->SetZExtents(0.0, 8.0);
+  video->SetZExtents(0.0, 12.0);	//FIXME: Get real extents
   video->SetPosition(64.0, 64.0, 0);	//FIXME: Really find start pos
   video->SetAngle(cur_ang, 0);
   video->SetZoom(cur_zoom, 0);

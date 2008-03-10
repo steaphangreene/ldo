@@ -412,10 +412,6 @@ void Game::UpdatePercept(int plnum, unsigned int rnd) {
     exit(1);
     }
 
-//  if(rnd >= round) {	// Current (Unresolved) Round
-//    rnd = round - 1;	//Temporary?
-//    }
-
   percept[plnum]->Clear();
   map<int, vector<UnitAct> >::const_iterator itr = master.my_units.begin();
   for(; itr != master.my_units.end(); ++itr) {
@@ -430,6 +426,11 @@ void Game::UpdatePercept(int plnum, unsigned int rnd) {
     }
   //Temporary!
   percept[plnum]->objects = master.objects;
+
+  //Temporary, calculate based on discovery
+  percept[plnum]->mapxs = master.mapxs;
+  percept[plnum]->mapys = master.mapys;
+  percept[plnum]->mapzs = master.mapzs;
   }
 
 //Thread Stuff
