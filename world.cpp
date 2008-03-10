@@ -77,14 +77,17 @@ World::World(Percept *per, Orders *ord) {
   modmap[132] = models.size();
   models.push_back(SM_LoadModel("models/ramp_low.obj"));
 
-//  texmap[132] = textures.size();
-  textures.push_back(new SimpleTexture("graphics/wall.png"));
-
-  for(int n=1; n < 1000; ++n) {
+  for(int n=0; n < 1000; ++n) {
     char name[64];
     sprintf(name, "graphics/util/test%.3d.png%c", n, 0);
     textures.push_back(new SimpleTexture(name));
     }
+
+  texmap[70] = textures.size();
+  texmap[130] = textures.size();
+  texmap[131] = textures.size();
+  texmap[132] = textures.size();
+  textures.push_back(new SimpleTexture("graphics/wall.png"));
 
   texmap[25] = textures.size();
   texmap[26] = textures.size();
@@ -117,7 +120,8 @@ World::World(Percept *per, Orders *ord) {
   texmap[9] = textures.size();
   textures.push_back(new SimpleTexture("models/cabbage.png"));
 
-  texmap[32] = 0;	//Broken Fence
+  //Items that aren't drawn
+  modmap[32] = -2;	//Broken Fence
   }
 
 World::~World() {
@@ -150,14 +154,15 @@ void World::DrawMap() {
     if(modmap.count(obj->second.which) > 0) mod = modmap[obj->second.which];
     if(texmap.count(obj->second.which) > 0) tex = texmap[obj->second.which];
 
-    if(obj->first.z > cur_zpos) {
-      continue;
+    if(obj->first.z > cur_zpos) {	//Items above the view Z plane
+      continue;	//Don't draw it
       }
 
-    if(tex == 0) {
-      continue;	//Nothing to show
+    if(mod < -1) {			//Items that aren't drawn
+      continue;	//Don't draw it
       }
-    else if(tex > 0) {
+
+    if(tex >= 0) {
       glColor3f(1.0, 1.0, 1.0);
       glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
       }
