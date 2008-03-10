@@ -31,8 +31,6 @@
 #include "percept.h"
 #include "orders.h"
 
-#define CELL_HEIGHT 3.0
-
 class World {
 public:
   World(Percept *per, Orders *ord);

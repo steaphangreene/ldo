@@ -32,6 +32,8 @@ using namespace std;
 
 #include "unit.h"
 
+#define CELL_HEIGHT 3.0
+
 enum ObjectType {
   OBJECT_NONE,
   GROUND_FLOOR,

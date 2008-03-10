@@ -148,9 +148,6 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
   if(dx == 0 && dy == 0 && dz == 0) {
     ret = -1;		// No self-links
     }
-  else if(dz != 0) {
-    ret = -1;		// No vertical movement yet
-    }
   else if(dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1) {
     ret = -1;		// Not Adjacent
     }
@@ -174,6 +171,12 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
 	  height2 = obj->second.height;
 	  }
 	}
+      }
+    if(dz > 0) {	// Moving Up
+      height2 += CELL_HEIGHT;
+      }
+    else if(dz < 0) {	// Moving Down
+      height += CELL_HEIGHT;
       }
     if(fabsf(height2 - height) > 1.0) {
       ret = -1;	// Too big a step
