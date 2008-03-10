@@ -359,6 +359,13 @@ void World::DrawModels(Uint32 offset) {
     const UnitAct *act = &(mapact->second);
     int mod = cur_game->PlayerForUnit(act->id)->Color();
     if(act->time <= offset) {
+      float azh, tzh;
+      {	MapCoord apos = { act->x, act->y, act->z };
+	azh = act->z * CELL_HEIGHT + percept->HeightAt(apos);
+	}
+      {	MapCoord tpos = { act->targ1, act->targ2, act->targ3 };
+	tzh = act->targ3 * CELL_HEIGHT + percept->HeightAt(tpos);
+	}
       anims[0] = models[mod]->LookUpAnimation("LEGS_IDLE");
       anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
       if(anims[0] < 0) {
@@ -369,20 +376,20 @@ void World::DrawModels(Uint32 offset) {
       times[1] = act->time;
       float x = act->x * 2 + 1;
       float y = act->y * 2 + 1;
-      float z = act->z * CELL_HEIGHT;
+      float z = azh;
       float a = 0.0;
       if(act->act == ACT_STAND) {
 	if(act->time + 0 <= offset) {
 	  x = act->targ1 * 2 + 1;
 	  y = act->targ2 * 2 + 1;
-	  z = act->targ3 * CELL_HEIGHT;
+	  z = tzh;
 	  }
 	}
       else if(act->act == ACT_FALL) {
 	if(act->time + 0 <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
-	  z = act->z * CELL_HEIGHT;
+	  z = azh;
 	  if(act->time + 1000 <= offset) {
 	    int anim = models[mod]->LookUpAnimation("BOTH_DEAD1");
 	    if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
@@ -405,7 +412,7 @@ void World::DrawModels(Uint32 offset) {
 	if((unsigned int)(act->time + duration) <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
-	  z = act->z * CELL_HEIGHT;
+	  z = azh;
 	  }
 	else {
 	  Uint32 off = offset - act->time;
@@ -415,7 +422,7 @@ void World::DrawModels(Uint32 offset) {
 	  anims[0] = anim;
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
-	  z = (act->targ3 * CELL_HEIGHT) * (duration - off) + (act->z * CELL_HEIGHT) * off;
+	  z = tzh * (duration - off) + azh * off;
 	  x /= duration; y /= duration; z /= duration;
 	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
@@ -428,7 +435,7 @@ void World::DrawModels(Uint32 offset) {
 	if((unsigned int)(act->time + duration) <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
-	  z = act->z * CELL_HEIGHT;
+	  z = azh;
 	  }
 	else {
 	  Uint32 off = offset - act->time;
@@ -438,7 +445,7 @@ void World::DrawModels(Uint32 offset) {
 	  anims[0] = anim;
 	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
-	  z = (act->targ3 * CELL_HEIGHT) * (duration - off) + (act->z * CELL_HEIGHT) * off;
+	  z = tzh * (duration - off) + azh * off;
 	  x /= duration; y /= duration; z /= duration;
 	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
@@ -473,7 +480,7 @@ void World::DrawModels(Uint32 offset) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  }
         }
-      if(z <= cur_zpos*CELL_HEIGHT) {
+      if(z < (cur_zpos+1)*CELL_HEIGHT) {
 	glPushMatrix();
 	glTranslatef(x, y, z);
 	glRotatef(a, 0.0, 0.0, 1.0);
