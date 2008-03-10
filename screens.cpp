@@ -455,6 +455,7 @@ ScreenNum Screen_Title::Start(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *a
 void Screen_Title::Render(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *audio) {
   glTranslatef(0.0, 0.0, -3.0);
   Uint32 t = SDL_GetTicks()/2;
+  glScalef(1.5, 1.5, 1.5);
   guy->Render(t, anims, times);
   }
 

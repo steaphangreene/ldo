@@ -473,12 +473,10 @@ void World::DrawModels(Uint32 offset) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  }
         }
-//      fprintf(stderr, "Action Time: (%d/%d)\n", act->time, offset);
       if(z <= cur_zpos*CELL_HEIGHT) {
 	glPushMatrix();
 	glTranslatef(x, y, z);
 	glRotatef(a, 0.0, 0.0, 1.0);
-	glScalef(0.75, 0.75, 0.75);
 	models[mod]->Render(offset, anims, times);
 	glPopMatrix();
 	}
