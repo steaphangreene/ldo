@@ -143,6 +143,30 @@ World::World(Percept *per, Orders *ord) {
 
   //Items that aren't drawn
   modmap[32] = -2;	//Broken Fence
+
+  scene = SimpleScene::Current(); //Yes, this is ok, it's static!
+
+  //Special Effects Resources
+  SimpleTexture *smoke_tex = new SimpleTexture("graphics/smoke.png");
+  textures.push_back(smoke_tex);
+  SimpleScene_ParticleType smoke_type = {
+    smoke_tex,
+    0.8, 0.8, 0.8, 1.0,
+    0.2, 0.2, 0.2, 0.0,
+    0.0, 0.0, 1.0,
+    0.5, 3.0,
+    10000
+    };
+  smoke = scene->AddParticleType(smoke_type);
+  SimpleScene_ParticleType fire_type = {
+    smoke_tex,
+    1.0, 0.7, 0.2, 1.0,
+    1.0, 0.2, 0.0, 1.0,
+    0.0, 0.0, 10.0,
+    1.0, 0.5,
+    250
+    };
+  fire = scene->AddParticleType(fire_type);
   }
 
 World::~World() {
@@ -157,7 +181,9 @@ void World::SetViewAngle(int ang) {
   angle = ang;
   }
 
-void World::DrawMap() {
+void World::DrawMap(Uint32 offset) {
+  static Uint32 effectsto = 0;
+
   GLfloat shininess[] = { 128.0 * 0.75 };
   GLfloat specular[] = { 0.75, 0.75, 0.75, 1.0 };
   GLfloat ambient[] = { 0.5, 0.5, 0.5, 1.0 };
@@ -323,8 +349,31 @@ void World::DrawMap() {
 	glEnd();
 	}
       }
+    else if(obj->second.type == EFFECT_FIRE) {
+      if(obj->second.which >= effectsto && obj->second.which <= offset) {
+	for(Uint32 start = obj->second.which;
+		start < obj->second.which + 20000; start += 10) {
+	  scene->AddParticle(fire,
+		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		obj->first.z*2.0, start);
+	  }
+	}
+      }
+    else if(obj->second.type == EFFECT_FIRE || obj->second.type == EFFECT_SMOKE) {
+      if(obj->second.which >= effectsto && obj->second.which <= offset) {
+	for(Uint32 start = obj->second.which;
+		start < obj->second.which + 20000; start += 250) {
+	  scene->AddParticle(smoke,
+		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		obj->first.z*2.0, start);
+	  }
+	}
+      }
     }
 
+  effectsto = offset + 1;
   glPopMatrix();
   }
 
@@ -496,7 +545,7 @@ void World::DrawModels(Uint32 offset) {
   }
 
 void World::Render(Uint32 offset) {	// Render for playback
-  DrawMap();
+  DrawMap(offset);
   DrawModels(offset);
   DrawOrders(offset);
   }

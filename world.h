@@ -27,6 +27,7 @@
 #include "SDL_opengl.h"
 
 #include "simplemodel.h"
+#include "simplescene.h"
 
 #include "percept.h"
 #include "orders.h"
@@ -45,7 +46,7 @@ public:
 	float r=1.0, float g=1.0, float b=1.0);
 
 protected:
-  void DrawMap();
+  void DrawMap(Uint32 offset);
   void DrawModels(Uint32 offset);
   void DrawOrders(Uint32 offset);
 
@@ -55,10 +56,13 @@ protected:
   int angle;
   float pointx, pointy;
 
+  SimpleScene *scene;
+
   vector<SimpleModel *> models;
   vector<SimpleTexture *> textures;
   map<Uint8, unsigned int> modmap;
   map<Uint8, unsigned int> texmap;
+  int smoke, fire;
   };
 
 #endif // WORLD_H
