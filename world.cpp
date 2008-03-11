@@ -464,6 +464,7 @@ void World::DrawModels(Uint32 offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
 	  z = azh;
+	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	else {
 	  Uint32 off = offset - act->time;
@@ -487,6 +488,7 @@ void World::DrawModels(Uint32 offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
 	  z = azh;
+	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	else {
 	  Uint32 off = offset - act->time;
