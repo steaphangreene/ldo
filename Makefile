@@ -22,8 +22,14 @@
 
 ARCH=	$(shell gcc -v 2>&1 | grep Target | cut -f2 -d" ")
 
+.PHONY: all
 all:	ldo.$(ARCH)
+
+.PHONY: win32
 win32:	ldo.exe
+
+#Purge all default rules
+.SUFFIXES:
 
 CXX=	g++
 LIBS=	`simple-config --libs`
@@ -58,25 +64,29 @@ ChangeLog:      *.cpp *.h TODO COPYING Makefile .svn scripts/*
 %.$(ARCH).o:	%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-%.$(WARCH).o:	%.cpp %.$(ARCH).o
+%.$(WARCH).o:	%.cpp
 	$(WCXX) $(WCXXFLAGS) -c $< -o $@
 
 deps.mk:	*.cpp *.h
-	$(CXX) $(CXXFLAGS) -MM *.cpp > deps.mk
+	$(CXX) $(CXXFLAGS) -MM *.cpp | sed 's/\.o:/.$(ARCH).o:/' > deps.mk
 
+.PHONY: clean
 clean:
 	rm -f deps.mk *.o ldo.* *.exe
 
 ldo.$(ARCH):	$(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LIBS)
 
+.PHONY: win32
 win32:	$(WOBJS)
 
 ldo.exe:	$(WOBJS)
 	$(WCXX) $(WCXXFLAGS) -o ldo.exe $(WOBJS) $(WLIBS)
 
 TSTR:=	$(shell date -u +"%Y%m%d%H%M")
+.PHONY: tar
 backup:	tar
+.PHONY: backup
 tar:
 	cd .. ; tar chvf ldo/ldo.$(TSTR).tar \
 		ldo/Makefile ldo/TODO ldo/COPYING ldo/*.cpp ldo/*.h \
