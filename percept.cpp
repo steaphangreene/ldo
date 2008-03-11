@@ -279,10 +279,16 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
 		  if(dir == pdir) dirs[dir] = 1;	//Twice+ in a row
 		  else dirs[dir] = dirs[dir];		//Creates if missing
 
-		  if(dirs.size() > 2) break;	//Not straight
-		  if(dirs.size() == 2 && dirs.begin()->second > 0
-					&& dirs.rbegin()->second > 0) {
-		    break;		//Not straight
+		  if(dirs.size() > 2) break;	//Too many dirs - Not straight
+		  if(dirs.size() == 2) {
+		    if(dirs.begin()->second > 0
+			&& dirs.rbegin()->second > 0) {	// To Jagged
+		      break;		//Not straight
+		      }
+		    int sep = abs(dirs.begin()->first - dirs.rbegin()->first);
+		    if(sep != 1 && sep != 4) {		// Turns too Sharply
+		      break;		//Not straight
+		      }
 		    }
 		  test = prev[test];
 		  pdir = dir;
