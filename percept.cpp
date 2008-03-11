@@ -272,7 +272,31 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
 	      int rd = RDist(cur, tmp);
 	      if(rd > 0) {
 		int gd = gdist[cur] + rd;
-		int td = gd + HDist(tmp, end);
+
+		//Check and optimize for straighter paths
+		map<int, int> dirs;
+		int pdir = 16 * (1 + tmp.z - cur.z)
+				+ 4 * (1 + tmp.y - cur.y)
+				+ (1 + tmp.x - cur.x);
+		dirs[pdir] = 0;
+		MapCoord test = cur;
+		while(test < start || start < test) {	// != without operator
+		  int dir = 16 * (1 + test.z - prev[test].z)
+				+ 4 * (1 + test.y - prev[test].y)
+				+ (1 + test.x - prev[test].x);
+		  if(dir == pdir) dirs[dir] = 1;	//Twice+ in a row
+		  else dirs[dir] = dirs[dir];		//Creates if missing
+
+		  if(dirs.size() > 2) break;	//Not straight
+		  if(dirs.size() == 2 && dirs.begin()->second > 0
+					&& dirs.rbegin()->second > 0) {
+		    break;		//Not straight
+		    }
+		  test = prev[test];
+		  pdir = dir;
+		  }
+		int td = gdist[test] + HDist(test, tmp) + HDist(tmp, end);
+
 		if(open.count(tmp) == 0 || open[tmp] > td) {
 // FIXME: How do I do this right?
 //		  if(open.count(tmp) > 0) {
