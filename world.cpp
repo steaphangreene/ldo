@@ -50,30 +50,30 @@ World::World(Percept *per, Orders *ord) {
   models.push_back(SM_LoadModel("models/players/trooper", "red"));
   models.back()->AttachSubmodel("tag_weapon", weap);
 
-  modmap[25] = models.size();
-  modmap[29] = models.size();
+  modmap[0x119] = models.size();
+  modmap[0x11D] = models.size();
   models.push_back(SM_LoadModel("models/fence1.obj"));
 
-  modmap[26] = models.size();
-  modmap[30] = models.size();
+  modmap[0x11A] = models.size();
+  modmap[0x11E] = models.size();
   models.push_back(SM_LoadModel("models/fence2.obj"));
 
-  modmap[16] = models.size();
-  modmap[17] = models.size();
-  modmap[20] = models.size();
-  modmap[21] = models.size();
+  modmap[0x110] = models.size();
+  modmap[0x111] = models.size();
+  modmap[0x114] = models.size();
+  modmap[0x115] = models.size();
   models.push_back(SM_LoadModel("models/wall_low.obj"));
   models.push_back(SM_LoadModel("models/wall_med.obj"));
 
-  modmap[18] = models.size();
-  modmap[19] = models.size();
+  modmap[0x112] = models.size();
+  modmap[0x113] = models.size();
   models.push_back(SM_LoadModel("models/wall_high.obj"));
 
-  modmap[130] = models.size();
+  modmap[0x182] = models.size();
   models.push_back(SM_LoadModel("models/ramp_high.obj"));
-  modmap[131] = models.size();
+  modmap[0x183] = models.size();
   models.push_back(SM_LoadModel("models/ramp_med.obj"));
-  modmap[132] = models.size();
+  modmap[0x184] = models.size();
   models.push_back(SM_LoadModel("models/ramp_low.obj"));
 
   for(int n=0; n < 1000; ++n) {
@@ -82,67 +82,67 @@ World::World(Percept *per, Orders *ord) {
     textures.push_back(new SimpleTexture(name));
     }
 
-  texmap[70] = textures.size();
-  texmap[130] = textures.size();
-  texmap[131] = textures.size();
-  texmap[132] = textures.size();
+  texmap[0x146] = textures.size();
+  texmap[0x182] = textures.size();
+  texmap[0x183] = textures.size();
+  texmap[0x184] = textures.size();
   textures.push_back(new SimpleTexture("graphics/wall.png"));
 
-  texmap[25] = textures.size();
-  texmap[26] = textures.size();
-  texmap[29] = textures.size();
-  texmap[30] = textures.size();
+  texmap[0x119] = textures.size();
+  texmap[0x11A] = textures.size();
+  texmap[0x11D] = textures.size();
+  texmap[0x11E] = textures.size();
   textures.push_back(new SimpleTexture("models/wood.png"));
 
-  texmap[16] = textures.size();
-  texmap[17] = textures.size();
+  texmap[0x110] = textures.size();
+  texmap[0x111] = textures.size();
   textures.push_back(new SimpleTexture("models/stone.png"));
 
-  texmap[18] = textures.size();
-  texmap[19] = textures.size();
-  texmap[20] = textures.size();
-  texmap[21] = textures.size();
+  texmap[0x112] = textures.size();
+  texmap[0x113] = textures.size();
+  texmap[0x114] = textures.size();
+  texmap[0x115] = textures.size();
   textures.push_back(new SimpleTexture("models/hedge.png"));
 
-  texmap[2] = textures.size();
+  texmap[0x102] = textures.size();
   textures.push_back(new SimpleTexture("models/grass.png"));
 
-  texmap[4] = textures.size();
+  texmap[0x104] = textures.size();
   textures.push_back(new SimpleTexture("models/dirt.png"));
 
-  texmap[5] = textures.size();
+  texmap[0x105] = textures.size();
   textures.push_back(new SimpleTexture("models/reaped.png"));
 
-  texmap[6] = textures.size();
+  texmap[0x106] = textures.size();
   textures.push_back(new SimpleTexture("models/wheat.png"));
 
-  texmap[9] = textures.size();
+  texmap[0x109] = textures.size();
   textures.push_back(new SimpleTexture("models/cabbage.png"));
 
-  texmap[44] = textures.size();
-  texmap[45] = textures.size();
+  texmap[0x12C] = textures.size();
+  texmap[0x12D] = textures.size();
   textures.push_back(new SimpleTexture("models/boards.png"));
 
-  texmap[46] = textures.size();	//FIXME: Window LOS!
-  texmap[47] = textures.size();	//FIXME: Window LOS!
+  texmap[0x12E] = textures.size();	//FIXME: Window LOS!
+  texmap[0x12F] = textures.size();	//FIXME: Window LOS!
   textures.push_back(new SimpleTexture("models/boards_window.png"));
 
-  texmap[56] = textures.size();	//FIXME: Door Open/Close!
-  texmap[57] = textures.size();	//FIXME: Door Open/Close!
+  texmap[0x138] = textures.size();	//FIXME: Door Open/Close!
+  texmap[0x139] = textures.size();	//FIXME: Door Open/Close!
   textures.push_back(new SimpleTexture("models/door.png"));
 
-  texmap[49] = textures.size();
-  texmap[50] = textures.size();
+  texmap[0x131] = textures.size();
+  texmap[0x132] = textures.size();
   textures.push_back(new SimpleTexture("models/brick.png"));
 
-  texmap[58] = textures.size();
+  texmap[0x13A] = textures.size();
   textures.push_back(new SimpleTexture("models/pavers.png"));
 
-  texmap[41] = textures.size();
+  texmap[0x129] = textures.size();
   textures.push_back(new SimpleTexture("models/metalroof.png"));
 
   //Items that aren't drawn
-  modmap[32] = -2;	//Broken Fence
+  modmap[0x120] = -2;	//Broken Fence
 
   scene = SimpleScene::Current(); //Yes, this is ok, it's static!
 
@@ -211,23 +211,23 @@ void World::DrawMap(Uint32 offset) {
 
     if(tex >= 0) {
       glColor3f(1.0, 1.0, 1.0);
-      glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
       }
     else {
       glColor3f(obj->first.x/float(50), 0.5, obj->first.y/float(50));
-      glBindTexture(GL_TEXTURE_2D, textures[obj->second.which]->GLTexture());
+      tex = (obj->second.which & 0xFF);
       }
+    glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
 
     if(obj->second.type == GROUND_FLOOR) {
       glNormal3d(0.0, 0.0, 1.0);
       glBegin(GL_QUADS);
-      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+      glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
       glVertex3f(obj->first.x*2.0+0.0, obj->first.y*2.0+0.0, obj->first.z*CELL_HEIGHT);
-      glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+      glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
       glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0+0.0, obj->first.z*CELL_HEIGHT);
-      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+      glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
       glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT);
-      glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+      glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
       glVertex3f(obj->first.x*2.0+0.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT);
       glEnd();
       }
@@ -241,22 +241,22 @@ void World::DrawMap(Uint32 offset) {
       else {
 	glNormal3d(0.0, 1.0, 0.0);
 	glBegin(GL_QUADS);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
 
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
 	glEnd();
 	}
@@ -272,22 +272,22 @@ void World::DrawMap(Uint32 offset) {
       else {
 	glNormal3d(1.0, 0.0, 0.0);
 	glBegin(GL_QUADS);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT);
 
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
 	glEnd();
 	}
@@ -302,49 +302,49 @@ void World::DrawMap(Uint32 offset) {
       else {
 	glNormal3d(1.0, 0.0, 0.0);
 	glBegin(GL_QUADS);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
 
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
 
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
 
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
 
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(0.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(1.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[obj->second.which]->ScaleX(1.0), textures[obj->second.which]->ScaleY(0.0));
+	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
 	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
 	glEnd();
 	}

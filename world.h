@@ -60,8 +60,8 @@ protected:
 
   vector<SimpleModel *> models;
   vector<SimpleTexture *> textures;
-  map<Uint8, unsigned int> modmap;
-  map<Uint8, unsigned int> texmap;
+  map<int, unsigned int> modmap;
+  map<int, unsigned int> texmap;
   int smoke, fire;
   };
 

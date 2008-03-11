@@ -192,11 +192,38 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
   master.mapname = "X-Com Map";
   master.mapdesc = "Loaded from an X-Com tactical save.";
   round = 1;	//FIXME, load from map
+  int ttype = 0;
+
+  FILE *mis = fopen((dir + "/misdata.dat").c_str(), "rb");
+  if(mis == NULL) mis = fopen((dir + "/MISDATA.DAT").c_str(), "rb");
+  if(mis) {
+    fseek(mis, 0, SEEK_END);
+    if(ftell(mis) == 172) ttype = 10;
+    fclose(mis);
+    }
+
+  FILE *geo = fopen((dir + "/geodata.dat").c_str(), "rb");
+  if(geo == NULL) geo = fopen((dir + "/GEODATA.DAT").c_str(), "rb");
+  if(geo) {
+    Uint8 geo_data[92];
+    fread(geo_data, 1, 92, geo);
+    fclose(geo);
+    ttype += (int(Sint8(geo_data[11])) << 8) + int(geo_data[10]);
+    }
+
+  FILE *seemap = fopen((dir + "/seemap.dat").c_str(), "rb");
+  if(seemap == NULL) seemap = fopen((dir + "/SEEMAP.DAT").c_str(), "rb");
+  if(seemap) {
+    Uint8 see_data[master.mapzs][master.mapys][master.mapxs];
+    fread(see_data, master.mapxs, master.mapys*master.mapzs, seemap);
+    fclose(seemap);
+    }
+
   FILE *map = fopen((dir + "/map.dat").c_str(), "rb");
   if(map == NULL) map = fopen((dir + "/MAP.DAT").c_str(), "rb");
   if(map) {
     Uint8 map_data[master.mapzs][master.mapys][master.mapxs][4];
-    fread(map_data, 4, 4*master.mapxs*master.mapys, map);
+    fread(map_data, 4, master.mapzs*master.mapxs*master.mapys, map);
     fclose(map);
     int x, y, z;
     for(z = 0; z < master.mapzs; ++z) {
@@ -204,25 +231,33 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	for(x = 0; x < master.mapxs; ++x) {
 	  if(map_data[z][y][x][0] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
-	    MapObject obj = { GROUND_FLOOR, map_data[z][y][x][0], 0.0 };
+	    MapObject obj = {
+	      GROUND_FLOOR, 0x100 * ttype + map_data[z][y][x][0], 0.0
+	      };
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][1] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
-	    MapObject obj = { WALL_NORTHSOUTH, map_data[z][y][x][1], 3.0 };
+	    MapObject obj = {
+	      WALL_NORTHSOUTH, 0x100 * ttype + map_data[z][y][x][1], 3.0
+	      };
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][2] > 0) {
 	    MapCoord pos = { x, master.mapys-y, master.mapzs-1-z };
-	    MapObject obj = { WALL_EASTWEST, map_data[z][y][x][2], 3.0 };
+	    MapObject obj = {
+	      WALL_EASTWEST, 0x100 * ttype + map_data[z][y][x][2], 3.0
+	      };
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
 	  if(map_data[z][y][x][3] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
-	    MapObject obj = { OBJECT_MISC, map_data[z][y][x][3], 1.0 };
+	    MapObject obj = {
+	      OBJECT_MISC, 0x100 * ttype + map_data[z][y][x][3], 1.0
+	      };
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
