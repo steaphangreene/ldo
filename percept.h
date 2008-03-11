@@ -47,7 +47,19 @@ enum ObjectType {
 
 struct MapCoord {
   int x, y, z;
-  bool operator < (const MapCoord &) const;
+  //These are so set<> and map<> can sort by these, and for basic comparisons.
+  bool operator < (const MapCoord &b) const {
+    return (z < b.z || (z == b.z && (y < b.y || (y == b.y && x < b.x))));
+    }
+  bool operator > (const MapCoord &b) const {
+    return (z > b.z || (z == b.z && (y > b.y || (y == b.y && x > b.x))));
+    }
+  bool operator != (const MapCoord &b) const {
+    return (z != b.z || y != b.y || x != b.x);
+    }
+  bool operator == (const MapCoord &b) const {
+    return (z != b.z || y != b.y || x != b.x);
+    }
   };
 
 struct MapObject {

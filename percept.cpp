@@ -134,12 +134,6 @@ void Percept::GetPos(int id, int &x, int &y, int &z) {
     }
   }
 
-//This is so set<> and map<> can sort by these.
-bool MapCoord::operator < (const MapCoord &other) const {
-  return (z < other.z || (z == other.z && (y < other.y
-	|| (y == other.y && x < other.x))));
-  }
-
 float Percept::HeightAt(const MapCoord &pos) {
   float height = 0.0;
   multimap<MapCoord, MapObject>::const_iterator obj = objects.find(pos);
@@ -275,14 +269,12 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
 
 		//Check and optimize for straighter paths
 		map<int, int> dirs;
-		int pdir = 16 * (1 + tmp.z - cur.z)
-				+ 4 * (1 + tmp.y - cur.y)
-				+ (1 + tmp.x - cur.x);
+		int pdir = 4 * (1 + tmp.y - cur.y) + (1 + tmp.x - cur.x);
 		dirs[pdir] = 0;
 		MapCoord test = cur;
-		while(test < start || start < test) {	// != without operator
-		  int dir = 16 * (1 + test.z - prev[test].z)
-				+ 4 * (1 + test.y - prev[test].y)
+		while(test != start && tmp.z == cur.z) {// FIXME: Z Straight?
+		  if(test.z != prev[test].z) break;	// FIXME: Z Straight?
+		  int dir = 4 * (1 + test.y - prev[test].y)
 				+ (1 + test.x - prev[test].x);
 		  if(dir == pdir) dirs[dir] = 1;	//Twice+ in a row
 		  else dirs[dir] = dirs[dir];		//Creates if missing
@@ -317,7 +309,7 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
   vector<MapCoord> ret;
   if(closed.count(end) > 0) {	// Only return a path if I can get there
     MapCoord cur = end;
-    while(prev[cur] < cur || cur < prev[cur]) {	// Is != without != operator
+    while(prev[cur] != cur) {
       ret.push_back(cur);
       cur = prev[cur];
       }
