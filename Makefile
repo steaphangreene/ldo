@@ -20,7 +20,9 @@
 #  59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 # *************************************************************************
 
-all:	ldo
+ARCH=	$(shell gcc -v 2>&1 | grep Target | cut -f2 -d" ")
+
+all:	ldo.$(ARCH)
 win32:	ldo.exe
 
 CXX=	g++
@@ -32,18 +34,19 @@ LIBS=	`simple-config --libs`
 #DEGUGGING OPTIONS
 CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `simple-config --cflags`
 
-OBJS:=	screens.o percept.o orders.o world.o \
-	game.o unit.o player.o main.o \
-	player_local.o player_ai.o
+OBJS:=	screens.$(ARCH).o percept.$(ARCH).o orders.$(ARCH).o \
+	game.$(ARCH).o unit.$(ARCH).o player.$(ARCH).o main.$(ARCH).o \
+	player_local.$(ARCH).o player_ai.$(ARCH).o world.$(ARCH).o
 
 #PRODUCTION OPTIONS (CROSS-COMPILED FOR WINDOWS)
+WARCH=	i586-mingw32msvc
 WCXX=	i586-mingw32msvc-g++
 WCXXFLAGS=	-s -O2 -Wall `i586-mingw32msvc-simple-config --cflags`
 WLIBS=	`i586-mingw32msvc-simple-config --libs`
 
-WOBJS:=	screens.win32_o percept.win32_o orders.win32_o world.win32_o \
-	game.win32_o unit.win32_o player.win32_o main.win32_o \
-	player_local.win32_o player_ai.win32_o
+WOBJS:=	screens.$(WARCH).o percept.$(WARCH).o orders.$(WARCH).o \
+	game.$(WARCH).o unit.$(WARCH).o player.$(WARCH).o main.$(WARCH).o \
+	player_local.$(WARCH).o player_ai.$(WARCH).o world.$(WARCH).o
 
 %.h:	%.tga
 	./scripts/tga2raw.csh $*
@@ -52,20 +55,20 @@ WOBJS:=	screens.win32_o percept.win32_o orders.win32_o world.win32_o \
 ChangeLog:      *.cpp *.h TODO COPYING Makefile .svn scripts/*
 	./scripts/svn2cl.sh | sed 's-  stea-  sgreene-g' > ChangeLog
 
-%.o:	%.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+%.$(ARCH).o:	%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-%.win32_o:	%.cpp %.o
+%.$(WARCH).o:	%.cpp %.$(ARCH).o
 	$(WCXX) $(WCXXFLAGS) -c $< -o $@
 
 deps.mk:	*.cpp *.h
 	$(CXX) $(CXXFLAGS) -MM *.cpp > deps.mk
 
 clean:
-	rm -f deps.mk *.o ldo *.win32_o *.exe
+	rm -f deps.mk *.o ldo.* *.exe
 
-ldo:	$(OBJS)
-	$(CXX) $(CXXFLAGS) -o ldo $(OBJS) $(LIBS)
+ldo.$(ARCH):	$(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LIBS)
 
 win32:	$(WOBJS)
 
