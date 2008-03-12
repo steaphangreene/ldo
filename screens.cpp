@@ -449,6 +449,8 @@ ScreenNum Screen_Title::Start(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *a
   video->SetDown(0.5, 0);
   video->SetPosition(0.0, 0.0, 0);
   video->SetZoom(2.0, 0);
+  video->SetMove(0.0, 0.0);
+  video->SetZPosition(0.0, 0);
   return SCREEN_SAME;
   }
 
