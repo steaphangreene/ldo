@@ -67,12 +67,12 @@ ChangeLog:      *.cpp *.h TODO COPYING Makefile .svn scripts/*
 %.$(WARCH).o:	%.cpp
 	$(WCXX) $(WCXXFLAGS) -c $< -o $@
 
-deps.mk:	*.cpp *.h
-	$(CXX) $(CXXFLAGS) -MM *.cpp | sed 's/\.o:/.$(ARCH).o:/' > deps.mk
+deps.$(ARCH).mk:	*.cpp *.h
+	$(CXX) $(CXXFLAGS) -MM *.cpp | sed 's/\.o:/.$(ARCH).o:/' > $@
 
 .PHONY: clean
 clean:
-	rm -f deps.mk *.o ldo.* *.exe
+	rm -f deps.*.mk *.o ldo.* *.exe
 
 ldo.$(ARCH):	$(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LIBS)
@@ -89,8 +89,7 @@ backup:	tar
 .PHONY: backup
 tar:
 	cd .. ; tar chvf ldo/ldo.$(TSTR).tar \
-		ldo/Makefile ldo/TODO ldo/COPYING ldo/*.cpp ldo/*.h \
-		ldo/deps.mk
+		ldo/Makefile ldo/TODO ldo/COPYING ldo/*.cpp ldo/*.h
 	gzip -9 ldo.$(TSTR).tar
 
-include deps.mk
+include deps.$(ARCH).mk
