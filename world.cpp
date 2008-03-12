@@ -50,6 +50,9 @@ World::World(Percept *per, Orders *ord) {
   models.push_back(SM_LoadModel("models/players/trooper", "red"));
   models.back()->AttachSubmodel("tag_weapon", weap);
 
+  modmap[-GROUND_FLOOR] = models.size();
+  models.push_back(SM_LoadModel("models/floor.obj"));
+
   modmap[0x119] = models.size();
   modmap[0x11D] = models.size();
   models.push_back(SM_LoadModel("models/fence1.obj"));
@@ -219,17 +222,11 @@ void World::DrawMap(Uint32 offset) {
     glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
 
     if(obj->second.type == GROUND_FLOOR) {
+      glPushMatrix();
+      glTranslatef(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
+      models[modmap[-GROUND_FLOOR]]->Render(0);
+      glPopMatrix();
       glNormal3d(0.0, 0.0, 1.0);
-      glBegin(GL_QUADS);
-      glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-      glVertex3f(obj->first.x*2.0+0.0, obj->first.y*2.0+0.0, obj->first.z*CELL_HEIGHT);
-      glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-      glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0+0.0, obj->first.z*CELL_HEIGHT);
-      glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-      glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT);
-      glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-      glVertex3f(obj->first.x*2.0+0.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT);
-      glEnd();
       }
     else if(obj->second.type == WALL_EASTWEST) {
       if(mod >= 0) {
