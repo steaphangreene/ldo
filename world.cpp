@@ -223,7 +223,7 @@ void World::DrawMap(Uint32 offset) {
 
     if(obj->second.type == GROUND_FLOOR) {
       glPushMatrix();
-      glTranslatef(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
+      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
       models[modmap[-GROUND_FLOOR]]->Render(0);
       glPopMatrix();
       glNormal3d(0.0, 0.0, 1.0);
