@@ -212,62 +212,7 @@ void World::DrawMap(Uint32 offset) {
   glPushMatrix();
   map<MapCoord, MapObject>::const_iterator obj = percept->objects.begin();
   for(; obj != percept->objects.end(); ++obj) {
-    int tex = -1, mod = -1;
-    if(modmap.count(obj->second.which) > 0) mod = modmap[obj->second.which];
-    if(texmap.count(obj->second.which) > 0) tex = texmap[obj->second.which];
-
-    if(obj->first.z > cur_zpos) {	//Items above the view Z plane
-      continue;	//Don't draw it
-      }
-
-    if(mod < -1) {			//Items that aren't drawn
-      continue;	//Don't draw it
-      }
-
-    if(tex >= 0) {
-      glColor3f(1.0, 1.0, 1.0);
-      }
-    else {
-      glColor3f(obj->first.x/float(50), 0.5, obj->first.y/float(50));
-      tex = (obj->second.which & 0xFF);
-      }
-    glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
-
-    if(obj->second.type == GROUND_FLOOR) {
-      glPushMatrix();
-      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-      models[modmap[-GROUND_FLOOR]]->Render(0);
-      glPopMatrix();
-      glNormal3d(0.0, 0.0, 1.0);
-      }
-    else if(obj->second.type == WALL_NORTH) {
-      if(mod < 0) {
-	mod = modmap[-WALL_NORTH];
-	}
-      glPushMatrix();
-      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-      models[mod]->Render(0);
-      glPopMatrix();
-      }
-    else if(obj->second.type == WALL_WEST) {
-      if(mod < 0) {
-	mod = modmap[-WALL_WEST];
-	}
-      glPushMatrix();
-      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-      models[mod]->Render(0);
-      glPopMatrix();
-      }
-    else if(obj->second.type == OBJECT_MISC) {
-      if(mod < 0) {
-	mod = modmap[-OBJECT_MISC];
-	}
-      glPushMatrix();
-      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-      models[mod]->Render(0);
-      glPopMatrix();
-      }
-    else if(obj->second.type == EFFECT_FIRE) {
+    if(obj->second.type == EFFECT_FIRE) {
       if(obj->second.which >= (int)(effectsto)
 		&& obj->second.which <= (int)(offset)) {
 	for(Uint32 start = obj->second.which;
@@ -290,6 +235,38 @@ void World::DrawMap(Uint32 offset) {
 		obj->first.z*2.0, start);
 	  }
 	}
+      }
+    else {
+      int tex = -1, mod = -1;
+      if(modmap.count(obj->second.which) > 0) mod = modmap[obj->second.which];
+      if(texmap.count(obj->second.which) > 0) tex = texmap[obj->second.which];
+
+      if(obj->first.z > cur_zpos) {	//Items above the view Z plane
+	continue;	//Don't draw it
+	}
+
+      if(mod < -1) {			//Items that aren't drawn
+	continue;	//Don't draw it
+	}
+
+      glPushMatrix();
+      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
+
+      if(tex >= 0) {
+	glColor3f(1.0, 1.0, 1.0);
+	}
+      else {
+	glColor3f(obj->first.x/float(50), 0.5, obj->first.y/float(50));
+	tex = (obj->second.which & 0xFF);
+	}
+      glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
+
+      if(mod < 0) {
+	mod = modmap[-(obj->second.type)];
+	}
+
+      models[mod]->Render(0);
+      glPopMatrix();
       }
     }
 
