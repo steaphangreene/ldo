@@ -189,7 +189,7 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
       obj = objects.find(tmp);
       if(obj != objects.end()) {
 	for(; obj != objects.upper_bound(tmp); ++obj) {
-	  if(obj->second.type == WALL_EASTWEST && obj->second.height > 0.0) {
+	  if(obj->second.type == WALL_NORTH && obj->second.height > 0.0) {
 	    ret = -1;
 	    }
 	  }
@@ -198,7 +198,7 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
       obj = objects.find(tmp);
       if(dx != 0 && obj != objects.end()) {
 	for(; obj != objects.upper_bound(tmp); ++obj) {
-	  if(obj->second.type == WALL_EASTWEST && obj->second.height > 0.0) {
+	  if(obj->second.type == WALL_NORTH && obj->second.height > 0.0) {
 	    ret = -1;
 	    }
 	  }
@@ -210,7 +210,7 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
       obj = objects.find(tmp);
       if(obj != objects.end()) {
 	for(; obj != objects.upper_bound(tmp); ++obj) {
-	  if(obj->second.type == WALL_NORTHSOUTH && obj->second.height > 0.0) {
+	  if(obj->second.type == WALL_WEST && obj->second.height > 0.0) {
 	    ret = -1;
 	    }
 	  }
@@ -219,7 +219,7 @@ int Percept::RDist(const MapCoord &start, const MapCoord &end) {
       obj = objects.find(tmp);
       if(dy != 0 && obj != objects.end()) {
 	for(; obj != objects.upper_bound(tmp); ++obj) {
-	  if(obj->second.type == WALL_NORTHSOUTH && obj->second.height > 0.0) {
+	  if(obj->second.type == WALL_WEST && obj->second.height > 0.0) {
 	    ret = -1;
 	    }
 	  }

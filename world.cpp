@@ -53,31 +53,43 @@ World::World(Percept *per, Orders *ord) {
   modmap[-GROUND_FLOOR] = models.size();
   models.push_back(SM_LoadModel("models/floor.obj"));
 
-  modmap[0x119] = models.size();
+  modmap[-OBJECT_MISC] = models.size();
+  models.push_back(SM_LoadModel("models/object.obj"));
+
+  modmap[-WALL_NORTH] = models.size();
+  models.push_back(SM_LoadModel("models/nwall_thin_high.obj"));
+
+  modmap[-WALL_WEST] = models.size();
+  models.push_back(SM_LoadModel("models/wwall_thin_high.obj"));
+
   modmap[0x11D] = models.size();
-  models.push_back(SM_LoadModel("models/fence1.obj"));
+  models.push_back(SM_LoadModel("models/nfence1.obj"));
+  modmap[0x119] = models.size();
+  models.push_back(SM_LoadModel("models/wfence1.obj"));
 
-  modmap[0x11A] = models.size();
   modmap[0x11E] = models.size();
-  models.push_back(SM_LoadModel("models/fence2.obj"));
+  models.push_back(SM_LoadModel("models/nfence2.obj"));
+  modmap[0x11A] = models.size();
+  models.push_back(SM_LoadModel("models/wfence2.obj"));
 
-  modmap[0x110] = models.size();
   modmap[0x111] = models.size();
-  modmap[0x114] = models.size();
   modmap[0x115] = models.size();
-  models.push_back(SM_LoadModel("models/wall_low.obj"));
-  models.push_back(SM_LoadModel("models/wall_med.obj"));
+  models.push_back(SM_LoadModel("models/nwall_thick_low.obj"));
+  modmap[0x110] = models.size();
+  modmap[0x114] = models.size();
+  models.push_back(SM_LoadModel("models/wwall_thick_low.obj"));
 
-  modmap[0x112] = models.size();
   modmap[0x113] = models.size();
-  models.push_back(SM_LoadModel("models/wall_high.obj"));
+  models.push_back(SM_LoadModel("models/nwall_thick_high.obj"));
+  modmap[0x112] = models.size();
+  models.push_back(SM_LoadModel("models/wwall_thick_high.obj"));
 
   modmap[0x182] = models.size();
-  models.push_back(SM_LoadModel("models/ramp_high.obj"));
+  models.push_back(SM_LoadModel("models/nramp_high.obj"));
   modmap[0x183] = models.size();
-  models.push_back(SM_LoadModel("models/ramp_med.obj"));
+  models.push_back(SM_LoadModel("models/nramp_med.obj"));
   modmap[0x184] = models.size();
-  models.push_back(SM_LoadModel("models/ramp_low.obj"));
+  models.push_back(SM_LoadModel("models/nramp_low.obj"));
 
   for(int n=0; n < 1000; ++n) {
     char name[64];
@@ -228,123 +240,32 @@ void World::DrawMap(Uint32 offset) {
       glPopMatrix();
       glNormal3d(0.0, 0.0, 1.0);
       }
-    else if(obj->second.type == WALL_EASTWEST) {
-      if(mod >= 0) {
-	glPushMatrix();
-	glTranslatef(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	models[mod]->Render(0);
-	glPopMatrix();
+    else if(obj->second.type == WALL_NORTH) {
+      if(mod < 0) {
+	mod = modmap[-WALL_NORTH];
 	}
-      else {
-	glNormal3d(0.0, 1.0, 0.0);
-	glBegin(GL_QUADS);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glEnd();
-	}
+      glPushMatrix();
+      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
+      models[mod]->Render(0);
+      glPopMatrix();
       }
-    else if(obj->second.type == WALL_NORTHSOUTH) {
-      if(mod >= 0) {
-	glPushMatrix();
-	glTranslatef(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glRotatef(90.0, 0.0, 0.0, 1.0);
-	models[mod]->Render(0);
-	glPopMatrix();
+    else if(obj->second.type == WALL_WEST) {
+      if(mod < 0) {
+	mod = modmap[-WALL_WEST];
 	}
-      else {
-	glNormal3d(1.0, 0.0, 0.0);
-	glBegin(GL_QUADS);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT);
-
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0, obj->first.y*2.0+2.0, obj->first.z*CELL_HEIGHT + CELL_HEIGHT);
-	glEnd();
-	}
+      glPushMatrix();
+      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
+      models[mod]->Render(0);
+      glPopMatrix();
       }
     else if(obj->second.type == OBJECT_MISC) {
-      if(mod >= 0) {
-	glPushMatrix();
-	glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-	models[mod]->Render(0);
-	glPopMatrix();
+      if(mod < 0) {
+	mod = modmap[-OBJECT_MISC];
 	}
-      else {
-	glNormal3d(1.0, 0.0, 0.0);
-	glBegin(GL_QUADS);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
-
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
-
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+0.2, obj->first.z*CELL_HEIGHT+1.0);
-
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
-	glTexCoord2f(textures[tex]->ScaleX(0.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+1.8, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(1.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT);
-	glTexCoord2f(textures[tex]->ScaleX(1.0), textures[tex]->ScaleY(0.0));
-	glVertex3f(obj->first.x*2.0+0.2, obj->first.y*2.0+1.8, obj->first.z*CELL_HEIGHT+1.0);
-	glEnd();
-	}
+      glPushMatrix();
+      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
+      models[mod]->Render(0);
+      glPopMatrix();
       }
     else if(obj->second.type == EFFECT_FIRE) {
       if(obj->second.which >= (int)(effectsto)

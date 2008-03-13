@@ -240,7 +240,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	  if(map_data[z][y][x][1] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
 	    MapObject obj = {
-	      WALL_NORTHSOUTH, 0x100 * ttype + map_data[z][y][x][1], 3.0
+	      WALL_WEST, 0x100 * ttype + map_data[z][y][x][1], 3.0
 	      };
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -248,7 +248,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	  if(map_data[z][y][x][2] > 0) {
 	    MapCoord pos = { x, master.mapys-y, master.mapzs-1-z };
 	    MapObject obj = {
-	      WALL_EASTWEST, 0x100 * ttype + map_data[z][y][x][2], 3.0
+	      WALL_NORTH, 0x100 * ttype + map_data[z][y][x][2], 3.0
 	      };
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -256,7 +256,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	  if(map_data[z][y][x][3] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
 	    MapObject obj = {
-	      OBJECT_MISC, 0x100 * ttype + map_data[z][y][x][3], 1.0
+	      OBJECT_MISC, 0x100 * ttype + map_data[z][y][x][3], 0.8
 	      };
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));

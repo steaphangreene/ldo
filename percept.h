@@ -37,8 +37,8 @@ using namespace std;
 enum ObjectType {
   OBJECT_NONE,
   GROUND_FLOOR,
-  WALL_EASTWEST,
-  WALL_NORTHSOUTH,
+  WALL_NORTH,
+  WALL_WEST,
   OBJECT_MISC,
   EFFECT_SMOKE,
   EFFECT_FIRE,
