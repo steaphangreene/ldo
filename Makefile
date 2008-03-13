@@ -25,9 +25,6 @@ ARCH=	$(shell gcc -v 2>&1 | grep Target | cut -f2 -d" ")
 .PHONY: all
 all:	ldo.$(ARCH)
 
-.PHONY: win32
-win32:	ldo.exe
-
 #Purge all default rules
 .SUFFIXES:
 
@@ -49,10 +46,7 @@ WARCH=	i586-mingw32msvc
 WCXX=	i586-mingw32msvc-g++
 WCXXFLAGS=	-s -O2 -Wall `i586-mingw32msvc-simple-config --cflags`
 WLIBS=	`i586-mingw32msvc-simple-config --libs`
-
-WOBJS:=	screens.$(WARCH).o percept.$(WARCH).o orders.$(WARCH).o \
-	game.$(WARCH).o unit.$(WARCH).o player.$(WARCH).o main.$(WARCH).o \
-	player_local.$(WARCH).o player_ai.$(WARCH).o world.$(WARCH).o
+WARCH=	i586-mingw32msvc
 
 %.h:	%.tga
 	./scripts/tga2raw.csh $*
@@ -78,10 +72,11 @@ ldo.$(ARCH):	$(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LIBS)
 
 .PHONY: win32
-win32:	$(WOBJS)
+win32:	ldo.exe
 
-ldo.exe:	$(WOBJS)
-	$(WCXX) $(WCXXFLAGS) -o ldo.exe $(WOBJS) $(WLIBS)
+ldo.exe:	*.cpp *.h
+	make ARCH=$(WARCH) CXX='$(WCXX)' FLAGS='$(WFLAGS)' LIBS='$(WLIBS)'
+	mv -vf ldo.$(WARCH) ldo.exe
 
 TSTR:=	$(shell date -u +"%Y%m%d%H%M")
 .PHONY: tar
