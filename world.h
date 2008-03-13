@@ -34,7 +34,7 @@
 
 class World {
 public:
-  World(Percept *per, Orders *ord);
+  World(Percept *per, Orders *ord, int pl);
   ~World();
 
   void Render(Uint32 offset);		// Render for playback
@@ -52,6 +52,7 @@ protected:
 
   Percept *percept;
   Orders *orders;
+  int plnum;
 
   int angle;
   float pointx, pointy;

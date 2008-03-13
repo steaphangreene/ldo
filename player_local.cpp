@@ -61,7 +61,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
     //FIXME: Initialize audio myself if it's not already done for me!
     }
 
-  world = new World(&percept, &orders);
+  world = new World(&percept, &orders, id);
 
   music = audio->LoadMusic("music/iconoclasm.ogg");
   cur_music = -1;

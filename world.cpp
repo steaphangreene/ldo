@@ -31,9 +31,10 @@ using namespace std;
 extern Game *cur_game;
 extern int cur_zpos;
 
-World::World(Percept *per, Orders *ord) {
+World::World(Percept *per, Orders *ord, int pl) {
   percept = per;
   orders = ord;
+  plnum = pl;
   angle = 45;
   pointx = 0.0;
   pointy = 0.0;
@@ -212,61 +213,64 @@ void World::DrawMap(Uint32 offset) {
   glPushMatrix();
   map<MapCoord, MapObject>::const_iterator obj = percept->objects.begin();
   for(; obj != percept->objects.end(); ++obj) {
-    if(obj->second.type == EFFECT_FIRE) {
-      if(obj->second.which >= (int)(effectsto)
+    if(obj->second.last_seen.count(plnum)
+	&& obj->second.last_seen.find(plnum)->second <= offset) {
+      if(obj->second.type == EFFECT_FIRE) {
+	if(obj->second.which >= (int)(effectsto)
 		&& obj->second.which <= (int)(offset)) {
-	for(Uint32 start = obj->second.which;
+	  for(Uint32 start = obj->second.which;
 		(int)(start) < obj->second.which + 20000; start += 10) {
-	  scene->AddParticle(fire,
+	    scene->AddParticle(fire,
 		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
 		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
 		obj->first.z*2.0, start);
+	    }
 	  }
 	}
-      }
-    else if(obj->second.type == EFFECT_FIRE || obj->second.type == EFFECT_SMOKE) {
-      if(obj->second.which >= (int)(effectsto)
+      else if(obj->second.type == EFFECT_FIRE || obj->second.type == EFFECT_SMOKE) {
+	if(obj->second.which >= (int)(effectsto)
 		&& obj->second.which <= (int)(offset)) {
-	for(Uint32 start = obj->second.which;
+	  for(Uint32 start = obj->second.which;
 		(int)(start) < obj->second.which + 20000; start += 250) {
-	  scene->AddParticle(smoke,
+	    scene->AddParticle(smoke,
 		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
 		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
 		obj->first.z*2.0, start);
+	    }
 	  }
-	}
-      }
-    else {
-      int tex = -1, mod = -1;
-      if(modmap.count(obj->second.which) > 0) mod = modmap[obj->second.which];
-      if(texmap.count(obj->second.which) > 0) tex = texmap[obj->second.which];
-
-      if(obj->first.z > cur_zpos) {	//Items above the view Z plane
-	continue;	//Don't draw it
-	}
-
-      if(mod < -1) {			//Items that aren't drawn
-	continue;	//Don't draw it
-	}
-
-      glPushMatrix();
-      glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-
-      if(tex >= 0) {
-	glColor3f(1.0, 1.0, 1.0);
 	}
       else {
-	glColor3f(obj->first.x/float(50), 0.5, obj->first.y/float(50));
-	tex = (obj->second.which & 0xFF);
-	}
-      glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
+	int tex = -1, mod = -1;
+	if(modmap.count(obj->second.which) > 0) mod = modmap[obj->second.which];
+	if(texmap.count(obj->second.which) > 0) tex = texmap[obj->second.which];
 
-      if(mod < 0) {
-	mod = modmap[-(obj->second.type)];
-	}
+	if(obj->first.z > cur_zpos) {	//Items above the view Z plane
+	  continue;	//Don't draw it
+	  }
 
-      models[mod]->Render(0);
-      glPopMatrix();
+	if(mod < -1) {			//Items that aren't drawn
+	  continue;	//Don't draw it
+	  }
+
+	glPushMatrix();
+	glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
+
+	if(tex >= 0) {
+	  glColor3f(1.0, 1.0, 1.0);
+	  }
+	else {
+	  glColor3f(obj->first.x/float(50), 0.5, obj->first.y/float(50));
+	  tex = (obj->second.which & 0xFF);
+	  }
+	glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
+
+	if(mod < 0) {
+	  mod = modmap[-(obj->second.type)];
+	  }
+
+	models[mod]->Render(0);
+	glPopMatrix();
+	}
       }
     }
 
