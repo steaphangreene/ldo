@@ -213,8 +213,8 @@ void World::DrawMap(Uint32 offset) {
   glPushMatrix();
   map<MapCoord, MapObject>::const_iterator obj = percept->objects.begin();
   for(; obj != percept->objects.end(); ++obj) {
-    if(obj->second.last_seen.count(plnum)
-	&& obj->second.last_seen.find(plnum)->second <= offset) {
+    if(obj->second.first_seen.size() > 0
+	&& obj->second.first_seen.begin()->second <= offset) {
       if(obj->second.type == EFFECT_FIRE) {
 	if(obj->second.which >= (int)(effectsto)
 		&& obj->second.which <= (int)(offset)) {

@@ -66,7 +66,7 @@ struct MapObject {
   ObjectType type;
   int which;
   float height;
-  map<int, Uint32> last_seen;
+  map<int, Uint32> last_seen, first_seen;
   };
 
 enum Act {	// For Example

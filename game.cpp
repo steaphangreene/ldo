@@ -235,7 +235,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	    MapObject obj = {
 	      GROUND_FLOOR, 0x100 * ttype + map_data[z][y][x][0], 0.0
 	      };
-	    if((see_data[z][y][x] & 0x04) > 0) obj.last_seen[0] = 0;
+	    if((see_data[z][y][x] & 0x04) > 0) {
+	      obj.last_seen[0] = 0;
+	      obj.first_seen[0] = 0;
+	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
@@ -244,7 +247,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	    MapObject obj = {
 	      WALL_WEST, 0x100 * ttype + map_data[z][y][x][1], 3.0
 	      };
-	    if((see_data[z][y][x] & 0x01) > 0) obj.last_seen[0] = 0;
+	    if((see_data[z][y][x] & 0x01) > 0) {
+	      obj.last_seen[0] = 0;
+	      obj.first_seen[0] = 0;
+	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
@@ -253,7 +259,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	    MapObject obj = {
 	      WALL_NORTH, 0x100 * ttype + map_data[z][y][x][2], 3.0
 	      };
-	    if((see_data[z][y][x] & 0x02) > 0) obj.last_seen[0] = 0;
+	    if((see_data[z][y][x] & 0x02) > 0) {
+	      obj.last_seen[0] = 0;
+	      obj.first_seen[0] = 0;
+	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
@@ -262,7 +271,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	    MapObject obj = {
 	      OBJECT_MISC, 0x100 * ttype + map_data[z][y][x][3], 0.8
 	      };
-	    if((see_data[z][y][x] & 0x04) > 0) obj.last_seen[0] = 0;
+	    if((see_data[z][y][x] & 0x04) > 0) {
+	      obj.last_seen[0] = 0;
+	      obj.first_seen[0] = 0;
+	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
@@ -496,7 +508,26 @@ void Game::UpdatePercept(int plnum, unsigned int rnd) {
   multimap<MapCoord, MapObject>::const_iterator obj = master.objects.begin();
   for(; obj != master.objects.end(); ++obj) {
     if(obj->second.last_seen.count(plnum)) {
-      percept[plnum]->objects.insert(*obj);
+      multimap<MapCoord, MapObject>::iterator nobj;
+      nobj = percept[plnum]->objects.insert(*obj);
+
+      //Only give "seen" data for the particular player
+      nobj->second.last_seen.erase(
+	nobj->second.last_seen.begin(),
+	nobj->second.last_seen.find(plnum)
+	);
+      nobj->second.last_seen.erase(
+	nobj->second.last_seen.upper_bound(plnum),
+	nobj->second.last_seen.end()
+	);
+      nobj->second.first_seen.erase(
+	nobj->second.first_seen.begin(),
+	nobj->second.first_seen.find(plnum)
+	);
+      nobj->second.first_seen.erase(
+	nobj->second.first_seen.upper_bound(plnum),
+	nobj->second.first_seen.end()
+	);
       }
     }
 

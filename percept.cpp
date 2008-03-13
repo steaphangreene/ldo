@@ -359,6 +359,9 @@ void Percept::AddAction(int id, int time, int xp, int yp, int zp,
 	  if(obj != objects.end()) {
 	    for(; obj != objects.upper_bound(pos); ++obj) {
 		// FIXME: Should be act's END time, not START time
+	      if(obj->second.first_seen.count(unplayer[id]) < 1) {
+		obj->second.first_seen[unplayer[id]] = time;
+		}
 	      obj->second.last_seen[unplayer[id]] = time;
 	      }
 	    }
