@@ -66,6 +66,7 @@ struct MapObject {
   ObjectType type;
   int which;
   float height;
+  map<int, Uint32> last_seen;
   };
 
 enum Act {	// For Example
@@ -111,6 +112,9 @@ public:
 
   void Clear();
 
+  void AddAction(int i, int t, int xp, int yp, int zp,
+	Act a, int t1 = 0, int t2 = 0, int t3 = 0);
+
   //Basic map info
   int mapxs, mapys, mapzs;
   string mapname, mapdesc;
@@ -123,6 +127,8 @@ public:
   // Enemy:-1, Own:1, None/Neutral:0
   int UnitPresent(int xc, int yc, int zc, int &id);
   int UnitAt(int xc, int yc, int zc);
+  int PlayerIDForUnit(const int unitid) { return unplayer[unitid]; };
+  map<int, int> unplayer;		// Lookup PlayerID by UnitID
 
   float HeightAt(const MapCoord &pos);
   void GetPos(int id, int &x, int &y, int &z);

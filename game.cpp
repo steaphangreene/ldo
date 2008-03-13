@@ -211,10 +211,11 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
     ttype += (int(Sint8(geo_data[11])) << 8) + int(geo_data[10]);
     }
 
+  Uint8 see_data[master.mapzs][master.mapys][master.mapxs];
+  memset(see_data, 7, master.mapzs * master.mapys * master.mapxs);
   FILE *seemap = fopen((dir + "/seemap.dat").c_str(), "rb");
   if(seemap == NULL) seemap = fopen((dir + "/SEEMAP.DAT").c_str(), "rb");
   if(seemap) {
-    Uint8 see_data[master.mapzs][master.mapys][master.mapxs];
     fread(see_data, master.mapxs, master.mapys*master.mapzs, seemap);
     fclose(seemap);
     }
@@ -234,6 +235,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	    MapObject obj = {
 	      GROUND_FLOOR, 0x100 * ttype + map_data[z][y][x][0], 0.0
 	      };
+	    if((see_data[z][y][x] & 0x04) > 0) obj.last_seen[0] = 0;
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
@@ -242,6 +244,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	    MapObject obj = {
 	      WALL_WEST, 0x100 * ttype + map_data[z][y][x][1], 3.0
 	      };
+	    if((see_data[z][y][x] & 0x01) > 0) obj.last_seen[0] = 0;
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
@@ -250,6 +253,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	    MapObject obj = {
 	      WALL_NORTH, 0x100 * ttype + map_data[z][y][x][2], 3.0
 	      };
+	    if((see_data[z][y][x] & 0x02) > 0) obj.last_seen[0] = 0;
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
@@ -258,6 +262,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	    MapObject obj = {
 	      OBJECT_MISC, 0x100 * ttype + map_data[z][y][x][3], 0.8
 	      };
+	    if((see_data[z][y][x] & 0x04) > 0) obj.last_seen[0] = 0;
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	    }
@@ -316,11 +321,9 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	unit_ptr->id = int(unit) + 1;
 	unit_ptr->troop = unit_data[unit][9];
 	unit_ptr->name = "Bob, Joe";	//FIXME!
-	unplayer[int(unit)+1] = unit_data[unit][9];
-	master.my_units[unit_ptr->id].push_back(UnitAct(unit_ptr->id, 0,
-		x, y, z, ACT_START));
-	master.my_units[unit_ptr->id].push_back(UnitAct(unit_ptr->id, 0,
-		x, y, z, ACT_EQUIP, 0, 1));
+	master.unplayer[int(unit)+1] = unit_data[unit][9];
+	master.AddAction(unit_ptr->id, 0, x, y, z, ACT_START);
+	master.AddAction(unit_ptr->id, 0, x, y, z, ACT_EQUIP, 0, 1);
 //	printf("Unit at %dx%dx%d\t[%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X]\n",
 //		unit_data[unit][1], unit_data[unit][0], unit_data[unit][2],
 //		unit_data[unit][3], unit_data[unit][4], unit_data[unit][5],
@@ -375,17 +378,15 @@ int Game::Load(FILE *fl) {
     //TODO: Use REAL starting locations from map
     //TODO: Do a Real Initial Equip of Items Here
     //TODO: Equip Requested EQUIP Items
-    master.my_units[unit_ptr->id].push_back(UnitAct(
-	unit_ptr->id, 0, 20+unit, 32, 0, ACT_START));
-    master.my_units[unit_ptr->id].push_back(UnitAct(
-	unit_ptr->id, 0, 20+unit, 32, 0, ACT_EQUIP, 0, 1));
+    master.AddAction(unit_ptr->id, 0, 20+unit, 32, 0, ACT_START);
+    master.AddAction(unit_ptr->id, 0, 20+unit, 32, 0, ACT_EQUIP, 0, 1);
     }
 
   Uint32 id = 1;
   for(Uint32 pl=0; pl < plsquads.size(); ++pl) {
     for(Uint32 sq=0; sq < plsquads[pl].size(); ++sq) {
       for(Uint32 un=0; un < squnits[plsquads[pl][sq]].size(); ++un) {
-	unplayer[id] = pl;
+	master.unplayer[id] = pl;
 	++id;
 	}
       }
@@ -484,7 +485,7 @@ void Game::UpdatePercept(int plnum, unsigned int rnd) {
   for(; itr != master.my_units.end(); ++itr) {
 //    fprintf(stderr, "Sending %d action %d for %d (Round %d)\n",
 //	plnum, itr->act, itr->id, rnd);
-    if(plnum == PlayerIDForUnit(itr->first)) {
+    if(plnum == master.unplayer[itr->first]) {
       percept[plnum]->my_units.insert(*itr);
       }
     else {
@@ -492,7 +493,12 @@ void Game::UpdatePercept(int plnum, unsigned int rnd) {
       }
     }
   //Temporary!
-  percept[plnum]->objects = master.objects;
+  multimap<MapCoord, MapObject>::const_iterator obj = master.objects.begin();
+  for(; obj != master.objects.end(); ++obj) {
+    if(obj->second.last_seen.count(plnum)) {
+      percept[plnum]->objects.insert(*obj);
+      }
+    }
 
   //Temporary, calculate based on discovery
   percept[plnum]->mapxs = master.mapxs;
@@ -613,9 +619,9 @@ void Game::ResolveRound() {
 	      vector<MapCoord>::const_iterator lpt = pt;
 	      ++pt;
 	      for(; pt != path.end(); ++pt) {
-		master.my_units[order->id].push_back(UnitAct(order->id,
+		master.AddAction(order->id,
 		(CurrentRound() - 1) * 3000 + order->time + offset,
-		pt->x, pt->y, pt->z, act, lpt->x, lpt->y, lpt->z));
+		pt->x, pt->y, pt->z, act, lpt->x, lpt->y, lpt->z);
 		offset += step;
 		lpt = pt;
 		}
@@ -625,18 +631,17 @@ void Game::ResolveRound() {
 	  case(ORDER_EQUIP): {
 	    if(round != 0 || order->time != 0) {	// Not Initial EQUIP
 	      if(ordered.count(order->id) <= 0) {
-		master.my_units[order->id].push_back(UnitAct(order->id,
+		master.AddAction(order->id,
 			(CurrentRound() - 1) * 3000 + order->time + offset,
 			x, y, z, ACT_EQUIP,
-			order->targ1, order->targ2, order->targ3));
+			order->targ1, order->targ2, order->targ3);
 		ordered.insert(order->id);
 		}
 	      }
 	    else {				// Initial Equip is Free
 	      if(ordered.count(order->id) <= 0) {
-		master.my_units[order->id].push_back(UnitAct(order->id, 0,
-			x, y, z, ACT_EQUIP,
-			order->targ1, order->targ2, order->targ3));
+		master.AddAction(order->id, 0, x, y, z, ACT_EQUIP,
+			order->targ1, order->targ2, order->targ3);
 		ordered.insert(order->id);
 		}
 	      }
@@ -657,14 +662,14 @@ void Game::ResolveRound() {
 		tx, ty, tz, ACT_FALL));
 	      ordered.insert(hit);
 
-	      master.my_units[order->id].push_back(UnitAct(order->id,
+	      master.AddAction(order->id,
 		(CurrentRound() - 1) * 3000 + order->time + offset, x, y, z,
-		ACT_SHOOT, tx, ty, tz));
+		ACT_SHOOT, tx, ty, tz);
 	      }
 	    else {
-	      master.my_units[order->id].push_back(UnitAct(order->id,
+	      master.AddAction(order->id,
 		(CurrentRound() - 1) * 3000 + order->time + offset, x, y, z,
-		ACT_SHOOT, order->targ1, order->targ2, order->targ3));
+		ACT_SHOOT, order->targ1, order->targ2, order->targ3);
 	      }
 	    ordered.insert(order->id);
 	    }break;

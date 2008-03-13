@@ -340,3 +340,30 @@ vector<MapCoord> Percept::GetPath2x2(const MapCoord &start, const MapCoord &end)
     }
   return ret;
   }
+
+#define VDIST 20
+void Percept::AddAction(int id, int time, int xp, int yp, int zp,
+	Act a, int t1, int t2, int t3) {
+  UnitAct act(id, time, xp, yp, zp, a, t1, t2, t3);
+  my_units[id].push_back(act);
+
+  //Handle Vision/Discovery	//FIXME: This is static (no obstructions yet)
+  for(int z = -VDIST; z < +VDIST; ++z) {
+    for(int y = -VDIST; y < +VDIST; ++y) {
+      for(int x = -VDIST; x < +VDIST; ++x) {
+	if((z+zp) >= 0 && (z+zp) < mapzs && (y+yp) >= 0 && (y+yp) < mapys
+		&& (x+xp) >= 0 && (x+xp) < mapxs
+		&& sqrt(z*z + y*y + x*x) <= VDIST) {
+	  MapCoord pos = { x+xp, y+yp, z+zp };
+	  multimap<MapCoord, MapObject>::iterator obj = objects.find(pos);
+	  if(obj != objects.end()) {
+	    for(; obj != objects.upper_bound(pos); ++obj) {
+		// FIXME: Should be act's END time, not START time
+	      obj->second.last_seen[unplayer[id]] = time;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+  }
