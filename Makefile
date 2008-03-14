@@ -37,6 +37,9 @@ LIBS=	`simple-config --libs`
 #DEGUGGING OPTIONS
 CXXFLAGS=	-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `simple-config --cflags`
 
+#PROFILING OPTIONS
+#CXXFLAGS=	-pg -g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `simple-config --cflags`
+
 OBJS:=	screens.$(ARCH).o percept.$(ARCH).o orders.$(ARCH).o \
 	game.$(ARCH).o unit.$(ARCH).o player.$(ARCH).o main.$(ARCH).o \
 	player_local.$(ARCH).o player_ai.$(ARCH).o world.$(ARCH).o

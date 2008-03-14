@@ -61,9 +61,10 @@ int Percept::Save(FILE *fl, unsigned int ver) {
   return 1;
   }
 
-void Percept::Clear() {	//Prepares for next frame - DOES NOT CLEAR my_units
+void Percept::Clear() {	//Prepares for next frame
   my_units.clear();
   other_units.clear();
+  objects.clear();
   }
 
 int Percept::UnitPresent(int xc, int yc, int zc, int &id) {
