@@ -357,6 +357,18 @@ int Game::Load(FILE *fl) {
   unsigned int num, ver;
   round = 1;
 
+  //Temporary, flat map with no features
+  master.mapxs = 50;
+  master.mapys = 50;
+  master.mapzs = 1;
+  for(int y=0; y < 50; ++y) {
+    for(int x=0; x < 50; ++x) {
+      MapCoord pos = { x, y, 0 };
+      MapObject obj = { GROUND_FLOOR, 0, 0.0 };
+      master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
+      }
+    }
+
   memset(buf, 0, BUF_LEN);
   if(fscanf(fl, "%s\n", buf) < 1) return 0;
   if(strcmp(buf, HEADER_STRING)) return 0;
@@ -401,18 +413,6 @@ int Game::Load(FILE *fl) {
 	master.unplayer[id] = pl;
 	++id;
 	}
-      }
-    }
-
-  //Temporary, flat map with no features
-  master.mapxs = 50;
-  master.mapys = 50;
-  master.mapzs = 1;
-  for(int y=0; y < 50; ++y) {
-    for(int x=0; x < 50; ++x) {
-      MapCoord pos = { x, y, 0 };
-      MapObject obj = { GROUND_FLOOR, 0, 0.0 };
-      master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
       }
     }
   return 1;
