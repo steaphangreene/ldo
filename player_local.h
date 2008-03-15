@@ -32,6 +32,7 @@
 #include "simplevideo.h"
 #include "simplescene.h"
 #include "simpleaudio.h"
+#include "simpleconfig.h"
 
 enum Phase {
   PHASE_NONE = -1,
@@ -96,6 +97,8 @@ protected:
   SG_StickyButton *ddoneb;
   SG_TransLabel *dtext;
   SG_PassThrough *dpass;
+
+  SimpleConfig *config_gui;
 
   int targ_id;			//ID Of Unit Targeted
   int maction, raction;

@@ -92,7 +92,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   wind[PHASE_REPLAY] = new SG_Table(48, 14, 0.0625, 0.125);
   wind[PHASE_REPLAY]->SetBackground(
 	new SG_PassThrough(SG_PT_CLICK, SG_PT_CLICK, SG_PT_CLICK));
-  roptb = new SG_Button("Options");
+  roptb = new SG_StickyButton("Options");
   wind[PHASE_REPLAY]->AddWidget(roptb, 0, 13, 8, 1);
   rpastb = new SG_StickyButton("+");
   rpastb->SetAlignment(SG_ALIGN_CENTER);
@@ -145,7 +145,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   dpass->SetMenu(3, ractions[raction]);
   targ_id = -1;
 
-  doptb = new SG_Button("Options");
+  doptb = new SG_StickyButton("Options");
   wind[PHASE_DECLARE]->AddWidget(doptb, 0, 13);
   ddoneb = new SG_StickyButton("Ready");
   wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 13);
@@ -161,6 +161,9 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
 //  wind[PHASE_DECLARE]->AddWidget(new SG_Panel(), 0, 0, 2, 20);
 //  wind[PHASE_DECLARE]->AddWidget(new SG_Panel(), 0, 12, 20, 8);
 //  wind[PHASE_DECLARE]->AddWidget(new SG_Panel(), 14, 0, 6, 20);
+
+  //Define configuration GUI
+  config_gui = new SimpleConfig;
 
   vid_mut = SDL_CreateMutex();
   off_mut = SDL_CreateMutex();
@@ -351,6 +354,12 @@ int Player_Local::EventHandler() {
 	else if(event.user.data1 == (void*)rpastb) {
 	  past = 1;
 	  }
+	else if(event.user.data1 == (void*)roptb) {
+	  gui->SetPopupWidget(config_gui);
+	  }
+	else if(event.user.data1 == (void*)doptb) {
+	  gui->SetPopupWidget(config_gui);
+	  }
 	else {
 	  exiting = 1;  //Return
 	  }
@@ -366,6 +375,12 @@ int Player_Local::EventHandler() {
 	  }
 	else if(event.user.data1 == (void*)rpastb) {
 	  past = 0;
+	  }
+	else if(event.user.data1 == (void*)roptb) {
+	  gui->UnsetPopupWidget();
+	  }
+	else if(event.user.data1 == (void*)doptb) {
+	  gui->UnsetPopupWidget();
 	  }
 	else {
 	  exiting = 1;  //Return
