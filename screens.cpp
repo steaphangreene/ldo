@@ -269,7 +269,9 @@ int Screens::Handle() {
 	  case(SG_EVENT_FILEOPEN):
 	  case(SG_EVENT_STICKYOFF):
 	  case(SG_EVENT_STICKYON):
+	  case(SG_EVENT_OK):
 	  case(SG_EVENT_SELECT):
+	  case(SG_EVENT_CANCEL):
 	  case(SG_EVENT_BUTTONPRESS): {
 	    audio->Play(click);
 	    }break;
@@ -541,8 +543,6 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
       connector->SetSlotColors(slot_cols);
       connector->SetSlotTeams(slot_cols);
       connector->Config();
-      }
-    else if(event.user.code == SG_EVENT_OK) {
       }
     }
   if(!play_game) return SCREEN_SAME;
@@ -857,6 +857,9 @@ ScreenNum Popup_LoadMap::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
 
 	return POPUP_CLEAR;
 	}
+      }
+    else if(event.user.code == SG_EVENT_CANCEL) {
+      return POPUP_CLEAR;
       }
     }
   return SCREEN_SAME;
