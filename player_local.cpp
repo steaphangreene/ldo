@@ -530,6 +530,15 @@ bool Player_Local::Run() {
       UpdateEquipIDs();	 // See if we need to do the Equip thing again
 
       gui->Unlock();
+
+      sel_x = -1;
+      sel_y = -1;
+      sel_z = -1;
+      sel_id = -1;
+      maction = 0;
+      raction = 0;
+      ppass->SetMenu(2, mactions[maction]);
+      ppass->SetMenu(3, ractions[raction]);
       }
 
     if(phase != nextphase) {
