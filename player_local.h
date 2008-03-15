@@ -37,8 +37,7 @@
 enum Phase {
   PHASE_NONE = -1,
   PHASE_EQUIP,
-  PHASE_REPLAY,
-  PHASE_DECLARE,
+  PHASE_PLAY,
   PHASE_MAX,
   };
 enum PopPhase {
@@ -81,22 +80,18 @@ protected:
   SDL_Surface *equip_bg;
 
   unsigned int disround;	//Currently Displayed Round for Playback
-  SG_StickyButton *rpastb;
-  SG_Button *roptb, *rdoneb;	//Widgets for Replay phase
-  SG_TransLabel *rtext, *rstamp;
-  SG_Tabs *rcontrols;
+  SG_StickyButton *ppastb;
+  SG_Button *poptb, *pdoneb;	//Widgets for Play phase
+  SG_TransLabel *ptext, *pstamp;
+  SG_Tabs *pcontrols;
+  SG_PassThrough *ppass;
 
-  Uint32 last_time;		//Data for Replay phase
+  Uint32 last_time;		//Data for Play phase
   Uint32 offset, last_offset;
   int playback_speed, past;
   SDL_mutex *off_mut;		//MutEx to protect offsets
 
   void CalcOffset(Uint32);
-
-  SG_Button *doptb;		//Widgets for Declare phase
-  SG_StickyButton *ddoneb;
-  SG_TransLabel *dtext;
-  SG_PassThrough *dpass;
 
   SimpleConfig *config_gui;
 

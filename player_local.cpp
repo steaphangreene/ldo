@@ -88,25 +88,25 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   wind[PHASE_EQUIP]->AddWidget(estats, 12, 1, 4, 1);
   ednd = NULL;
 
-  //Define base GUI for Replay phase
-  wind[PHASE_REPLAY] = new SG_Table(48, 14, 0.0625, 0.125);
-  wind[PHASE_REPLAY]->SetBackground(
+  //Define base GUI for Play phase
+  wind[PHASE_PLAY] = new SG_Table(48, 14, 0.0625, 0.125);
+  wind[PHASE_PLAY]->SetBackground(
 	new SG_PassThrough(SG_PT_CLICK, SG_PT_CLICK, SG_PT_CLICK));
-  roptb = new SG_StickyButton("Options");
-  wind[PHASE_REPLAY]->AddWidget(roptb, 0, 13, 8, 1);
-  rpastb = new SG_StickyButton("+");
-  rpastb->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_REPLAY]->AddWidget(rpastb, 14, 13, 2, 1);
-  rdoneb = new SG_Button("Ok");
-  wind[PHASE_REPLAY]->AddWidget(rdoneb, 40, 13, 8, 1);
-  rtext = new SG_TransLabel("Playback Turn", drkred);
-  rtext->SetFontSize(50);
-  rtext->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_REPLAY]->AddWidget(rtext, 8, 12, 32, 1);
-  rstamp = new SG_TransLabel("<Time Offset>", drkred);
-  rstamp->SetFontSize(50);
-  rstamp->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_REPLAY]->AddWidget(rstamp, 8, 11, 32, 1);
+  poptb = new SG_StickyButton("Options");
+  wind[PHASE_PLAY]->AddWidget(poptb, 0, 13, 8, 1);
+  ppastb = new SG_StickyButton("+");
+  ppastb->SetAlignment(SG_ALIGN_CENTER);
+  wind[PHASE_PLAY]->AddWidget(ppastb, 14, 13, 2, 1);
+  pdoneb = new SG_StickyButton("Ready");
+  wind[PHASE_PLAY]->AddWidget(pdoneb, 40, 13, 8, 1);
+  ptext = new SG_TransLabel("Declare Turn (#1)", drkred);
+  ptext->SetFontSize(50);
+  ptext->SetAlignment(SG_ALIGN_CENTER);
+  wind[PHASE_PLAY]->AddWidget(ptext, 8, 12, 32, 1);
+  pstamp = new SG_TransLabel("<Time Offset>", drkred);
+  pstamp->SetFontSize(50);
+  pstamp->SetAlignment(SG_ALIGN_CENTER);
+  wind[PHASE_PLAY]->AddWidget(pstamp, 8, 11, 32, 1);
   vector<string> conts;			//Temporary - until textures
   conts.push_back("<<");
   conts.push_back("<");
@@ -115,16 +115,13 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   conts.push_back("|>");
   conts.push_back(">");
   conts.push_back(">>");
-  rcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
-  rcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
-  rcontrols->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_REPLAY]->AddWidget(rcontrols, 16, 13, 16, 1);
-
-  //Define base GUI for Declare phase
-  wind[PHASE_DECLARE] = new SG_Table(6, 14, 0.0625, 0.125);
-  dpass = new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU);
-  wind[PHASE_DECLARE]->SetBackground(dpass);
-  dpass->SetSendMotion();
+  pcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
+  pcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
+  pcontrols->SetAlignment(SG_ALIGN_CENTER);
+  wind[PHASE_PLAY]->AddWidget(pcontrols, 16, 13, 16, 1);
+  ppass = new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU);
+  wind[PHASE_PLAY]->SetBackground(ppass);
+  ppass->SetSendMotion();
 
   maction = 0;
   mactions[0].push_back("View");
@@ -141,26 +138,9 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   ractions[1].push_back("Shoot Here");
   ractions[2].push_back("Shoot At");
   ractions[2].push_back("Throw At");
-  dpass->SetMenu(2, mactions[maction]);
-  dpass->SetMenu(3, ractions[raction]);
+  ppass->SetMenu(2, mactions[maction]);
+  ppass->SetMenu(3, ractions[raction]);
   targ_id = -1;
-
-  doptb = new SG_StickyButton("Options");
-  wind[PHASE_DECLARE]->AddWidget(doptb, 0, 13);
-  ddoneb = new SG_StickyButton("Ready");
-  wind[PHASE_DECLARE]->AddWidget(ddoneb, 5, 13);
-  dtext = new SG_TransLabel("Declare Turn (#1)", drkred);
-  dtext->SetFontSize(50);
-  dtext->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_DECLARE]->AddWidget(dtext, 1, 12, 4, 1);
-
-//  //Temporary!
-//  SG_Widget *tmp = wind[PHASE_DECLARE];
-//  wind[PHASE_DECLARE] = new SG_Table(20, 20, 0.0, 0.0);
-//  wind[PHASE_DECLARE]->AddWidget(tmp, 2, 0, 12, 12);
-//  wind[PHASE_DECLARE]->AddWidget(new SG_Panel(), 0, 0, 2, 20);
-//  wind[PHASE_DECLARE]->AddWidget(new SG_Panel(), 0, 12, 20, 8);
-//  wind[PHASE_DECLARE]->AddWidget(new SG_Panel(), 14, 0, 6, 20);
 
   //Define configuration GUI
   config_gui = new SimpleConfig;
@@ -296,17 +276,14 @@ int Player_Local::EventHandler() {
 	    orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
 	    }
 	  SDL_mutexP(off_mut);
-	  nextphase = PHASE_REPLAY;
+	  nextphase = PHASE_PLAY;	//FIXME: Not Updated!
 	  last_time = SDL_GetTicks();
 	  last_offset = (pround - 2) * 3000;
 	  playback_speed = 5; //Default is play
 	  gui->Lock();
-	  rcontrols->Set(playback_speed);
+	  pcontrols->Set(playback_speed);
 	  gui->Unlock();
 	  SDL_mutexV(off_mut);
-	  }
-	else if(event.user.data1 == (void*)rdoneb) {
-	  nextphase = PHASE_DECLARE; //Move on to declaring orders for next turn
 	  }
 	}
 
@@ -344,20 +321,17 @@ int Player_Local::EventHandler() {
 
       else if(event.user.code == SG_EVENT_STICKYON) {
 	audio->Play(click);
-	if(event.user.data1 == (void*)ddoneb) {
+	if(event.user.data1 == (void*)pdoneb) {
 	  if(!game->SetReady(id, true)) {
 	    gui->Lock();
-	    ddoneb->TurnOff(); // Reject this attempt
+	    pdoneb->TurnOff(); // Reject this attempt
 	    gui->Unlock();
 	    }
 	  }
-	else if(event.user.data1 == (void*)rpastb) {
+	else if(event.user.data1 == (void*)ppastb) {
 	  past = 1;
 	  }
-	else if(event.user.data1 == (void*)roptb) {
-	  gui->SetPopupWidget(config_gui);
-	  }
-	else if(event.user.data1 == (void*)doptb) {
+	else if(event.user.data1 == (void*)poptb) {
 	  gui->SetPopupWidget(config_gui);
 	  }
 	else {
@@ -366,20 +340,17 @@ int Player_Local::EventHandler() {
 	}
       else if(event.user.code == SG_EVENT_STICKYOFF) {
 	audio->Play(click);
-	if(event.user.data1 == (void*)ddoneb) {
+	if(event.user.data1 == (void*)pdoneb) {
 	  if(game->SetReady(id, false)) {
 	    gui->Lock();
-	    ddoneb->TurnOn(); // Reject this attempt
+	    pdoneb->TurnOn(); // Reject this attempt
 	    gui->Unlock();
 	    }
 	  }
-	else if(event.user.data1 == (void*)rpastb) {
+	else if(event.user.data1 == (void*)ppastb) {
 	  past = 0;
 	  }
-	else if(event.user.data1 == (void*)roptb) {
-	  gui->UnsetPopupWidget();
-	  }
-	else if(event.user.data1 == (void*)doptb) {
+	else if(event.user.data1 == (void*)poptb) {
 	  gui->UnsetPopupWidget();
 	  }
 	else {
@@ -395,7 +366,7 @@ int Player_Local::EventHandler() {
 	    gui->Unlock();
 	    }
 	  }
-	else if(event.user.data1 == (void*)(rcontrols)) {
+	else if(event.user.data1 == (void*)(pcontrols)) {
 	  SDL_mutexP(off_mut);
 	  Uint32 cur_time = SDL_GetTicks();
 	  if((!past) && offset == (pround - 1) * 3000
@@ -451,8 +422,8 @@ int Player_Local::EventHandler() {
 	  sel_z = cur_zpos;
 	  maction = 1;
 	  raction = 1;
-	  dpass->SetMenu(2, mactions[maction]);
-	  dpass->SetMenu(3, ractions[raction]);
+	  ppass->SetMenu(2, mactions[maction]);
+	  ppass->SetMenu(3, ractions[raction]);
 	  }
 	else {
 	  sel_id = -1;
@@ -461,8 +432,8 @@ int Player_Local::EventHandler() {
 	  sel_z = -1;
 	  maction = 0;
 	  raction = 0;
-	  dpass->SetMenu(2, mactions[maction]);
-	  dpass->SetMenu(3, ractions[raction]);
+	  ppass->SetMenu(2, mactions[maction]);
+	  ppass->SetMenu(3, ractions[raction]);
 	  }
 	}
       else if(event.user.code == SG_EVENT_MOTION) {
@@ -475,12 +446,12 @@ int Player_Local::EventHandler() {
 	mouse_y = ((int)(y)) / 2;
 	if(sel_id > 0 && percept.UnitPresent(mouse_x, mouse_y, cur_zpos, targ_id) < 0) {
 	  raction = 2;
-	  dpass->SetMenu(3, ractions[raction]);
+	  ppass->SetMenu(3, ractions[raction]);
 	  }
 	else if(sel_id > 0) {
 	  raction = 1;
 	  targ_id = -1;
-	  dpass->SetMenu(3, ractions[raction]);
+	  ppass->SetMenu(3, ractions[raction]);
 	  }
 	}
       else if(event.user.code == SG_EVENT_DND) {
@@ -548,53 +519,50 @@ bool Player_Local::Run() {
 
   while(exiting == 0) {
     if(pround != game->CurrentRound()) {
+      if(disround == pround) { disround = -1; }
       pround = game->CurrentRound();
       game->UpdatePercept(id, pround);
 
       gui->Lock();
 
-      ddoneb->TurnOff(); // Make sure "Ready" isn't checked next time
+      pdoneb->TurnOff(); // Make sure "Ready" isn't checked next time
 
       UpdateEquipIDs();	 // See if we need to do the Equip thing again
-
-      sprintf(buf, "Declare Turn (#%d)%c", pround, 0);
-      dtext->SetText(buf);
-      sprintf(buf, "Playback Turn (#%d)%c", pround-1, 0);
-      rtext->SetText(buf);
-      disround = pround-1;
 
       gui->Unlock();
       }
 
     if(phase != nextphase) {
       gui->Lock();
-      if(nextphase == PHASE_REPLAY) UpdateEquipIDs();
       gui->MasterWidget()->RemoveWidget(wind[phase]);
       phase = nextphase;
       gui->MasterWidget()->AddWidget(wind[phase]);
       gui->Unlock();
-
-//      //Temporary!
-//      if(phase == PHASE_DECLARE) video->SetSubscreen(-0.8, -0.2, 0.4, 1.0);
-//      else video->ResetSubscreen();
       }
     Uint32 cur_time = SDL_GetTicks();
 
-    if(phase == PHASE_REPLAY) {
+    if(phase == PHASE_PLAY) {
       SDL_mutexP(off_mut);
       CalcOffset(cur_time);
-      sprintf(buf, "%d.%.3d seconds%c", offset / 1000, offset % 1000, 0);
       SDL_mutexV(off_mut);
+      sprintf(buf, "%d.%.3d seconds%c", offset / 1000, offset % 1000, 0);
+      gui->Lock();
+      pstamp->SetText(buf);
+      gui->Unlock();
 
       unsigned int showround = offset / 3000 + 1;
-      if(showround > pround - 1)
-	showround = pround - 1;
       if(disround != showround) {
 	disround = showround;
-	sprintf(buf, "Playback Turn (#%d)%c", disround, 0);
-	rtext->SetText(buf);
+	if(disround >= pround) {
+	  sprintf(buf, "Declare Turn (#%d)%c", disround, 0);
+	  }
+	else {
+	  sprintf(buf, "Playback Turn (#%d)%c", disround, 0);
+	  }
+	gui->Lock();
+	ptext->SetText(buf);
+	gui->Unlock();
 	}
-      rstamp->SetText(buf);
       }
 
     SDL_mutexP(vid_mut);
@@ -603,27 +571,23 @@ bool Player_Local::Run() {
 
     gui->RenderStart(cur_time, true);
 
-    if(phase == PHASE_DECLARE) {
-      world->Render((pround-1)*3000);
-
-      int unit;
-      int unitthere = percept.UnitPresent(mouse_x, mouse_y, cur_zpos, unit);
-      if(unitthere > 0) {
-	world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 0.0, 1.0, 0.0);
-	}
-      else if(unitthere < 0) {
-	world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 0.0, 0.0);
-	}
-      else {
-	world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 1.0, 0.0);
-	}
-
-      world->DrawSelBox(sel_x, sel_y, sel_z);
-
-      scene->Render((pround-1)*3000);
-      }
-    else if(phase == PHASE_REPLAY) {
+    if(phase == PHASE_PLAY) {
       world->Render(offset);
+      if(offset == (pround-1)*3000) {
+	int unit;
+	int unitthere = percept.UnitPresent(mouse_x, mouse_y, cur_zpos, unit);
+	if(unitthere > 0) {
+	  world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 0.0, 1.0, 0.0);
+	  }
+	else if(unitthere < 0) {
+	  world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 0.0, 0.0);
+	  }
+	else {
+	  world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 1.0, 0.0);
+	  }
+	world->DrawSelBox(sel_x, sel_y, sel_z);
+	}
+
       scene->Render(offset);
       }
 
@@ -740,18 +704,15 @@ void Player_Local::UpdateEquipIDs() {
       ednd = NULL;
       dnds.clear();
       }
-    if(pround == 1) nextphase = PHASE_DECLARE;
-    else {
-      SDL_mutexP(off_mut);
-      nextphase = PHASE_REPLAY;
-      last_time = SDL_GetTicks();
-      last_offset = (pround - 2) * 3000;
-      playback_speed = 5; //Default is play
-      gui->Lock();
-      rcontrols->Set(playback_speed);
-      gui->Unlock();
-      SDL_mutexV(off_mut);
-      }
+    SDL_mutexP(off_mut);
+    nextphase = PHASE_PLAY;
+    last_time = SDL_GetTicks();
+    last_offset = (pround - 2) * 3000;
+    playback_speed = 5; //Default is play
+    gui->Lock();
+    pcontrols->Set(playback_speed);
+    gui->Unlock();
+    SDL_mutexV(off_mut);
     }
   }
 
@@ -784,7 +745,10 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
 	playback_speed);	// Should never happen
       }break;
     }
-  if(offset > 2147483647U) {	//Compare to INT_MAX, since is unsigned
+  if(pround < 2) {
+    offset = 0;
+    }
+  else if(offset > 2147483647U) {	//Compare to INT_MAX, since is unsigned
     if(past) {
       offset = 0;
       }
@@ -793,21 +757,21 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
       }
     playback_speed = 3; //Auto-stop
     gui->Lock();
-    rcontrols->Set(playback_speed);
+    pcontrols->Set(playback_speed);
     gui->Unlock();
     }
   else if((!past) && offset < (pround - 2) * 3000) {
     offset = (pround - 2) * 3000;
     playback_speed = 3; //Auto-stop
     gui->Lock();
-    rcontrols->Set(playback_speed);
+    pcontrols->Set(playback_speed);
     gui->Unlock();
     }
   else if(offset > (pround - 1) * 3000) {
     offset = (pround - 1) * 3000;
     playback_speed = 3; //Auto-stop
     gui->Lock();
-    rcontrols->Set(playback_speed);
+    pcontrols->Set(playback_speed);
     gui->Unlock();
     }
   }
