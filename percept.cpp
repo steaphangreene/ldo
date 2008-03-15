@@ -33,7 +33,6 @@ Percept::Percept() {
 
 Percept::~Percept() {
   Clear();
-  my_units.clear();
   }
 
 //static char buf[BUF_LEN];
@@ -61,10 +60,16 @@ int Percept::Save(FILE *fl, unsigned int ver) {
   return 1;
   }
 
-void Percept::Clear() {	//Prepares for next frame
+void Percept::Clear() {	//Erases all data (re-init)
   my_units.clear();
   other_units.clear();
   objects.clear();
+  unplayer.clear();
+  mapxs = 0;
+  mapys = 0;
+  mapzs = 0;
+  mapname = "";
+  mapdesc = "";
   }
 
 int Percept::UnitPresent(int xc, int yc, int zc, int &id) {

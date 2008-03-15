@@ -161,6 +161,7 @@ World::World(Percept *per, Orders *ord, int pl) {
   modmap[0x120] = -2;	//Broken Fence
 
   scene = SimpleScene::Current(); //Yes, this is ok, it's static!
+  scene->Clear();
 
   //Special Effects Resources
   SimpleTexture *smoke_tex = new SimpleTexture("graphics/smoke.png");
@@ -183,6 +184,7 @@ World::World(Percept *per, Orders *ord, int pl) {
     250
     };
   fire = scene->AddParticleType(fire_type);
+  effectsto = 0;
   }
 
 World::~World() {
@@ -198,8 +200,6 @@ void World::SetViewAngle(int ang) {
   }
 
 void World::DrawMap(Uint32 offset) {
-  static Uint32 effectsto = 0;
-
   GLfloat shininess[] = { 128.0 * 0.75 };
   GLfloat specular[] = { 0.75, 0.75, 0.75, 1.0 };
   GLfloat ambient[] = { 0.5, 0.5, 0.5, 1.0 };

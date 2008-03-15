@@ -463,6 +463,7 @@ void Game::Clear() {
   squnits.clear();
   percept.clear();
   orders.clear();
+  sides.clear();
   }
 
 void Game::SetOrders(int plnum, Orders *ord) {

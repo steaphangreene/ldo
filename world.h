@@ -64,6 +64,7 @@ protected:
   map<int, unsigned int> modmap;
   map<int, unsigned int> texmap;
   int smoke, fire;
+  Uint32 effectsto;
   };
 
 #endif // WORLD_H

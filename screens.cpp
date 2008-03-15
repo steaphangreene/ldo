@@ -85,7 +85,7 @@ public:
   virtual ~Screen_Single();
   virtual ScreenNum Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *audio, SDL_Event &event);
 protected:
-  SG_Button *cancelb, *optb, *loadb, *gob;
+  SG_Button *cancelb, *optb, *loadb, *gob, *contb;
   SG_ScrollingArea *connscr;
   SimpleConnect *connector;
   };
@@ -494,9 +494,11 @@ Screen_Single::Screen_Single() {
   loadb = new SG_Button("Load");
   main->AddWidget(loadb, 5, 2);
   gob = new SG_Button("Go");
-//  gob->SetAlignment(SG_ALIGN_LEFT);	//Temporary!
   main->AddWidget(gob, 5, 6);
   gob->Disable();
+  contb = new SG_Button("Continue");
+  main->AddWidget(contb, 5, 7);
+  contb->Disable();
   connscr = new SG_ScrollingArea(SG_AUTOSIZE, 12.0);
   main->AddWidget(connscr, 0, 2, 5, 10);
   connector = new SimpleConnect();
@@ -509,18 +511,23 @@ Screen_Single::~Screen_Single() {
   }
 
 ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *audio, SDL_Event &event) {
-  bool play_game = false;
+  bool play_game = false, create_game = false;
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_BUTTONCLICK) {
       if(event.user.data1 == (void*)cancelb) return SCREEN_TITLE;
       else if(event.user.data1 == (void*)optb) return SCREEN_CONFIG;
       else if(event.user.data1 == (void*)loadb) return POPUP_LOADMAP;
-      else if(event.user.data1 == (void*)gob) play_game = true;
+      else if(event.user.data1 == (void*)contb) play_game = true;
+      else if(event.user.data1 == (void*)gob) {
+	play_game = true;
+	create_game = true;
+	}
       }
     else if(event.user.code == SG_EVENT_CONNECTDONE) {
       play_game = true;
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
+      contb->Disable();
       if(cur_game) gob->Enable();
       vector<SC_SlotType> slots;
       vector<int> slot_cols;
@@ -540,17 +547,21 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
     }
   if(!play_game) return SCREEN_SAME;
 
-  SimpleConnections conn = connector->ClaimConnections();
-  vector<SlotData>::iterator slot = conn.slots.begin();
-  for(int pn=0; slot != conn.slots.end(); ++slot, ++pn) {
-    if(slot->ptype == SC_PLAYER_LOCAL) {
-      cur_game->AttachPlayer(new Player_Local(cur_game, PLAYER_LOCAL, pn,
-	slot->color - 1));
+  if(create_game) {
+    SimpleConnections conn = connector->ClaimConnections();
+    vector<SlotData>::iterator slot = conn.slots.begin();
+    for(int pn=0; slot != conn.slots.end(); ++slot, ++pn) {
+      if(slot->ptype == SC_PLAYER_LOCAL) {
+	cur_game->AttachPlayer(new Player_Local(cur_game, PLAYER_LOCAL, pn,
+		slot->color - 1));
+	}
+      else { //if(slot->ptype == SC_PLAYER_AI) {
+	cur_game->AttachPlayer(new Player_AI(cur_game, PLAYER_AI, pn,
+		slot->color - 1));
+	}
       }
-    else { //if(slot->ptype == SC_PLAYER_AI) {
-      cur_game->AttachPlayer(new Player_AI(cur_game, PLAYER_AI, pn,
-	slot->color - 1));
-      }
+    gob->Disable();
+    contb->Enable();
     }
 
   return SCREEN_PLAY;
@@ -702,6 +713,7 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *
 	  }
 	fprintf(stderr, "Sent data to clients\n");
 	}
+      gob->Disable();
       return SCREEN_PLAY;
       }
     }
