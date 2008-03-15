@@ -51,6 +51,9 @@ World::World(Percept *per, Orders *ord, int pl) {
   models.push_back(SM_LoadModel("models/players/trooper", "red"));
   models.back()->AttachSubmodel("tag_weapon", weap);
 
+  //For Items that aren't drawn
+  modmap[0x0000] = (Uint32)(-1);
+
   modmap[-GROUND_FLOOR] = models.size();
   models.push_back(SM_LoadModel("models/floor.obj"));
 
@@ -97,6 +100,9 @@ World::World(Percept *per, Orders *ord, int pl) {
     sprintf(name, "graphics/util/test%.3d.png%c", n, 0);
     textures.push_back(new SimpleTexture(name));
     }
+
+  //Items that aren't drawn
+  modmap[0x120] = modmap[0x0000];	//Broken Fence
 
   texmap[0x146] = textures.size();
   texmap[0x182] = textures.size();
@@ -156,9 +162,6 @@ World::World(Percept *per, Orders *ord, int pl) {
 
   texmap[0x129] = textures.size();
   textures.push_back(new SimpleTexture("models/metalroof.png"));
-
-  //Items that aren't drawn
-  modmap[0x120] = -2;	//Broken Fence
 
   scene = SimpleScene::Current(); //Yes, this is ok, it's static!
   scene->Clear();
@@ -240,22 +243,24 @@ void World::DrawMap(Uint32 offset) {
 	  }
 	}
       else {
-	int tex = -1, mod = -1;
-	if(modmap.count(obj->second.which) > 0) mod = modmap[obj->second.which];
-	if(texmap.count(obj->second.which) > 0) tex = texmap[obj->second.which];
+	Uint32 tex, mod;
+	if(modmap.count(obj->second.which) > 0) {
+	  mod = modmap[obj->second.which];
+	  }
+	else {
+	  mod = modmap[-(obj->second.type)];
+	  }
 
 	if(obj->first.z > cur_zpos) {	//Items above the view Z plane
 	  continue;	//Don't draw it
 	  }
 
-	if(mod < -1) {			//Items that aren't drawn
+	if(mod == modmap[0x0000]) {		//Items that aren't drawn
 	  continue;	//Don't draw it
 	  }
 
-	glPushMatrix();
-	glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-
-	if(tex >= 0) {
+	if(texmap.count(obj->second.which) > 0) {
+	  tex = texmap[obj->second.which];
 	  glColor3f(1.0, 1.0, 1.0);
 	  }
 	else {
@@ -264,9 +269,8 @@ void World::DrawMap(Uint32 offset) {
 	  }
 	glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
 
-	if(mod < 0) {
-	  mod = modmap[-(obj->second.type)];
-	  }
+	glPushMatrix();
+	glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
 
 	models[mod]->Render(0);
 	glPopMatrix();

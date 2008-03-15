@@ -364,7 +364,7 @@ int Game::Load(FILE *fl) {
   for(int y=0; y < 50; ++y) {
     for(int x=0; x < 50; ++x) {
       MapCoord pos = { x, y, 0 };
-      MapObject obj = { GROUND_FLOOR, 0, 0.0 };
+      MapObject obj = { GROUND_FLOOR, 1+x+y, 0.0 };
       master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
       }
     }
@@ -464,6 +464,8 @@ void Game::Clear() {
   percept.clear();
   orders.clear();
   sides.clear();
+
+  round = 1;
   }
 
 void Game::SetOrders(int plnum, Orders *ord) {

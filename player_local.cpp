@@ -519,7 +519,7 @@ bool Player_Local::Run() {
 
   while(exiting == 0) {
     if(pround != game->CurrentRound()) {
-      if(disround == pround) { disround = -1; }
+      if(disround == pround) { disround = 0; }
       pround = game->CurrentRound();
       game->UpdatePercept(id, pround);
 

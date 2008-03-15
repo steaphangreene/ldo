@@ -31,7 +31,7 @@ Player::Player(Game *gm, PlayerType tp, int num, int c) {
   id = num;
   color = c;
 
-  pround = -1;
+  pround = 0;
 
   cur_game->SetPercept(num, &percept);
   cur_game->SetOrders(num, &orders);
