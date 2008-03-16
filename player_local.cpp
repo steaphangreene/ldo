@@ -302,7 +302,7 @@ int Player_Local::EventHandler() {
 	  SDL_mutexP(off_mut);
 	  nextphase = PHASE_PLAY;	//FIXME: Not Updated!
 	  last_time = SDL_GetTicks();
-	  last_offset = (pround - 2) * 3000;
+	  last_offset = (percept.round - 2) * 3000;
 	  playback_speed = 5; //Default is play
 	  gui->Lock();
 	  pcontrols->Set(playback_speed);
@@ -393,21 +393,21 @@ int Player_Local::EventHandler() {
 	else if(event.user.data1 == (void*)(pcontrols)) {
 	  SDL_mutexP(off_mut);
 	  Uint32 cur_time = SDL_GetTicks();
-	  if((!past) && offset == (pround - 1) * 3000
+	  if((!past) && offset == (percept.round - 1) * 3000
 		&& playback_speed == 3 && *((int*)(event.user.data2)) > 3) {
-	    offset = (pround - 2) * 3000;		//Re-Play
+	    offset = (percept.round - 2) * 3000;		//Re-Play
 	    }
-	  else if((!past) && offset == (pround - 2) * 3000
+	  else if((!past) && offset == (percept.round - 2) * 3000
 		&& playback_speed == 3 && *((int*)(event.user.data2)) < 3) {
-	    offset = (pround - 1) * 3000;		//Re-Reverse
+	    offset = (percept.round - 1) * 3000;		//Re-Reverse
 	    }
-	  else if(past && offset == (pround - 1) * 3000
+	  else if(past && offset == (percept.round - 1) * 3000
 		&& playback_speed == 3 && *((int*)(event.user.data2)) > 3) {
 	    offset = 0;						//Re-Play All
 	    }
 	  else if(past && offset == 0
 		&& playback_speed == 3 && *((int*)(event.user.data2)) < 3) {
-	    offset = (pround - 1) * 3000;		//Re-Rev All
+	    offset = (percept.round - 1) * 3000;		//Re-Rev All
 	    }
 	  else {
 	    CalcOffset(cur_time);
@@ -542,10 +542,9 @@ bool Player_Local::Run() {
   SDL_Thread *th = SDL_CreateThread(event_thread_func, (void*)(this));
 
   while(exiting == 0) {
-    if(pround != percept.round) {
-      if(disround == pround) { disround = 0; }
-      pround = percept.round;
-      game->UpdatePercept(id, pround);
+    if(!(game->PerceptUpToDate(id))) {
+      if(disround == percept.round) { disround = 0; }
+      game->UpdatePercept(id);
 
       gui->Lock();
 
@@ -586,7 +585,7 @@ bool Player_Local::Run() {
       unsigned int showround = offset / 3000 + 1;
       if(disround != showround) {
 	disround = showround;
-	if(disround >= pround) {
+	if(disround >= percept.round) {
 	  sprintf(buf, "Declare Turn (#%d)%c", disround, 0);
 	  }
 	else {
@@ -606,7 +605,7 @@ bool Player_Local::Run() {
 
     if(phase == PHASE_PLAY) {
       world->Render(offset);
-      if(offset == (pround-1)*3000) {
+      if(offset == (percept.round - 1)*3000) {
 	if(xspd == 0.0 && yspd == 0.0) {
 	  int unit;
 	  int unitthere = percept.UnitPresent(mouse_x, mouse_y, cur_zpos, unit);
@@ -654,7 +653,7 @@ bool Player_Local::Run() {
 
 	//Note: gui_mut must be locked before calling this function!
 void Player_Local::UpdateEquipIDs() {
-  Uint32 start_time = (pround-1)*3000;
+  Uint32 start_time = (percept.round - 1)*3000;
   set<int> eqtmp;	//Temporary set of ids for eq
   eqid.clear();
 
@@ -742,7 +741,7 @@ void Player_Local::UpdateEquipIDs() {
     SDL_mutexP(off_mut);
     nextphase = PHASE_PLAY;
     last_time = SDL_GetTicks();
-    last_offset = (pround - 2) * 3000;
+    last_offset = (percept.round - 2) * 3000;
     playback_speed = 5; //Default is play
     gui->Lock();
     pcontrols->Set(playback_speed);
@@ -780,7 +779,7 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
 	playback_speed);	// Should never happen
       }break;
     }
-  if(pround < 2) {
+  if(percept.round < 2) {
     offset = 0;
     }
   else if(offset > 2147483647U) {	//Compare to INT_MAX, since is unsigned
@@ -788,22 +787,22 @@ void Player_Local::CalcOffset(Uint32 cur_time) {
       offset = 0;
       }
     else {
-      offset = (pround - 2) * 3000;
+      offset = (percept.round - 2) * 3000;
       }
     playback_speed = 3; //Auto-stop
     gui->Lock();
     pcontrols->Set(playback_speed);
     gui->Unlock();
     }
-  else if((!past) && offset < (pround - 2) * 3000) {
-    offset = (pround - 2) * 3000;
+  else if((!past) && offset < (percept.round - 2) * 3000) {
+    offset = (percept.round - 2) * 3000;
     playback_speed = 3; //Auto-stop
     gui->Lock();
     pcontrols->Set(playback_speed);
     gui->Unlock();
     }
-  else if(offset > (pround - 1) * 3000) {
-    offset = (pround - 1) * 3000;
+  else if(offset > (percept.round - 1) * 3000) {
+    offset = (percept.round - 1) * 3000;
     playback_speed = 3; //Auto-stop
     gui->Lock();
     pcontrols->Set(playback_speed);

@@ -35,12 +35,11 @@ bool Player_AI::Run() {
 
   int exiting = 0;
   while(exiting == 0) {
-    if(pround != percept.round) {
-      pround = percept.round;
-      game->UpdatePercept(id, pround);
+    if(!(game->PerceptUpToDate(id))) {
+      game->UpdatePercept(id);
       //SDL_Delay(10);
 
-      if(pround == 0) {
+      if(percept.round == 0) {
 	map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
 	for(; unit != percept.my_units.end(); ++unit) {
 	  if(unit->second.back().act == ACT_EQUIP) {
@@ -49,7 +48,7 @@ bool Player_AI::Run() {
 	  //SDL_Delay(10);
 	  }
 	}
-      else if(pround >= 1 && pround < 5) {	// Everyone Run South
+      else if(percept.round >= 1 && percept.round < 5) { // Everyone Run South
 	map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
 	for(; unit != percept.my_units.end(); ++unit) {
 	  orders.orders.push_back(UnitOrder(unit->first, 0, ORDER_RUN,

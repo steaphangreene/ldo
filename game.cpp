@@ -489,12 +489,11 @@ void Game::SetPercept(int plnum, Percept *prcpt) {
   percept[plnum] = prcpt;
   }
 
-void Game::UpdatePercept(int plnum, unsigned int rnd) {
-  if(rnd < 1 || rnd > master.round) {
-    fprintf(stderr, "ERROR: Percept requested in future or pre-start!\n");
-    exit(1);
-    }
+bool Game::PerceptUpToDate(int plnum) {
+  return (percept[plnum]->round == master.round);
+  }
 
+void Game::UpdatePercept(int plnum) {
   percept[plnum]->Clear();
   map<int, vector<UnitAct> >::const_iterator itr = master.my_units.begin();
   for(; itr != master.my_units.end(); ++itr) {

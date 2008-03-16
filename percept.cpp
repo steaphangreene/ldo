@@ -29,6 +29,7 @@
 using namespace std;
 
 Percept::Percept() {
+  round = 0;	// Uninitialized
   }
 
 Percept::~Percept() {

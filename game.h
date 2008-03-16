@@ -69,7 +69,8 @@ public:
 
   void SetOrders(int plnum, Orders *ord);
   void SetPercept(int plnum, Percept *prcpt);
-  void UpdatePercept(int plnum, unsigned int rnd);
+  void UpdatePercept(int plnum);
+  bool PerceptUpToDate(int plnum);
 
   PlayResult Play();
 
