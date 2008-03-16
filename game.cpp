@@ -176,6 +176,7 @@ int Game::Load(vector< vector<int> > &vec, FILE *fl) {
   }
 
 int Game::LoadXCom(FILE *fl, const string &dir) {
+  bool tftd = false;	// Is this X-Com 2 (Terror from the Deep)?
   Uint8 buf[64];
   map<Uint8, float> height;	// All Non-Default Height Objects
   height[32] = 0.0;	// Broken Fence
@@ -198,7 +199,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
   if(mis == NULL) mis = fopen((dir + "/MISDATA.DAT").c_str(), "rb");
   if(mis) {
     fseek(mis, 0, SEEK_END);
-    if(ftell(mis) == 172) ttype = 10;
+    if(ftell(mis) == 172) {
+      tftd = true;	// This IS X-Com 2 (Terror from the Deep)
+      ttype = 10;
+      }
     fclose(mis);
     }
 
@@ -303,6 +307,20 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
       }
     }
 
+  int num_units = 80, recsize = 124;
+  FILE *unitref = fopen((dir + "/unitref.dat").c_str(), "rb");
+  if(unitref == NULL) unitref = fopen((dir + "/UNITREF.DAT").c_str(), "rb");
+  if(unitref) {
+    if(tftd) recsize = 132;
+    fseek(unitref, 0, SEEK_END);
+    num_units = ftell(unitref) / recsize;
+    fseek(unitref, 0, SEEK_SET);
+    }
+  Uint8 unitref_data[num_units][recsize];
+  if(unitref) {
+    fread(unitref_data, num_units, recsize, unitref);
+    fclose(unitref);
+    }
   sides.resize(3);
   sides[0].push_back(0);
   sides[1].push_back(1);
@@ -312,17 +330,18 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
   plsquads[1].push_back(1);
   plsquads[2].push_back(2);
   squnits.resize(3);
-  FILE *units = fopen((dir + "/unitpos.dat").c_str(), "rb");
-  if(units == NULL) units = fopen((dir + "/UNITPOS.DAT").c_str(), "rb");
-  if(units) {
+  FILE *unitfl = fopen((dir + "/unitpos.dat").c_str(), "rb");
+  if(unitfl == NULL) unitfl = fopen((dir + "/UNITPOS.DAT").c_str(), "rb");
+  if(unitfl) {
     Uint8 unit_data[80][14];
-    fread(unit_data, 14, 80, units);
-    fclose(units);
+    fread(unit_data, 14, 80, unitfl);
+    fclose(unitfl);
     int sidecount[3] = {0, 0, 0};
     for(int unit = 0; unit < 80; ++unit) { // FIXME: How do I tell what's real?
       if((unit_data[unit][1] |  unit_data[unit][0] | unit_data[unit][2]) != 0) {
+	int unit_id = (int)(units.size() + 1);
 	sidecount[unit_data[unit][9]] ++;
-	squnits[unit_data[unit][9]].push_back(int(unit)+1);
+	squnits[unit_data[unit][9]].push_back(unit_id);
 
 	Unit *unit_ptr;
 	int x, y, z;
@@ -330,12 +349,13 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	y = master.mapys - 1 - int(unit_data[unit][0]);
 	z = master.mapzs - 1 - int(unit_data[unit][2]);
 	unit_ptr = new Unit;
-	unit_ptr->id = int(unit) + 1;
+	unit_ptr->id = unit_id;
 	unit_ptr->troop = unit_data[unit][9];
-	unit_ptr->name = "Bob, Joe";	//FIXME!
-	master.unplayer[int(unit)+1] = unit_data[unit][9];
-	master.AddAction(unit_ptr->id, 0, x, y, z, ACT_START);
-	master.AddAction(unit_ptr->id, 0, x, y, z, ACT_EQUIP, 0, 1);
+	unit_ptr->name = (char*)(unitref_data[unit]+86);
+	units[unit_id] = unit_ptr;
+	master.unplayer[unit_id] = unit_data[unit][9];
+	master.AddAction(unit_id, 0, x, y, z, ACT_START);
+	master.AddAction(unit_id, 0, x, y, z, ACT_EQUIP, 0, 1);
 //	printf("Unit at %dx%dx%d\t[%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X]\n",
 //		unit_data[unit][1], unit_data[unit][0], unit_data[unit][2],
 //		unit_data[unit][3], unit_data[unit][4], unit_data[unit][5],
@@ -446,6 +466,8 @@ const Unit *Game::UnitRef(int id) {
   }
 
 void Game::Clear() {
+  ResetReady();
+
   map<int, Unit *>::iterator itrm = units.begin();
   for(; itrm != units.end(); ++itrm) {
     if(itrm->second) delete itrm->second;
@@ -663,7 +685,7 @@ void Game::ResolveRound() {
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_EQUIP): {
-	    if(master.round != 0 || order->time != 0) {	// Not Initial EQUIP
+	    if(master.round != 1 || order->time != 0) {	// Not Initial EQUIP
 	      if(ordered.count(order->id) <= 0) {
 		master.AddAction(order->id,
 			(master.round - 1) * 3000 + order->time + offset,

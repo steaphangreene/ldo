@@ -664,7 +664,7 @@ void Player_Local::UpdateEquipIDs() {
     for(; act != unit->second.end(); ++act) {
       if(act->act == ACT_EQUIP && act->time >= start_time
 		&& act->time < start_time+3000) {
-	//eqtmp.insert(act->id);	//Temporarily Disable Equip Screen
+	eqtmp.insert(act->id);
 	}
       }
     }
@@ -682,8 +682,8 @@ void Player_Local::UpdateEquipIDs() {
       if(act->act == ACT_EQUIP && eqtmp.count(act->id)
 		&& (targ == -1 || targ == act->targ1)
 		&& act->time >= start_time && act->time < start_time+3000) {
-	//targ = act->targ1;		//Temporarily Disable Equip Screen
-	//eqid.push_back(act->id);
+	targ = act->targ1;
+	eqid.push_back(act->id);
 	}
       }
     }
