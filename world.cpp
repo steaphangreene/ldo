@@ -454,7 +454,7 @@ void World::DrawModels(Uint32 offset) {
 void World::Render(Uint32 offset) {	// Render for playback
   DrawMap(offset);
   DrawModels(offset);
-  DrawOrders(offset);
+  if(offset == (percept->round - 1) * 3000) DrawOrders(offset);
   }
 
 void World::DrawOrders(Uint32 offset) {
