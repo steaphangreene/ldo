@@ -95,14 +95,14 @@ World::World(Percept *per, Orders *ord, int pl) {
   modmap[0x184] = models.size();
   models.push_back(SM_LoadModel("models/nramp_low.obj"));
 
-  for(int n=0; n < 1000; ++n) {
-    char name[64];
-    sprintf(name, "graphics/util/test%.3d.png%c", n, 0);
-    textures.push_back(new SimpleTexture(name));
-    }
-
   //Items that aren't drawn
   modmap[0x120] = modmap[0x0000];	//Broken Fence
+
+  for(int n=0; n < 0x0100; ++n) {
+    char name[64];
+    sprintf(name, "graphics/util/test%.2X.png%c", n, 0);
+    textures.push_back(new SimpleTexture(name));
+    }
 
   texmap[0x146] = textures.size();
   texmap[0x182] = textures.size();
