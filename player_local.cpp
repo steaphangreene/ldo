@@ -542,9 +542,9 @@ bool Player_Local::Run() {
   SDL_Thread *th = SDL_CreateThread(event_thread_func, (void*)(this));
 
   while(exiting == 0) {
-    if(pround != game->CurrentRound()) {
+    if(pround != percept.round) {
       if(disround == pround) { disround = 0; }
-      pround = game->CurrentRound();
+      pround = percept.round;
       game->UpdatePercept(id, pround);
 
       gui->Lock();

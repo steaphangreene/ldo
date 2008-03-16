@@ -191,7 +191,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 
   master.mapname = "X-Com Map";
   master.mapdesc = "Loaded from an X-Com tactical save.";
-  round = 1;	//FIXME, load from map
+  master.round = 1;	//FIXME, load from map
   int ttype = 0;
 
   FILE *mis = fopen((dir + "/misdata.dat").c_str(), "rb");
@@ -355,7 +355,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 
 int Game::Load(FILE *fl) {
   unsigned int num, ver;
-  round = 1;
+  master.round = 1;
 
   //Temporary, flat map with no features
   master.mapxs = 50;
@@ -465,7 +465,7 @@ void Game::Clear() {
   orders.clear();
   sides.clear();
 
-  round = 1;
+  master.round = 1;
   }
 
 void Game::SetOrders(int plnum, Orders *ord) {
@@ -490,7 +490,7 @@ void Game::SetPercept(int plnum, Percept *prcpt) {
   }
 
 void Game::UpdatePercept(int plnum, unsigned int rnd) {
-  if(rnd < 1 || rnd > round) {
+  if(rnd < 1 || rnd > master.round) {
     fprintf(stderr, "ERROR: Percept requested in future or pre-start!\n");
     exit(1);
     }
@@ -538,6 +538,7 @@ void Game::UpdatePercept(int plnum, unsigned int rnd) {
   percept[plnum]->mapxs = master.mapxs;
   percept[plnum]->mapys = master.mapys;
   percept[plnum]->mapzs = master.mapzs;
+  percept[plnum]->round = master.round;
   }
 
 //Thread Stuff
@@ -654,7 +655,7 @@ void Game::ResolveRound() {
 	      ++pt;
 	      for(; pt != path.end(); ++pt) {
 		master.AddAction(order->id,
-		(CurrentRound() - 1) * 3000 + order->time + offset,
+		(master.round - 1) * 3000 + order->time + offset,
 		pt->x, pt->y, pt->z, act, lpt->x, lpt->y, lpt->z);
 		offset += step;
 		lpt = pt;
@@ -663,10 +664,10 @@ void Game::ResolveRound() {
 	    ordered.insert(order->id);
 	    }break;
 	  case(ORDER_EQUIP): {
-	    if(round != 0 || order->time != 0) {	// Not Initial EQUIP
+	    if(master.round != 0 || order->time != 0) {	// Not Initial EQUIP
 	      if(ordered.count(order->id) <= 0) {
 		master.AddAction(order->id,
-			(CurrentRound() - 1) * 3000 + order->time + offset,
+			(master.round - 1) * 3000 + order->time + offset,
 			x, y, z, ACT_EQUIP,
 			order->targ1, order->targ2, order->targ3);
 		ordered.insert(order->id);
@@ -692,17 +693,17 @@ void Game::ResolveRound() {
 	      int tx, ty, tz;
 	      master.GetPos(hit, tx, ty, tz);
 	      master.my_units[hit].push_back(UnitAct(hit,
-		(CurrentRound() - 1) * 3000 + order->time + 250 + offset,
+		(master.round - 1) * 3000 + order->time + 250 + offset,
 		tx, ty, tz, ACT_FALL));
 	      ordered.insert(hit);
 
 	      master.AddAction(order->id,
-		(CurrentRound() - 1) * 3000 + order->time + offset, x, y, z,
+		(master.round - 1) * 3000 + order->time + offset, x, y, z,
 		ACT_SHOOT, tx, ty, tz);
 	      }
 	    else {
 	      master.AddAction(order->id,
-		(CurrentRound() - 1) * 3000 + order->time + offset, x, y, z,
+		(master.round - 1) * 3000 + order->time + offset, x, y, z,
 		ACT_SHOOT, order->targ1, order->targ2, order->targ3);
 	      }
 	    ordered.insert(order->id);
@@ -715,5 +716,5 @@ void Game::ResolveRound() {
       }
     orders[pnum]->Clear();
     }
-  round++;
+  master.round++;
   }

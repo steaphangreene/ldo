@@ -35,8 +35,8 @@ bool Player_AI::Run() {
 
   int exiting = 0;
   while(exiting == 0) {
-    if(pround != game->CurrentRound()) {
-      pround = game->CurrentRound();
+    if(pround != percept.round) {
+      pround = percept.round;
       game->UpdatePercept(id, pround);
       //SDL_Delay(10);
 
