@@ -180,6 +180,9 @@ int Player_Local::EventHandler() {
 	SDL_mutexP(vid_mut);
 	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
+
+	mouse_x = -1;
+	mouse_y = -1;
 	}
       else if(event.key.keysym.sym == SDLK_LEFT) {
 	xspd -= MOVE_SPEED;
@@ -187,6 +190,9 @@ int Player_Local::EventHandler() {
 	SDL_mutexP(vid_mut);
 	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
+
+	mouse_x = -1;
+	mouse_y = -1;
 	}
       else if(event.key.keysym.sym == SDLK_UP) {
 	yspd += MOVE_SPEED;
@@ -194,6 +200,9 @@ int Player_Local::EventHandler() {
 	SDL_mutexP(vid_mut);
 	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
+
+	mouse_x = -1;
+	mouse_y = -1;
 	}
       else if(event.key.keysym.sym == SDLK_DOWN) {
 	yspd -= MOVE_SPEED;
@@ -201,18 +210,27 @@ int Player_Local::EventHandler() {
 	SDL_mutexP(vid_mut);
 	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
+
+	mouse_x = -1;
+	mouse_y = -1;
 	}
       else if(event.key.keysym.sym == SDLK_PAGEUP) {
 	cur_ang += 90.0;
 	SDL_mutexP(vid_mut);
 	video->SetAngle(cur_ang, ROT_DELAY);
 	SDL_mutexV(vid_mut);
+
+	mouse_x = -1;
+	mouse_y = -1;
 	}
       else if(event.key.keysym.sym == SDLK_PAGEDOWN) {
 	cur_ang -= 90.0;
 	SDL_mutexP(vid_mut);
 	video->SetAngle(cur_ang, ROT_DELAY);
 	SDL_mutexV(vid_mut);
+
+	mouse_x = -1;
+	mouse_y = -1;
 	}
       else if(event.key.keysym.sym == SDLK_KP_MINUS) {
 	++cur_zpos;
@@ -221,6 +239,9 @@ int Player_Local::EventHandler() {
 	  SDL_mutexP(vid_mut);
 	  video->SetZPosition(CELL_HEIGHT*cur_zpos, MOVE_DELAY);
 	  SDL_mutexV(vid_mut);
+
+	  mouse_x = -1;
+	  mouse_y = -1;
 	  }
 	}
       else if(event.key.keysym.sym == SDLK_KP_PLUS) {
@@ -230,6 +251,9 @@ int Player_Local::EventHandler() {
 	  SDL_mutexP(vid_mut);
 	  video->SetZPosition(CELL_HEIGHT*cur_zpos, MOVE_DELAY);
 	  SDL_mutexV(vid_mut);
+
+	  mouse_x = -1;
+	  mouse_y = -1;
 	  }
 	}
       }
@@ -583,16 +607,18 @@ bool Player_Local::Run() {
     if(phase == PHASE_PLAY) {
       world->Render(offset);
       if(offset == (pround-1)*3000) {
-	int unit;
-	int unitthere = percept.UnitPresent(mouse_x, mouse_y, cur_zpos, unit);
-	if(unitthere > 0) {
-	  world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 0.0, 1.0, 0.0);
-	  }
-	else if(unitthere < 0) {
-	  world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 0.0, 0.0);
-	  }
-	else {
-	  world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 1.0, 0.0);
+	if(xspd == 0.0 && yspd == 0.0) {
+	  int unit;
+	  int unitthere = percept.UnitPresent(mouse_x, mouse_y, cur_zpos, unit);
+	  if(unitthere > 0) {
+	    world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 0.0, 1.0, 0.0);
+	    }
+	  else if(unitthere < 0) {
+	    world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 0.0, 0.0);
+	    }
+	  else {
+	    world->DrawSelBox(mouse_x, mouse_y, cur_zpos, 1.0, 1.0, 0.0);
+	    }
 	  }
 	world->DrawSelBox(sel_x, sel_y, sel_z);
 	}
