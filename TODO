@@ -1,13 +1,10 @@
 -=Errors=-
-Remove SelBox after turn is declared.
 
 -=Codebase=-
-Implement the missing Player_Local popups
 Get screens to delete their widgets on destruction
 
 -=Mapfile=-
 Add Scoring Options
-Add actual map definition itself
 
 -=Design Flaws=-
-Figure out how config screen really fits in and update design
+Update design re: configuration ("Options") screens.
