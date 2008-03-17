@@ -169,24 +169,24 @@ World::World(Percept *per, Orders *ord, int pl) {
   //Special Effects Resources
   SimpleTexture *smoke_tex = new SimpleTexture("graphics/smoke.png");
   textures.push_back(smoke_tex);
-  SimpleScene_ParticleType smoke_type = {
-    smoke_tex,
-    0.8, 0.8, 0.8, 1.0,
-    0.2, 0.2, 0.2, 0.0,
-    0.0, 0.0, 1.0,
-    0.5, 3.0,
-    10000
-    };
-  smoke = scene->AddParticleType(smoke_type);
-  SimpleScene_ParticleType fire_type = {
-    smoke_tex,
-    1.0, 0.7, 0.2, 1.0,
-    1.0, 0.2, 0.0, 1.0,
-    0.0, 0.0, 10.0,
-    1.0, 0.5,
-    250
-    };
-  fire = scene->AddParticleType(fire_type);
+  smoke = scene->AddPType();
+  scene->SetPTypeTexture(smoke, smoke_tex);
+  scene->SetPTypeColor0(smoke, 0.8, 0.8, 0.8, 1.0);
+  scene->SetPTypeColor1(smoke, 0.2, 0.2, 0.2, 0.0);
+  scene->SetPTypeVelocity(smoke, 0.0, 0.0, 1.0);
+  scene->SetPTypeDuration(smoke, 10000);
+  scene->SetPTypeSize0(smoke, 0.5);
+  scene->SetPTypeSize1(smoke, 3.0);
+
+  fire = scene->AddPType();
+  scene->SetPTypeTexture(fire, smoke_tex);
+  scene->SetPTypeColor0(fire, 1.0, 0.7, 0.2, 1.0);
+  scene->SetPTypeColor1(fire, 1.0, 0.2, 0.0, 1.0);
+  scene->SetPTypeVelocity(fire, 0.0, 0.0, 10.0);
+  scene->SetPTypeDuration(fire, 250);
+  scene->SetPTypeSize0(fire, 1.0);
+  scene->SetPTypeSize1(fire, 0.5);
+
   effectsto = 0;
   }
 
@@ -223,10 +223,12 @@ void World::DrawMap(Uint32 offset) {
 		&& obj->second.which <= (int)(offset)) {
 	  for(Uint32 start = obj->second.which;
 		(int)(start) < obj->second.which + 20000; start += 10) {
-	    scene->AddParticle(fire,
+	    SS_Particle part = scene->AddParticle(fire);
+	    scene->SetParticlePosition(part,
 		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
 		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
-		obj->first.z*2.0, start);
+		obj->first.z*2.0);
+	    scene->SetParticleTime(part, start);
 	    }
 	  }
 	}
@@ -235,10 +237,12 @@ void World::DrawMap(Uint32 offset) {
 		&& obj->second.which <= (int)(offset)) {
 	  for(Uint32 start = obj->second.which;
 		(int)(start) < obj->second.which + 20000; start += 250) {
-	    scene->AddParticle(smoke,
+	    SS_Particle part = scene->AddParticle(smoke);
+	    scene->SetParticlePosition(part,
 		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
 		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
-		obj->first.z*2.0, start);
+		obj->first.z*2.0);
+	    scene->SetParticleTime(part, start);
 	    }
 	  }
 	}
