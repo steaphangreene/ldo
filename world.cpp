@@ -169,6 +169,7 @@ World::World(Percept *per, Orders *ord, int pl) {
   //Special Effects Resources
   SimpleTexture *smoke_tex = new SimpleTexture("graphics/smoke.png");
   textures.push_back(smoke_tex);
+
   smoke = scene->AddPType();
   scene->SetPTypeTexture(smoke, smoke_tex);
   scene->SetPTypeColor0(smoke, 0.8, 0.8, 0.8, 1.0);
