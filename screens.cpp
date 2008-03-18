@@ -527,6 +527,7 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
       }
     else if(event.user.code == SG_EVENT_CONNECTDONE) {
       play_game = true;
+      create_game = true;
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
       contb->Disable();
