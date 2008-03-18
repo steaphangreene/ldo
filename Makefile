@@ -21,6 +21,7 @@
 # *************************************************************************
 
 ARCH=	$(shell gcc -v 2>&1 | grep Target | cut -f2 -d" ")
+SSFLAGS=	$(shell $(ARCH)-simple-config --cflags)
 
 .PHONY: all
 all:	ldo.$(ARCH)
@@ -29,18 +30,18 @@ all:	ldo.$(ARCH)
 .SUFFIXES:
 
 CXX=	g++
-LIBS=	`simple-config --libs`
+LIBS=	$(shell $(ARCH)-simple-config --libs)
 
 #PRODUCTION OPTIONS
-CXXFLAGS=	-s -O2 -Wall `simple-config --cflags`
+CXXFLAGS=	-s -O2 -Wall $(SSFLAGS)
 
 #DEGUGGING OPTIONS
 debug:
-	make CXXFLAGS='-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `simple-config --cflags`'
+	make CXXFLAGS='-g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE $(SSFLAGS)'
 
 #PROFILING OPTIONS
 prof:
-	make CXXFLAGS'-pg -g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE `simple-config --cflags`'
+	make CXXFLAGS'-pg -g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE $(SSFLAGS)'
 
 OBJS:=	screens.$(ARCH).o percept.$(ARCH).o orders.$(ARCH).o \
 	game.$(ARCH).o unit.$(ARCH).o player.$(ARCH).o main.$(ARCH).o \
@@ -49,8 +50,8 @@ OBJS:=	screens.$(ARCH).o percept.$(ARCH).o orders.$(ARCH).o \
 #PRODUCTION OPTIONS (CROSS-COMPILED FOR WINDOWS)
 WARCH=	i586-mingw32msvc
 WCXX=	i586-mingw32msvc-g++
-WCXXFLAGS=	-s -O2 -Wall `i586-mingw32msvc-simple-config --cflags`
-WLIBS=	`i586-mingw32msvc-simple-config --libs`
+WCXXFLAGS=	-s -O2 -Wall $(shell i586-mingw32msvc-simple-config --cflags)
+WLIBS=	$(shell i586-mingw32msvc-simple-config --libs)
 WARCH=	i586-mingw32msvc
 
 %.h:	%.tga
@@ -71,7 +72,7 @@ deps.$(ARCH).mk:	*.cpp *.h
 
 .PHONY: clean
 clean:
-	rm -f deps.*.mk *.o ldo.* *.exe
+	rm -f deps.*.mk *.o ldo.*
 
 ldo.$(ARCH):	$(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LIBS)
@@ -79,9 +80,11 @@ ldo.$(ARCH):	$(OBJS)
 .PHONY: win32
 win32:	ldo.exe
 
-ldo.exe:	*.cpp *.h
+WPFIX=	$(shell i586-mingw32msvc-simple-config --prefix)
+
+ldo.exe:	*.cpp *.h $(WPFIX)/include/simple/*.h
 	make ARCH=$(WARCH) CXX='$(WCXX)' FLAGS='$(WFLAGS)' LIBS='$(WLIBS)'
-	mv -vf ldo.$(WARCH) ldo.exe
+	cp -av ldo.$(WARCH) ldo.exe
 
 TSTR:=	$(shell date -u +"%Y%m%d%H%M")
 .PHONY: tar
