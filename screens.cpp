@@ -639,14 +639,14 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *
 	}
       }
     else if(event.user.code == SG_EVENT_STICKYON) {
-      if(cur_game) gob->Enable();
+      //if(cur_game) gob->Enable();	//FIXME: Multiplayer Disabled
       }
     else if(event.user.code == SG_EVENT_STICKYOFF) {
       gob->Disable();
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
       if(cur_game && readyb->IsOn()) {
-	gob->Enable();
+	//gob->Enable();	//FIXME: Multiplayer Disabled
 	}
       connector->SetMapName(cur_game->MapName());
       vector<SC_SlotType> slots;
@@ -749,7 +749,7 @@ ScreenNum Screen_Replay::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
       else if(event.user.data1 == (void*)gob) return SCREEN_PLAY;
       }
     else if(event.user.code == SG_EVENT_FILEOPEN) {
-      if(cur_game) gob->Enable();
+      //if(cur_game) gob->Enable();	//FIXME: Replay Disabled
       }
     }
   return SCREEN_SAME;
