@@ -38,6 +38,10 @@ World::World(Percept *per, Orders *ord, int pl) {
   angle = 45;
   pointx = 0.0;
   pointy = 0.0;
+
+  scene = SimpleScene::Current(); //Yes, this is ok, it's static!
+  scene->Clear();
+
   SimpleModel *weap = SM_LoadModel("models/weapons2/machinegun/machinegun.md3");
 
   models.push_back(SM_LoadModel("models/players/trooper"));
@@ -52,48 +56,35 @@ World::World(Percept *per, Orders *ord, int pl) {
   models.back()->AttachSubmodel("tag_weapon", weap);
 
   //For Items that aren't drawn
-  modmap[0x0000] = (Uint32)(-1);
+  modmap[0x0000] = (SS_Model)(-1);
 
-  modmap[-GROUND_FLOOR] = models.size();
-  models.push_back(SM_LoadModel("models/floor.obj"));
+  modmap[-GROUND_FLOOR] = scene->AddModel(SM_LoadModel("models/floor.obj"));
 
-  modmap[-OBJECT_MISC] = models.size();
-  models.push_back(SM_LoadModel("models/object.obj"));
+  modmap[-OBJECT_MISC] = scene->AddModel(SM_LoadModel("models/object.obj"));
 
-  modmap[-WALL_NORTH] = models.size();
-  models.push_back(SM_LoadModel("models/nwall_thin_high.obj"));
+  modmap[-WALL_NORTH] =
+	scene->AddModel(SM_LoadModel("models/nwall_thin_high.obj"));
 
-  modmap[-WALL_WEST] = models.size();
-  models.push_back(SM_LoadModel("models/wwall_thin_high.obj"));
+  modmap[-WALL_WEST] =
+	scene->AddModel(SM_LoadModel("models/wwall_thin_high.obj"));
 
-  modmap[0x11D] = models.size();
-  models.push_back(SM_LoadModel("models/nfence1.obj"));
-  modmap[0x119] = models.size();
-  models.push_back(SM_LoadModel("models/wfence1.obj"));
+  modmap[0x11D] = scene->AddModel(SM_LoadModel("models/nfence1.obj"));
+  modmap[0x119] = scene->AddModel(SM_LoadModel("models/wfence1.obj"));
 
-  modmap[0x11E] = models.size();
-  models.push_back(SM_LoadModel("models/nfence2.obj"));
-  modmap[0x11A] = models.size();
-  models.push_back(SM_LoadModel("models/wfence2.obj"));
+  modmap[0x11E] = scene->AddModel(SM_LoadModel("models/nfence2.obj"));
+  modmap[0x11A] = scene->AddModel(SM_LoadModel("models/wfence2.obj"));
 
-  modmap[0x111] = models.size();
-  modmap[0x115] = models.size();
-  models.push_back(SM_LoadModel("models/nwall_thick_low.obj"));
-  modmap[0x110] = models.size();
-  modmap[0x114] = models.size();
-  models.push_back(SM_LoadModel("models/wwall_thick_low.obj"));
+  modmap[0x111] = scene->AddModel(SM_LoadModel("models/nwall_thick_low.obj"));
+  modmap[0x115] = modmap[0x111];
+  modmap[0x110] = scene->AddModel(SM_LoadModel("models/wwall_thick_low.obj"));
+  modmap[0x114] = modmap[0x110];
 
-  modmap[0x113] = models.size();
-  models.push_back(SM_LoadModel("models/nwall_thick_high.obj"));
-  modmap[0x112] = models.size();
-  models.push_back(SM_LoadModel("models/wwall_thick_high.obj"));
+  modmap[0x113] = scene->AddModel(SM_LoadModel("models/nwall_thick_high.obj"));
+  modmap[0x112] = scene->AddModel(SM_LoadModel("models/wwall_thick_high.obj"));
 
-  modmap[0x182] = models.size();
-  models.push_back(SM_LoadModel("models/nramp_high.obj"));
-  modmap[0x183] = models.size();
-  models.push_back(SM_LoadModel("models/nramp_med.obj"));
-  modmap[0x184] = models.size();
-  models.push_back(SM_LoadModel("models/nramp_low.obj"));
+  modmap[0x182] = scene->AddModel(SM_LoadModel("models/nramp_high.obj"));
+  modmap[0x183] = scene->AddModel(SM_LoadModel("models/nramp_med.obj"));
+  modmap[0x184] = scene->AddModel(SM_LoadModel("models/nramp_low.obj"));
 
   //Items that aren't drawn
   modmap[0x120] = modmap[0x0000];	//Broken Fence
@@ -101,74 +92,58 @@ World::World(Percept *per, Orders *ord, int pl) {
   for(int n=0; n < 0x0100; ++n) {
     char name[64];
     sprintf(name, "graphics/util/test%.2X.png%c", n, 0);
-    textures.push_back(new SimpleTexture(name));
+    texmap[n] = scene->AddSkin(new SimpleTexture(name));
     }
 
-  texmap[0x146] = textures.size();
-  texmap[0x182] = textures.size();
-  texmap[0x183] = textures.size();
-  texmap[0x184] = textures.size();
-  textures.push_back(new SimpleTexture("graphics/wall.png"));
+  texmap[0x146] = scene->AddSkin(new SimpleTexture("graphics/wall.png"));
+  texmap[0x182] = texmap[0x146];
+  texmap[0x183] = texmap[0x146];
+  texmap[0x184] = texmap[0x146];
 
-  texmap[0x119] = textures.size();
-  texmap[0x11A] = textures.size();
-  texmap[0x11D] = textures.size();
-  texmap[0x11E] = textures.size();
-  textures.push_back(new SimpleTexture("models/wood.png"));
+  texmap[0x119] = scene->AddSkin(new SimpleTexture("models/wood.png"));
+  texmap[0x11A] = texmap[0x119];
+  texmap[0x11D] = texmap[0x119];
+  texmap[0x11E] = texmap[0x119];
 
-  texmap[0x110] = textures.size();
-  texmap[0x111] = textures.size();
-  textures.push_back(new SimpleTexture("models/stone.png"));
+  texmap[0x110] = scene->AddSkin(new SimpleTexture("models/stone.png"));
+  texmap[0x111] = texmap[0x110];
 
-  texmap[0x112] = textures.size();
-  texmap[0x113] = textures.size();
-  texmap[0x114] = textures.size();
-  texmap[0x115] = textures.size();
-  textures.push_back(new SimpleTexture("models/hedge.png"));
+  texmap[0x112] = scene->AddSkin(new SimpleTexture("models/hedge.png"));
+  texmap[0x113] = texmap[0x112];
+  texmap[0x114] = texmap[0x112];
+  texmap[0x115] = texmap[0x112];
 
-  texmap[0x102] = textures.size();
-  textures.push_back(new SimpleTexture("models/grass.png"));
+  texmap[0x102] = scene->AddSkin(new SimpleTexture("models/grass.png"));
 
-  texmap[0x104] = textures.size();
-  textures.push_back(new SimpleTexture("models/dirt.png"));
+  texmap[0x104] = scene->AddSkin(new SimpleTexture("models/dirt.png"));
 
-  texmap[0x105] = textures.size();
-  textures.push_back(new SimpleTexture("models/reaped.png"));
+  texmap[0x105] = scene->AddSkin(new SimpleTexture("models/reaped.png"));
 
-  texmap[0x106] = textures.size();
-  textures.push_back(new SimpleTexture("models/wheat.png"));
+  texmap[0x106] = scene->AddSkin(new SimpleTexture("models/wheat.png"));
 
-  texmap[0x109] = textures.size();
-  textures.push_back(new SimpleTexture("models/cabbage.png"));
+  texmap[0x109] = scene->AddSkin(new SimpleTexture("models/cabbage.png"));
 
-  texmap[0x12C] = textures.size();
-  texmap[0x12D] = textures.size();
-  textures.push_back(new SimpleTexture("models/boards.png"));
+  texmap[0x12C] = scene->AddSkin(new SimpleTexture("models/boards.png"));
+  texmap[0x12D] = texmap[0x12C];
 
-  texmap[0x12E] = textures.size();	//FIXME: Window LOS!
-  texmap[0x12F] = textures.size();	//FIXME: Window LOS!
-  textures.push_back(new SimpleTexture("models/boards_window.png"));
+  //FIXME: Window LOS!
+  texmap[0x12E] = scene->AddSkin(new SimpleTexture("models/boards_window.png"));
+  texmap[0x12F] = texmap[0x12E];
 
-  texmap[0x138] = textures.size();	//FIXME: Door Open/Close!
-  texmap[0x139] = textures.size();	//FIXME: Door Open/Close!
-  textures.push_back(new SimpleTexture("models/door.png"));
+  //FIXME: Door Open/Close!
+  texmap[0x138] = scene->AddSkin(new SimpleTexture("models/door.png"));
+  texmap[0x139] = texmap[0x138];
 
-  texmap[0x131] = textures.size();
-  texmap[0x132] = textures.size();
-  textures.push_back(new SimpleTexture("models/brick.png"));
+  texmap[0x131] = scene->AddSkin(new SimpleTexture("models/brick.png"));
+  texmap[0x132] = texmap[0x131];
 
-  texmap[0x13A] = textures.size();
-  textures.push_back(new SimpleTexture("models/pavers.png"));
+  texmap[0x13A] = scene->AddSkin(new SimpleTexture("models/pavers.png"));
 
-  texmap[0x129] = textures.size();
-  textures.push_back(new SimpleTexture("models/metalroof.png"));
-
-  scene = SimpleScene::Current(); //Yes, this is ok, it's static!
-  scene->Clear();
+  texmap[0x129] = scene->AddSkin(new SimpleTexture("models/metalroof.png"));
 
   //Special Effects Resources
   SimpleTexture *smoke_tex = new SimpleTexture("graphics/smoke.png");
-  textures.push_back(smoke_tex);
+  scene->AddSkin(smoke_tex);
 
   smoke = scene->AddPType();
   scene->SetPTypeTexture(smoke, smoke_tex);
@@ -247,8 +222,8 @@ void World::DrawMap(Uint32 offset) {
 	    }
 	  }
 	}
-      else {
-	Uint32 tex, mod;
+      else if(obj->second.first_seen.begin()->second >= effectsto) {
+	SS_Model mod;
 	if(modmap.count(obj->second.which) > 0) {
 	  mod = modmap[obj->second.which];
 	  }
@@ -256,29 +231,26 @@ void World::DrawMap(Uint32 offset) {
 	  mod = modmap[-(obj->second.type)];
 	  }
 
-	if(obj->first.z > cur_zpos) {	//Items above the view Z plane
-	  continue;	//Don't draw it
-	  }
-
 	if(mod == modmap[0x0000]) {		//Items that aren't drawn
 	  continue;	//Don't draw it
 	  }
 
+	SS_Object sobj = scene->AddObject(mod);
+	scene->SetObjectPosition(sobj, obj->first.x*2.0+1.0,
+		obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
+	Uint32 base = obj->second.first_seen.begin()->second;
+
+	//FIXME: This is hard-coded to 100 seconds of life.
+	scene->ObjectAct(sobj, SS_ACT_VISIBLE, base+100000, 100000);
+
 	if(texmap.count(obj->second.which) > 0) {
-	  tex = texmap[obj->second.which];
-	  glColor3f(1.0, 1.0, 1.0);
+	  scene->SetObjectSkin(sobj, texmap[obj->second.which]);
 	  }
 	else {
-	  glColor3f(obj->first.x/float(50), 0.5, obj->first.y/float(50));
-	  tex = (obj->second.which & 0xFF);
+	  scene->SetObjectColor(sobj,
+		obj->first.x/float(50), 0.5, obj->first.y/float(50));
+	  scene->SetObjectSkin(sobj, obj->second.which & 0xFF);
 	  }
-	glBindTexture(GL_TEXTURE_2D, textures[tex]->GLTexture());
-
-	glPushMatrix();
-	glTranslatef(obj->first.x*2.0+1.0, obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-
-	models[mod]->Render(0);
-	glPopMatrix();
 	}
       }
     }
@@ -469,8 +441,9 @@ void World::DrawOrders(Uint32 offset) {
   glDisable(GL_LIGHTING);
   glDisable(GL_CULL_FACE);
   glBindTexture(GL_TEXTURE_2D, 0);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_BLEND);
+//FIXME: Better Order Graphics!
+//  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//  glEnable(GL_BLEND);
   for(; ord != orders->orders.end(); ++ord) {
     percept->GetPos(ord->id, xo, yo, zo);
     float ang = atan2f(ord->targ2 - yo, ord->targ1 - xo);

@@ -61,8 +61,8 @@ protected:
 
   vector<SimpleModel *> models;
   vector<SimpleTexture *> textures;
-  map<int, unsigned int> modmap;
-  map<int, unsigned int> texmap;
+  map<int, SS_Model> modmap;
+  map<int, SS_Skin> texmap;
   int smoke, fire;
   Uint32 effectsto;
   };

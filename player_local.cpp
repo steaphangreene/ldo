@@ -62,6 +62,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
     }
 
   world = new World(&percept, &orders, id);
+  scene->RestrictZ(0.0, CELL_HEIGHT);
 
   music = audio->LoadMusic("music/iconoclasm.ogg");
   cur_music = -1;
@@ -238,6 +239,7 @@ int Player_Local::EventHandler() {
 	else {
 	  SDL_mutexP(vid_mut);
 	  video->SetZPosition(CELL_HEIGHT*cur_zpos, MOVE_DELAY);
+	  scene->RestrictZ(0.0, CELL_HEIGHT*(cur_zpos+1));
 	  SDL_mutexV(vid_mut);
 
 	  mouse_x = -1;
@@ -250,6 +252,7 @@ int Player_Local::EventHandler() {
 	else {
 	  SDL_mutexP(vid_mut);
 	  video->SetZPosition(CELL_HEIGHT*cur_zpos, MOVE_DELAY);
+	  scene->RestrictZ(0.0, CELL_HEIGHT*(cur_zpos+1));
 	  SDL_mutexV(vid_mut);
 
 	  mouse_x = -1;
