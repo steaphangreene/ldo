@@ -78,12 +78,10 @@ ldo.$(ARCH):	$(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LIBS)
 
 .PHONY: win32
-win32:	ldo.exe
-
-WPFIX=	$(shell i586-mingw32msvc-simple-config --prefix)
-
-ldo.exe:	*.cpp *.h $(WPFIX)/include/simple/*.h
+win32:	
 	make ARCH=$(WARCH) CXX='$(WCXX)' FLAGS='$(WFLAGS)' LIBS='$(WLIBS)'
+
+ldo.exe:	win32
 	cp -av ldo.$(WARCH) ldo.exe
 
 TSTR:=	$(shell date -u +"%Y%m%d%H%M")
