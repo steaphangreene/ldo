@@ -104,7 +104,8 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   ptext->SetFontSize(50);
   ptext->SetAlignment(SG_ALIGN_CENTER);
   wind[PHASE_PLAY]->AddWidget(ptext, 8, 12, 32, 1);
-  pstamp = new SG_TransLabel("<Time Offset>", drkred);
+  distime = 0;
+  pstamp = new SG_TransLabel("0.000 seconds", drkred);
   pstamp->SetFontSize(50);
   pstamp->SetAlignment(SG_ALIGN_CENTER);
   wind[PHASE_PLAY]->AddWidget(pstamp, 8, 11, 32, 1);
@@ -580,10 +581,13 @@ bool Player_Local::Run() {
       SDL_mutexP(off_mut);
       CalcOffset(cur_time);
       SDL_mutexV(off_mut);
-      sprintf(buf, "%d.%.3d seconds%c", offset / 1000, offset % 1000, 0);
-      gui->Lock();
-      pstamp->SetText(buf);
-      gui->Unlock();
+      if(distime != offset) {
+	sprintf(buf, "%d.%.3d seconds%c", offset / 1000, offset % 1000, 0);
+	gui->Lock();
+	distime = offset;
+	pstamp->SetText(buf);
+	gui->Unlock();
+	}
 
       unsigned int showround = offset / 3000 + 1;
       if(disround != showround) {

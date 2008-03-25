@@ -80,6 +80,7 @@ protected:
   SDL_Surface *equip_bg;
 
   unsigned int disround;	//Currently Displayed Round for Playback
+  unsigned int distime;		//Currently Displayed Time for Playback
   SG_StickyButton *ppastb;
   SG_Button *poptb, *pdoneb;	//Widgets for Play phase
   SG_TransLabel *ptext, *pstamp;
