@@ -165,7 +165,7 @@ Screens::Screens() {
   cur_music = audio->Loop(music);
 
   gui = new SimpleGUI(ASPECT_FIXED_Y|ASPECT_FIXED_X, 16.0/10.0);
-  gui->LoadFont("fonts/Denmark Regular.ttf", 100);
+  gui->LoadFont("fonts/Denmark Regular.ttf", 24);
 
   gui->SetColor(SG_COL_BG,	0.250, 0.0, 0.0);
   gui->SetColor(SG_COL_FG,	0.750, 0.0, 0.0);

@@ -106,7 +106,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   wind[PHASE_PLAY]->AddWidget(ptext, 8, 12, 32, 1);
   distime = 0;
   pstamp = new SG_TransLabel("0.000 seconds", drkred);
-  pstamp->SetFontSize(50);
+  pstamp->SetFontSize(24);
   pstamp->SetAlignment(SG_ALIGN_CENTER);
   wind[PHASE_PLAY]->AddWidget(pstamp, 8, 11, 32, 1);
   vector<string> conts;			//Temporary - until textures
