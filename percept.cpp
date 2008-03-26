@@ -142,11 +142,14 @@ void Percept::GetPos(int id, int &x, int &y, int &z) {
   }
 
 float Percept::HeightAt(const MapCoord &pos) {
-  float height = 0.0;
+  float height = -256.0;
   multimap<MapCoord, MapObject>::const_iterator obj = objects.find(pos);
   if(obj != objects.end()) {
     for(; obj != objects.upper_bound(pos); ++obj) {
-      if(obj->second.type == OBJECT_MISC) {
+      if(obj->second.type == GROUND_FLOOR) {
+	if(height < 0.0) height = obj->second.height;
+	}
+      else if(obj->second.type == OBJECT_MISC) {
 	height = obj->second.height;
 	}
       }
@@ -250,19 +253,19 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
   map<MapCoord, int> gdist;
   multimap<int, MapCoord> openlist;
 
-  prev[start] = start;
-  gdist[start] = 0;
-  open[start] = HDist(start, end);
-  openlist.insert(pair<int, MapCoord>(open[start], start));
+  prev[end] = end;
+  gdist[end] = 0;
+  open[end] = HDist(end, start);
+  openlist.insert(pair<int, MapCoord>(open[end], end));
   while(openlist.size() > 0 && closed.count(openlist.begin()->second) > 0) {
     openlist.erase(openlist.begin());
     }
-  while(closed.count(end) == 0 && openlist.size() > 0) {
+  while(closed.count(start) == 0 && openlist.size() > 0) {
     MapCoord cur = openlist.begin()->second;
     openlist.erase(openlist.begin());
     open.erase(cur);
     closed.insert(cur);
-    if(cur.x != end.x || cur.y != end.y || cur.z != end.z) {
+    if(cur.x != start.x || cur.y != start.y || cur.z != start.z) {
       for(int zo = -1; zo < 2; zo++) {
 	for(int yo = -1; yo < 2; yo++) {
 	  for(int xo = -1; xo < 2; xo++) {
@@ -279,7 +282,7 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
 		int pdir = 4 * (1 + tmp.y - cur.y) + (1 + tmp.x - cur.x);
 		dirs[pdir] = 0;
 		MapCoord test = cur;
-		while(test != start && tmp.z == cur.z) {// FIXME: Z Straight?
+		while(test != end && tmp.z == cur.z) {// FIXME: Z Straight?
 		  if(test.z != prev[test].z) break;	// FIXME: Z Straight?
 		  int dir = 4 * (1 + test.y - prev[test].y)
 				+ (1 + test.x - prev[test].x);
@@ -289,7 +292,7 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
 		  if(dirs.size() > 2) break;	//Too many dirs - Not straight
 		  if(dirs.size() == 2) {
 		    if(dirs.begin()->second > 0
-			&& dirs.rbegin()->second > 0) {	// To Jagged
+			&& dirs.rbegin()->second > 0) {	// Too Jagged
 		      break;		//Not straight
 		      }
 		    int sep = abs(dirs.begin()->first - dirs.rbegin()->first);
@@ -300,7 +303,7 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
 		  test = prev[test];
 		  pdir = dir;
 		  }
-		int td = gdist[test] + HDist(test, tmp) + HDist(tmp, end);
+		int td = gdist[test] + HDist(test, tmp) + HDist(tmp, start);
 
 		if(open.count(tmp) == 0 || open[tmp] > td) {
 // FIXME: How do I do this right?
@@ -320,29 +323,28 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
       }
     }
   vector<MapCoord> ret;
-  if(closed.count(end) > 0) {	// Only return a path if I can get there
-    MapCoord cur = end;
+  if(closed.count(start) > 0) {	// Only return a path if I can get there
+    MapCoord cur = start;
     while(prev[cur] != cur) {
       ret.push_back(cur);
       cur = prev[cur];
       }
     ret.push_back(cur);
-    reverse(ret.begin(), ret.end());
     }
   return ret;
   }
 
 vector<MapCoord> Percept::GetPath2x2(const MapCoord &start, const MapCoord &end) {
   vector<MapCoord> ret;
-  MapCoord cur = start;
+  MapCoord cur = end;
   ret.push_back(cur);
-  while(cur.x != end.x || cur.y != end.y || cur.z != end.z) {
-    if(cur.x < end.x) cur.x ++;
-    else if(cur.x > end.x) cur.x --;
-    if(cur.y < end.y) cur.y ++;
-    else if(cur.y > end.y) cur.y --;
-    if(cur.z < end.z) cur.z ++;
-    else if(cur.z > end.z) cur.z --;
+  while(cur.x != start.x || cur.y != start.y || cur.z != start.z) {
+    if(cur.x < start.x) cur.x ++;
+    else if(cur.x > start.x) cur.x --;
+    if(cur.y < start.y) cur.y ++;
+    else if(cur.y > start.y) cur.y --;
+    if(cur.z < start.z) cur.z ++;
+    else if(cur.z > start.z) cur.z --;
     ret.push_back(cur);
     }
   return ret;
