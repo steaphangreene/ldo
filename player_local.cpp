@@ -62,7 +62,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
     }
 
   world = new World(&percept, &orders, id);
-  scene->RestrictZ(0.0, CELL_HEIGHT);
+  scene->RestrictZ(0.0, CELL_HEIGHT-1.5);	//FIXME: Real #
 
   music = audio->LoadMusic("music/iconoclasm.ogg");
   cur_music = -1;
@@ -240,7 +240,7 @@ int Player_Local::EventHandler() {
 	else {
 	  SDL_mutexP(vid_mut);
 	  video->SetZPosition(CELL_HEIGHT*cur_zpos, MOVE_DELAY);
-	  scene->RestrictZ(0.0, CELL_HEIGHT*(cur_zpos+1));
+	  scene->RestrictZ(0.0, CELL_HEIGHT*(cur_zpos+1)-1.5);	//FIXME: Real #
 	  SDL_mutexV(vid_mut);
 
 	  mouse_x = -1;
@@ -253,7 +253,7 @@ int Player_Local::EventHandler() {
 	else {
 	  SDL_mutexP(vid_mut);
 	  video->SetZPosition(CELL_HEIGHT*cur_zpos, MOVE_DELAY);
-	  scene->RestrictZ(0.0, CELL_HEIGHT*(cur_zpos+1));
+	  scene->RestrictZ(0.0, CELL_HEIGHT*(cur_zpos+1)-1.5);	//FIXME: Real #
 	  SDL_mutexV(vid_mut);
 
 	  mouse_x = -1;
@@ -708,7 +708,7 @@ void Player_Local::UpdateEquipIDs() {
       }
 
     SG_DNDBoxes *dnd = new SG_DNDBoxes(36, 28);
-    dnd->Include( 0,  5,  4,  6, 4, 6, 1, 1);	//Left Hand
+    dnd->Include( 0,  5,  4,  6, 4, 6, 1, 0);	//Left Hand
     dnd->Include(16,  5,  4,  6, 4, 6, 2, 0);	//Right Hand
     dnd->Include( 2,  1,  4,  2, 2, 2, 3, 0);	//Left Shoulder
     dnd->Include(14,  1,  4,  2, 2, 2, 4, 0);	//Right Shoulder
