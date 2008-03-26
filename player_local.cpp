@@ -724,7 +724,10 @@ void Player_Local::UpdateEquipIDs() {
     if(troops.size() != 2) dnd->AddItem(gun_icon, 16, 5, 4, 6, 1, 1);
     if(troops.size() != 1) dnd->AddItem(gren_icon, 24, 12, 2, 2, 2, 0);
 
-    dnd->SetBackground(new SG_Panel(equip_bg));
+    SG_Table *ntab = new SG_Table(18, 14);
+    ntab->AddWidget(new SG_Panel(equip_bg), 2, 1, 6, 7);
+    ntab->SetBackground(new SG_Panel(gui->NewColor(49/255.0, 71/255.8, 49/255.0)));
+    dnd->SetBackground(ntab);
 
     adnds.push_back(dnd);
     dnds.push_back(dnd);
