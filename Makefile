@@ -41,7 +41,7 @@ debug:
 
 #PROFILING OPTIONS
 prof:
-	make CXXFLAGS'-pg -g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE $(SSFLAGS)'
+	make CXXFLAGS='-pg -g -Wall -DSDL_DEBUG=SDL_INIT_NOPARACHUTE $(SSFLAGS)'
 
 OBJS:=	screens.$(ARCH).o percept.$(ARCH).o orders.$(ARCH).o \
 	game.$(ARCH).o unit.$(ARCH).o player.$(ARCH).o main.$(ARCH).o \
