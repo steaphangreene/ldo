@@ -30,6 +30,7 @@
 #include <set>
 #include <map>
 #include <vector>
+#include <cmath>
 
 #define HEADER_STRING "LDO_GAMESAVE_FILE"
 #define SAVEFILE_VERSION	0x00000004 // 0.0.0-r4
@@ -356,8 +357,8 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	unit_ptr->name = (char*)(unitref_data[unit]+86);
 	units[unit_id] = unit_ptr;
 	master.unplayer[unit_id] = unit_data[unit][9];
-	master.AddAction(unit_id, 0, 0, x, y, z, ACT_START);
-	master.AddAction(unit_id, 0, 0, x, y, z, ACT_EQUIP, 0, 1);
+	master.AddAction(unit_id, 0, 0, x, y, z, 0.0, ACT_START);
+	master.AddAction(unit_id, 0, 0, x, y, z, 0.0, ACT_EQUIP, 0, 1);
 //	printf("Unit at %dx%dx%d\t[%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X]\n",
 //		unit_data[unit][1], unit_data[unit][0], unit_data[unit][2],
 //		unit_data[unit][3], unit_data[unit][4], unit_data[unit][5],
@@ -410,6 +411,16 @@ int Game::Load(FILE *fl) {
   if(!Load(plsquads, fl)) return 0;
   if(!Load(squnits, fl)) return 0;
 
+  Uint32 id = 1;
+  for(Uint32 pl=0; pl < plsquads.size(); ++pl) {
+    for(Uint32 sq=0; sq < plsquads[pl].size(); ++sq) {
+      for(Uint32 un=0; un < squnits[plsquads[pl][sq]].size(); ++un) {
+	master.unplayer[id] = pl;
+	++id;
+	}
+      }
+    }
+
   Unit *unit_ptr;
   if(fscanf(fl, "%d\n", &num) < 1) return 0;
   for(unsigned int unit = 0; unit < num; ++unit) {
@@ -424,18 +435,8 @@ int Game::Load(FILE *fl) {
     //TODO: Use REAL starting locations from map
     //TODO: Do a Real Initial Equip of Items Here
     //TODO: Equip Requested EQUIP Items
-    master.AddAction(unit_ptr->id, 0, 0, 20+unit, 32, 0, ACT_START);
-    master.AddAction(unit_ptr->id, 0, 0, 20+unit, 32, 0, ACT_EQUIP, 0, 1);
-    }
-
-  Uint32 id = 1;
-  for(Uint32 pl=0; pl < plsquads.size(); ++pl) {
-    for(Uint32 sq=0; sq < plsquads[pl].size(); ++sq) {
-      for(Uint32 un=0; un < squnits[plsquads[pl][sq]].size(); ++un) {
-	master.unplayer[id] = pl;
-	++id;
-	}
-      }
+    master.AddAction(unit_ptr->id, 0, 0, 20+unit, 32, 0, 0.0, ACT_START);
+    master.AddAction(unit_ptr->id, 0, 0, 20+unit, 32, 0, 0.0, ACT_EQUIP, 0, 1);
     }
   return 1;
   }
@@ -674,11 +675,14 @@ void Game::ResolveRound() {
 	      for(; pt != path.end(); ++pt) {
 		Uint32 step = steps[abs(pt->x - lpt->x)
 			+ abs(pt->y - lpt->y) + abs(pt->z - lpt->z)];
+		float ang =
+			180.0 * atan2f(pt->y - lpt->y, pt->x - lpt->x) / M_PI;
 		offset += step;
 		if(offset > 3000) break;	//One Round at a Time!
 		master.AddAction(order->id,
 			(master.round - 1) * 3000 + order->time + offset, step,
-			pt->x, pt->y, pt->z, act, lpt->x, lpt->y, lpt->z);
+			pt->x, pt->y, pt->z, ang,
+			act, lpt->x, lpt->y, lpt->z);
 		lpt = pt;
 		}
 	      if(pt == path.end()) orders[pnum]->Completed(*order);
@@ -693,14 +697,14 @@ void Game::ResolveRound() {
 	      if(ordered.count(order->id) <= 0) {
 		master.AddAction(order->id,
 			(master.round - 1) * 3000 + order->time + offset, 0,
-			x, y, z, ACT_EQUIP,
+			x, y, z, 0.0, ACT_EQUIP,
 			order->targ1, order->targ2, order->targ3);
 		ordered.insert(order->id);
 		}
 	      }
 	    else {				// Initial Equip is Free
 	      if(ordered.count(order->id) <= 0) {
-		master.AddAction(order->id, 0, 0, x, y, z, ACT_EQUIP,
+		master.AddAction(order->id, 0, 0, x, y, z, 0.0, ACT_EQUIP,
 			order->targ1, order->targ2, order->targ3);
 		ordered.insert(order->id);
 		}
@@ -717,20 +721,24 @@ void Game::ResolveRound() {
 	      }
 	    if(hit > 0) {
 	      int tx, ty, tz;
-	      master.GetPos(hit, tx, ty, tz);
-	      master.my_units[hit].push_back(UnitAct(hit,
+	      float ang;
+	      master.GetPos(hit, tx, ty, tz, ang);
+	      master.AddAction(hit,
 		(master.round - 1) * 3000 + order->time + 350 + offset, 100,
-		tx, ty, tz, ACT_FALL));
+		tx, ty, tz, ang, ACT_FALL);
 	      ordered.insert(hit);
 
+	      ang = atan2f(tx - x, ty - y);
 	      master.AddAction(order->id,
 		(master.round - 1) * 3000 + order->time + offset + 100, 100,
-		x, y, z, ACT_SHOOT, tx, ty, tz);
+		x, y, z, ang, ACT_SHOOT, tx, ty, tz);
 	      }
 	    else {
+	      float ang = atan2f(order->targ2 - x, order->targ1 - y);
 	      master.AddAction(order->id,
 		(master.round - 1) * 3000 + order->time + offset + 100, 100,
-		x, y, z, ACT_SHOOT, order->targ1, order->targ2, order->targ3);
+		x, y, z, ang, ACT_SHOOT,
+		order->targ1, order->targ2, order->targ3);
 	      }
 	    orders[pnum]->Completed(*order);
 	    ordered.insert(order->id);
