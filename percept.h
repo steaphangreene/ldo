@@ -117,6 +117,7 @@ public:
 
   void Clear();
 
+  void FillActionsTo(int id, Uint32 f);
   void AddAction(int i, Uint32 f, Uint32 d, int xp, int yp, int zp, float ang,
 	Act a, int t1 = 0, int t2 = 0, int t3 = 0);
 

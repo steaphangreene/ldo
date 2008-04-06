@@ -359,9 +359,29 @@ vector<MapCoord> Percept::GetPath2x2(const MapCoord &start, const MapCoord &end)
   return ret;
   }
 
+void Percept::FillActionsTo(int id, Uint32 f) {
+  Uint32 lasttime = 0;
+  if(!my_units[id].empty()) lasttime = my_units[id].rbegin()->finish;
+  if(lasttime < f && (!my_units[id].empty())) {
+    if(my_units[id].rbegin()->act == ACT_STAND) {
+      Uint32 diff = f - my_units[id].rbegin()->finish;
+      my_units[id].rbegin()->finish += diff;
+      my_units[id].rbegin()->duration += diff;
+      }
+    else {
+      AddAction(id, f, f - lasttime,
+	my_units[id].rbegin()->x, my_units[id].rbegin()->y,
+	my_units[id].rbegin()->z, my_units[id].rbegin()->angle,
+	ACT_STAND, my_units[id].rbegin()->x, my_units[id].rbegin()->y,
+	my_units[id].rbegin()->z);
+      }
+    }
+  }
+
 void Percept::AddAction(int id, Uint32 f, Uint32 d,
 	int xp, int yp, int zp, float ang,
 	Act a, int t1, int t2, int t3) {
+  FillActionsTo(id, f-d);
   int oxp = 0, oyp = 0, ozp = 0;
   float oang = -1000.0;
   if(!my_units[id].empty()) {
@@ -431,7 +451,7 @@ void Percept::Unsee(int plnum, Uint32 tm, int xp, int yp, int zp, float ang, int
 void MapObject::See(int plnum, Uint32 tm) {
   seers[plnum]++;
   if(seers[plnum] == 1) {
-    seen[plnum].insert(pair<Uint32,Uint32>(tm, tm+3000));
+    seen[plnum].insert(pair<Uint32,Uint32>(tm, tm));
     }
   else {
     seen[plnum].rbegin()->second = tm+3000;

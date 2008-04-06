@@ -751,5 +751,11 @@ void Game::ResolveRound() {
       }
     orders[pnum]->ClearCompleted();
     }
+
+  map<int, Unit *>::iterator unit = units.begin();
+  for(; unit != units.end(); ++unit) {
+    master.FillActionsTo(unit->first, master.round*3000);
+    }
+
   master.round++;
   }
