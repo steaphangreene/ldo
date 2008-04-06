@@ -134,6 +134,7 @@ public:
 
   float HeightAt(const MapCoord &pos);
   void GetPos(int id, int &x, int &y, int &z);
+  void GetPos(int id, int &x, int &y, int &z, float &a);
   vector<MapCoord> GetPath(const MapCoord &start, const MapCoord &end);
   vector<MapCoord> GetPath2x2(const MapCoord &start, const MapCoord &end);
 

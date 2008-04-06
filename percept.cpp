@@ -117,28 +117,35 @@ int Percept::UnitAt(int xc, int yc, int zc) {
   return 0;
   }
 
+void Percept::GetPos(int id, int &x, int &y, int &z, float &a) {
+  vector<UnitAct>::const_iterator last;
+  if(my_units.count(id) > 0) {
+    last = my_units[id].end();
+    if(last == my_units[id].begin()) return;
+    }
+  else if(other_units.count(id) > 0) {
+    last = other_units[id].end();
+    if(last == other_units[id].begin()) return;
+    }
+  --last;
+  GetPos(id, x, y, z);
+  a = atan2f(last->targ2 - y, last->targ1 - x);	//FIXME: Backward Sometimes
+  }
+
 void Percept::GetPos(int id, int &x, int &y, int &z) {
   vector<UnitAct>::const_iterator last;
   if(my_units.count(id) > 0) {
     last = my_units[id].end();
-    for(; last != my_units[id].begin(); ++last) {
-      last--;
-      x = last->x;
-      y = last->y;
-      z = last->z;
-      return;
-      }
+    if(last == my_units[id].begin()) return;
     }
-  else if (other_units.count(id) > 0) {
+  else if(other_units.count(id) > 0) {
     last = other_units[id].end();
-    for(; last != other_units[id].begin(); ++last) {
-      last--;
-      x = last->x;
-      y = last->y;
-      z = last->z;
-      return;
-      }
+    if(last == other_units[id].begin()) return;
     }
+  --last;
+  x = last->x;
+  y = last->y;
+  z = last->z;
   }
 
 float Percept::HeightAt(const MapCoord &pos) {

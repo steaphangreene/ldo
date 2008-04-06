@@ -335,22 +335,17 @@ void World::DrawModels(Uint32 offset) {
 	  }
 	}
       else if(act->act == ACT_FALL) {
-	if(act->finish <= offset + act->duration) {
-	  x = act->x * 2 + 1;
-	  y = act->y * 2 + 1;
-	  z = azh;
-	  if(act->finish + 1000 <= offset + act->duration) {
-	    int anim = models[mod]->LookUpAnimation("BOTH_DEAD1");
-	    if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
-	    anims[0] = anim;
-	    anims[1] = anim;
-	    }
-	  else {
-	    int anim = models[mod]->LookUpAnimation("BOTH_DEATH1");
-	    if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
-	    anims[0] = anim;
-	    anims[1] = anim;
-	    }
+	if(act->finish + 1000 <= offset + act->duration) {
+	  int anim = models[mod]->LookUpAnimation("BOTH_DEAD1");
+	  if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
+	  anims[0] = anim;
+	  anims[1] = anim;
+	  }
+	else {
+	  int anim = models[mod]->LookUpAnimation("BOTH_DEATH1");
+	  if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
+	  anims[0] = anim;
+	  anims[1] = anim;
 	  }
 	}
       else if(act->act == ACT_MOVE || act->act == ACT_RUN) {
@@ -358,9 +353,6 @@ void World::DrawModels(Uint32 offset) {
 	int dy = act->y - act->targ2;
 	float dur = act->duration;
 	if(act->finish <= offset) {
-	  x = act->x * 2 + 1;
-	  y = act->y * 2 + 1;
-	  z = azh;
 	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	else {
