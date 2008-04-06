@@ -192,8 +192,8 @@ void World::DrawMap(Uint32 offset) {
   glPushMatrix();
   map<MapCoord, MapObject>::const_iterator obj = percept->objects.begin();
   for(; obj != percept->objects.end(); ++obj) {
-    if(obj->second.first_seen.size() > 0
-	&& obj->second.first_seen.begin()->second <= offset) {
+    if(obj->second.seen.size() > 0
+	&& obj->second.seen.begin()->second.begin()->first <= offset) {
       if(obj->second.type == EFFECT_FIRE) {
 	if(obj->second.which >= (int)(effectsto)
 		&& obj->second.which <= (int)(offset)) {
@@ -222,7 +222,7 @@ void World::DrawMap(Uint32 offset) {
 	    }
 	  }
 	}
-      else if(obj->second.first_seen.begin()->second >= effectsto) {
+      else {
 	SS_Model mod;
 	if(modmap.count(obj->second.which) > 0) {
 	  mod = modmap[obj->second.which];
@@ -235,21 +235,31 @@ void World::DrawMap(Uint32 offset) {
 	  continue;	//Don't draw it
 	  }
 
-	SS_Object sobj = scene->AddObject(mod);
-	scene->SetObjectPosition(sobj, obj->first.x*2.0+1.0,
+	SS_Object sobj;
+	if(objmap.count(obj->second.id) < 1) {
+	  sobj = scene->AddObject(mod);
+	  objmap[obj->second.id] = sobj;
+	  scene->SetObjectPosition(sobj, obj->first.x*2.0+1.0,
 		obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-	Uint32 base = obj->second.first_seen.begin()->second;
 
-	//FIXME: This is hard-coded to 100 seconds of life.
-	scene->ObjectAct(sobj, SS_ACT_VISIBLE, base+100000, 100000);
-
-	if(texmap.count(obj->second.which) > 0) {
-	  scene->SetObjectSkin(sobj, texmap[obj->second.which]);
+	  if(texmap.count(obj->second.which) > 0) {
+	    scene->SetObjectSkin(sobj, texmap[obj->second.which]);
+	    }
+	  else {
+	    scene->SetObjectColor(sobj,
+		obj->first.x/float(50), 0.5, obj->first.y/float(50));
+	    scene->SetObjectSkin(sobj, obj->second.which & 0xFF);
+	    }
 	  }
 	else {
-	  scene->SetObjectColor(sobj,
-		obj->first.x/float(50), 0.5, obj->first.y/float(50));
-	  scene->SetObjectSkin(sobj, obj->second.which & 0xFF);
+	  sobj = objmap[obj->second.id];
+	  }
+	if(obj->second.seen.begin()->second.begin()->second >= effectsto
+		&& obj->second.seen.begin()->second.begin()->first <= offset) {
+	  Uint32 base = obj->second.seen.begin()->second.begin()->first;
+	  Uint32 end = obj->second.seen.begin()->second.begin()->second + 1;
+
+	  scene->ObjectAct(sobj, SS_ACT_VISIBLE, end, end-base);
 	  }
 	}
       }
@@ -273,15 +283,21 @@ void World::DrawModels(Uint32 offset) {
   unitacts = percept->my_units.begin();
   for(; unitacts != percept->my_units.end(); ++unitacts) {
     unitact.erase(unitacts->first);
-    vector<UnitAct>::const_iterator act = unitacts->second.end();  --act;
-    for(; act->time > offset && act != unitacts->second.begin();) { --act; }
+    vector<UnitAct>::const_reverse_iterator act = unitacts->second.rbegin();
+    while(act != unitacts->second.rend()
+	&& act->finish > (offset + act->duration)) {
+      ++act;
+      }
     unitact.insert(pair<int,UnitAct>(unitacts->first, *act));
     }
   unitacts = percept->other_units.begin();
   for(; unitacts != percept->other_units.end(); ++unitacts) {
     unitact.erase(unitacts->first);
-    vector<UnitAct>::const_iterator act = unitacts->second.end();  --act;
-    for(; act->time > offset && act != unitacts->second.begin();) { --act; }
+    vector<UnitAct>::const_reverse_iterator act = unitacts->second.rbegin();
+    while(act != unitacts->second.rend()
+	&& act->finish > (offset + act->duration)) {
+      ++act;
+      }
     unitact.insert(pair<int,UnitAct>(unitacts->first, *act));
     }
 
@@ -289,7 +305,9 @@ void World::DrawModels(Uint32 offset) {
   for(; mapact != unitact.end(); ++mapact) {
     const UnitAct *act = &(mapact->second);
     int mod = cur_game->PlayerForUnit(act->id)->Color();
-    if(act->time <= offset) {
+    if(act->finish <= (offset + act->duration)) {
+//      fprintf(stderr, "Doing %d on %d, since %d <= (%d + %d)\n",
+//	act->act, act->id, act->finish, offset, act->duration);
       float azh, tzh;
       {	MapCoord apos = { act->x, act->y, act->z };
 	azh = act->z * CELL_HEIGHT + percept->HeightAt(apos);
@@ -303,25 +321,25 @@ void World::DrawModels(Uint32 offset) {
 	anims[0] = models[mod]->LookUpAnimation("STAND");
 	anims[1] = models[mod]->LookUpAnimation("STAND");
 	}
-      times[0] = act->time;
-      times[1] = act->time;
+      times[0] = act->finish - act->duration;
+      times[1] = act->finish - act->duration;
       float x = act->x * 2 + 1;
       float y = act->y * 2 + 1;
       float z = azh;
       float a = 0.0;
       if(act->act == ACT_STAND) {
-	if(act->time + 0 <= offset) {
+	if(act->finish <= offset + act->duration) {
 	  x = act->targ1 * 2 + 1;
 	  y = act->targ2 * 2 + 1;
 	  z = tzh;
 	  }
 	}
       else if(act->act == ACT_FALL) {
-	if(act->time + 0 <= offset) {
+	if(act->finish <= offset + act->duration) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
 	  z = azh;
-	  if(act->time + 1000 <= offset) {
+	  if(act->finish + 1000 <= offset + act->duration) {
 	    int anim = models[mod]->LookUpAnimation("BOTH_DEAD1");
 	    if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
 	    anims[0] = anim;
@@ -336,59 +354,57 @@ void World::DrawModels(Uint32 offset) {
 	  }
 	}
       else if(act->act == ACT_MOVE) {
-        int dx = act->x - act->targ1;
-        int dy = act->y - act->targ2;
-        int dz = act->z - act->targ3;
-	float duration = sqrt(dx*dx + dy*dy + dz*dz) * 333.33333333;
-	if((unsigned int)(act->time + duration) <= offset) {
+	int dx = act->x - act->targ1;
+	int dy = act->y - act->targ2;
+	float dur = act->duration;
+	if(act->finish <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
 	  z = azh;
 	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	else {
-	  Uint32 off = offset - act->time;
+	  Uint32 off = offset + act->duration - act->finish;
 	  int anim = models[mod]->LookUpAnimation("LEGS_WALK");
 	  if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
 	  if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
 	  anims[0] = anim;
-	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
-	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
-	  z = tzh * (duration - off) + azh * off;
-	  x /= duration; y /= duration; z /= duration;
+	  x = (act->targ1 * 2 + 1) * (dur - off) + (act->x * 2 + 1) * off;
+	  y = (act->targ2 * 2 + 1) * (dur - off) + (act->y * 2 + 1) * off;
+	  z = tzh * (dur - off) + azh * off;
+	  x /= dur; y /= dur; z /= dur;
 	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	}
       else if(act->act == ACT_RUN) {
-        int dx = act->x - act->targ1;
-        int dy = act->y - act->targ2;
-        int dz = act->z - act->targ3;
-	float duration = sqrt(dx*dx + dy*dy + dz*dz) * 166.66666666;
-	if((unsigned int)(act->time + duration) <= offset) {
+	int dx = act->x - act->targ1;
+	int dy = act->y - act->targ2;
+	float dur = act->duration;
+	if(act->finish <= offset) {
 	  x = act->x * 2 + 1;
 	  y = act->y * 2 + 1;
 	  z = azh;
 	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	else {
-	  Uint32 off = offset - act->time;
+	  Uint32 off = offset + act->duration - act->finish;
 	  int anim = models[mod]->LookUpAnimation("LEGS_RUN");
 	  if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
 	  if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
 	  anims[0] = anim;
-	  x = (act->targ1 * 2 + 1) * (duration - off) + (act->x * 2 + 1) * off;
-	  y = (act->targ2 * 2 + 1) * (duration - off) + (act->y * 2 + 1) * off;
-	  z = tzh * (duration - off) + azh * off;
-	  x /= duration; y /= duration; z /= duration;
+	  x = (act->targ1 * 2 + 1) * (dur - off) + (act->x * 2 + 1) * off;
+	  y = (act->targ2 * 2 + 1) * (dur - off) + (act->y * 2 + 1) * off;
+	  z = tzh * (dur - off) + azh * off;
+	  x /= dur; y /= dur; z /= dur;
 	  a = 180.0 * atan2f(dy, dx) / M_PI;
 	  }
 	}
       else if(act->act == ACT_SHOOT) {
-        int dx = act->targ1 - act->x;
-        int dy = act->targ2 - act->y;
-        //int dz = act->targ3 - act->z;
+	int dx = act->targ1 - act->x;
+	int dy = act->targ2 - act->y;
+	//int dz = act->targ3 - act->z;
 	a = 180.0 * atan2f(dy, dx) / M_PI;
-	if(act->time + 1500 <= offset) {
+	if(act->finish + 1500 <= offset + act->duration) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
 	  }
@@ -396,23 +412,23 @@ void World::DrawModels(Uint32 offset) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_ATTACK");
 	  }
 	}
-      else if(act->act == ACT_EQUIP && act->time > 0) {	// First EQUIP Free
-	if(act->time + 1500 <= offset) {
+      else if(act->act == ACT_EQUIP && act->finish > 0) { // First EQUIP Free
+	if(act->finish + 1500 <= offset + act->duration) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
 	  }
-	else if(act->time + 1000 <= offset) {
+	else if(act->finish + 1000 <= offset + act->duration) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_RAISE");
 	  times[1] += 1000;
 	  }
-	else if(act->time + 500 <= offset) {
+	else if(act->finish + 500 <= offset + act->duration) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_DROP");
 	  times[1] += 500;
 	  }
 	else {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  }
-        }
+	}
       if(z < (cur_zpos+1)*CELL_HEIGHT) {
 	glPushMatrix();
 	glTranslatef(x, y, z);
@@ -422,8 +438,8 @@ void World::DrawModels(Uint32 offset) {
 	}
       }
     else {
-      fprintf(stderr, "Not Doing %d on %d, since %d > %d\n",
-	act->act, act->id, act->time, offset);
+//      fprintf(stderr, "Not Doing %d on %d, since %d > (%d + %d)\n",
+//	act->act, act->id, act->finish, offset, act->duration);
       }
     }
   }
@@ -509,7 +525,7 @@ void World::DrawOrders(Uint32 offset) {
   }
 
 void World::DrawSelBox(int sel_x, int sel_y, int sel_z, float r, float g, float b) {
-        //FIXME: Use REAL map x and y size for limits
+	//FIXME: Use REAL map x and y size for limits
   if(sel_x < 0 || sel_y < 0 || sel_x >= 64 || sel_y >= 64) return;
 
 //  fprintf(stderr, "Selbox drawing at %d,%d\n", sel_x, sel_y);

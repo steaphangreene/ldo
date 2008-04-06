@@ -351,9 +351,9 @@ vector<MapCoord> Percept::GetPath2x2(const MapCoord &start, const MapCoord &end)
   }
 
 #define VDIST 20
-void Percept::AddAction(int id, int time, int xp, int yp, int zp,
+void Percept::AddAction(int id, Uint32 f, Uint32 d, int xp, int yp, int zp,
 	Act a, int t1, int t2, int t3) {
-  UnitAct act(id, time, xp, yp, zp, a, t1, t2, t3);
+  UnitAct act(id, f, d, xp, yp, zp, a, t1, t2, t3);
   my_units[id].push_back(act);
 
   //Handle Vision/Discovery	//FIXME: This is static (no obstructions yet)
@@ -368,10 +368,12 @@ void Percept::AddAction(int id, int time, int xp, int yp, int zp,
 	  if(obj != objects.end()) {
 	    for(; obj != objects.upper_bound(pos); ++obj) {
 		// FIXME: Should be act's END time, not START time
-	      if(obj->second.first_seen.count(unplayer[id]) < 1) {
-		obj->second.first_seen[unplayer[id]] = time;
+	      if(obj->second.seen.count(unplayer[id]) < 1) {
+		obj->second.seen[unplayer[id]].insert(
+			pair<Uint32,Uint32>(f - d, f)
+			);
 		}
-	      obj->second.last_seen[unplayer[id]] = time;
+	      obj->second.seen[unplayer[id]].rbegin()->second = f;
 	      }
 	    }
 	  }

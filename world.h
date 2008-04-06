@@ -63,6 +63,7 @@ protected:
   vector<SimpleTexture *> textures;
   map<int, SS_Model> modmap;
   map<int, SS_Skin> texmap;
+  map<int, SS_Object> objmap;
   int smoke, fire;
   Uint32 effectsto;
   };

@@ -30,6 +30,8 @@
 #define HEADER_STRING "LDO_GAMESAVE_FILE"
 #define SAVEFILE_VERSION	0x00000004 // 0.0.0-r4
 
+static int oid = 1;
+
 Game::Game() {
   status_mut = NULL;
   status_locked = false;
@@ -237,11 +239,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	  if(map_data[z][y][x][0] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
 	    MapObject obj = {
-	      GROUND_FLOOR, 0x100 * ttype + map_data[z][y][x][0], 0.0
+	      GROUND_FLOOR, oid++, 0x100 * ttype + map_data[z][y][x][0], 0.0
 	      };
 	    if((see_data[z][y][x] & 0x04) > 0) {
-	      obj.last_seen[0] = 0;
-	      obj.first_seen[0] = 0;
+	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -249,11 +250,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	  if(map_data[z][y][x][1] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
 	    MapObject obj = {
-	      WALL_WEST, 0x100 * ttype + map_data[z][y][x][1], 3.0
+	      WALL_WEST, oid++, 0x100 * ttype + map_data[z][y][x][1], 3.0
 	      };
 	    if((see_data[z][y][x] & 0x01) > 0) {
-	      obj.last_seen[0] = 0;
-	      obj.first_seen[0] = 0;
+	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -261,11 +261,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	  if(map_data[z][y][x][2] > 0) {
 	    MapCoord pos = { x, master.mapys-y, master.mapzs-1-z };
 	    MapObject obj = {
-	      WALL_NORTH, 0x100 * ttype + map_data[z][y][x][2], 3.0
+	      WALL_NORTH, oid++, 0x100 * ttype + map_data[z][y][x][2], 3.0
 	      };
 	    if((see_data[z][y][x] & 0x02) > 0) {
-	      obj.last_seen[0] = 0;
-	      obj.first_seen[0] = 0;
+	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -273,11 +272,10 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	  if(map_data[z][y][x][3] > 0) {
 	    MapCoord pos = { x, master.mapys-1-y, master.mapzs-1-z };
 	    MapObject obj = {
-	      OBJECT_MISC, 0x100 * ttype + map_data[z][y][x][3], 0.8
+	      OBJECT_MISC, oid++, 0x100 * ttype + map_data[z][y][x][3], 0.8
 	      };
 	    if((see_data[z][y][x] & 0x04) > 0) {
-	      obj.last_seen[0] = 0;
-	      obj.first_seen[0] = 0;
+	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -300,7 +298,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	y = master.mapys - 1 - int(effect_data[effect][0]);
 	z = master.mapzs - 1 - int(effect_data[effect][2]);
 	MapCoord pos = { x, y, z };
-	MapObject obj = { EFFECT_SMOKE, 0, 0.0 };
+	MapObject obj = { EFFECT_SMOKE, oid++, 0, 0.0 };
 	if(effect_data[effect][6] == 1) obj.type = EFFECT_FIRE;
 	master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	}
@@ -354,8 +352,8 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	unit_ptr->name = (char*)(unitref_data[unit]+86);
 	units[unit_id] = unit_ptr;
 	master.unplayer[unit_id] = unit_data[unit][9];
-	master.AddAction(unit_id, 0, x, y, z, ACT_START);
-	master.AddAction(unit_id, 0, x, y, z, ACT_EQUIP, 0, 1);
+	master.AddAction(unit_id, 0, 0, x, y, z, ACT_START);
+	master.AddAction(unit_id, 0, 0, x, y, z, ACT_EQUIP, 0, 1);
 //	printf("Unit at %dx%dx%d\t[%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X]\n",
 //		unit_data[unit][1], unit_data[unit][0], unit_data[unit][2],
 //		unit_data[unit][3], unit_data[unit][4], unit_data[unit][5],
@@ -384,7 +382,7 @@ int Game::Load(FILE *fl) {
   for(int y=0; y < 50; ++y) {
     for(int x=0; x < 50; ++x) {
       MapCoord pos = { x, y, 0 };
-      MapObject obj = { GROUND_FLOOR, 1+x+y, 0.0 };
+      MapObject obj = { GROUND_FLOOR, oid++, 1+x+y, 0.0 };
       master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
       }
     }
@@ -422,8 +420,8 @@ int Game::Load(FILE *fl) {
     //TODO: Use REAL starting locations from map
     //TODO: Do a Real Initial Equip of Items Here
     //TODO: Equip Requested EQUIP Items
-    master.AddAction(unit_ptr->id, 0, 20+unit, 32, 0, ACT_START);
-    master.AddAction(unit_ptr->id, 0, 20+unit, 32, 0, ACT_EQUIP, 0, 1);
+    master.AddAction(unit_ptr->id, 0, 0, 20+unit, 32, 0, ACT_START);
+    master.AddAction(unit_ptr->id, 0, 0, 20+unit, 32, 0, ACT_EQUIP, 0, 1);
     }
 
   Uint32 id = 1;
@@ -531,26 +529,18 @@ void Game::UpdatePercept(int plnum) {
   //Temporary!
   multimap<MapCoord, MapObject>::const_iterator obj = master.objects.begin();
   for(; obj != master.objects.end(); ++obj) {
-    if(obj->second.last_seen.count(plnum)) {
+    if(obj->second.seen.count(plnum)) {
       multimap<MapCoord, MapObject>::iterator nobj;
       nobj = percept[plnum]->objects.insert(*obj);
 
       //Only give "seen" data for the particular player
-      nobj->second.last_seen.erase(
-	nobj->second.last_seen.begin(),
-	nobj->second.last_seen.find(plnum)
+      nobj->second.seen.erase(
+	nobj->second.seen.begin(),
+	nobj->second.seen.find(plnum)
 	);
-      nobj->second.last_seen.erase(
-	nobj->second.last_seen.upper_bound(plnum),
-	nobj->second.last_seen.end()
-	);
-      nobj->second.first_seen.erase(
-	nobj->second.first_seen.begin(),
-	nobj->second.first_seen.find(plnum)
-	);
-      nobj->second.first_seen.erase(
-	nobj->second.first_seen.upper_bound(plnum),
-	nobj->second.first_seen.end()
+      nobj->second.seen.erase(
+	nobj->second.seen.upper_bound(plnum),
+	nobj->second.seen.end()
 	);
       }
     }
@@ -657,15 +647,17 @@ void Game::ResolveRound() {
 
 	int x=0, y=0, z=0;
 	master.GetPos(order->id, x, y, z);
-	int offset = (rand() % 500) + 500;
+	Uint32 offset = (rand() % 500) + 500;
 	switch(order->order) {
 	  case(ORDER_RUN):
 	  case(ORDER_MOVE): {
 	    Act act = ACT_MOVE;
-	    int step = 500;
+	    Uint32 steps[4] = { 0, 333, 471, 577 };
 	    if(order->order == ORDER_RUN) {
 	      act = ACT_RUN;
-	      step = 300;
+	      steps[1] = 167;
+	      steps[2] = 236;
+	      steps[3] = 289;
 	      }
 	    MapCoord start = { x, y, z };
 	    MapCoord end = { order->targ1, order->targ2, order->targ3 };
@@ -675,10 +667,16 @@ void Game::ResolveRound() {
 	      vector<MapCoord>::const_iterator lpt = pt;
 	      ++pt;
 	      for(; pt != path.end(); ++pt) {
-		master.AddAction(order->id,
-		(master.round - 1) * 3000 + order->time + offset,
-		pt->x, pt->y, pt->z, act, lpt->x, lpt->y, lpt->z);
+		Uint32 step = steps[abs(pt->x - lpt->x)
+			+ abs(pt->y - lpt->y) + abs(pt->z - lpt->z)];
 		offset += step;
+		//fprintf(stderr, "ROUND: %d\n", master.round);
+		//fprintf(stderr, "OTIME: %d\n", order->time);
+		//fprintf(stderr, "OFFSET: %d\n", offset);
+		//fprintf(stderr, "TIME: %d\n", (master.round - 1) * 3000 + order->time + offset);
+		master.AddAction(order->id,
+			(master.round - 1) * 3000 + order->time + offset, step,
+			pt->x, pt->y, pt->z, act, lpt->x, lpt->y, lpt->z);
 		lpt = pt;
 		}
 	      }
@@ -688,7 +686,7 @@ void Game::ResolveRound() {
 	    if(master.round != 1 || order->time != 0) {	// Not Initial EQUIP
 	      if(ordered.count(order->id) <= 0) {
 		master.AddAction(order->id,
-			(master.round - 1) * 3000 + order->time + offset,
+			(master.round - 1) * 3000 + order->time + offset, 0,
 			x, y, z, ACT_EQUIP,
 			order->targ1, order->targ2, order->targ3);
 		ordered.insert(order->id);
@@ -696,7 +694,7 @@ void Game::ResolveRound() {
 	      }
 	    else {				// Initial Equip is Free
 	      if(ordered.count(order->id) <= 0) {
-		master.AddAction(order->id, 0, x, y, z, ACT_EQUIP,
+		master.AddAction(order->id, 0, 0, x, y, z, ACT_EQUIP,
 			order->targ1, order->targ2, order->targ3);
 		ordered.insert(order->id);
 		}
@@ -714,18 +712,18 @@ void Game::ResolveRound() {
 	      int tx, ty, tz;
 	      master.GetPos(hit, tx, ty, tz);
 	      master.my_units[hit].push_back(UnitAct(hit,
-		(master.round - 1) * 3000 + order->time + 250 + offset,
+		(master.round - 1) * 3000 + order->time + 350 + offset, 100,
 		tx, ty, tz, ACT_FALL));
 	      ordered.insert(hit);
 
 	      master.AddAction(order->id,
-		(master.round - 1) * 3000 + order->time + offset, x, y, z,
-		ACT_SHOOT, tx, ty, tz);
+		(master.round - 1) * 3000 + order->time + offset + 100, 100,
+		x, y, z, ACT_SHOOT, tx, ty, tz);
 	      }
 	    else {
 	      master.AddAction(order->id,
-		(master.round - 1) * 3000 + order->time + offset, x, y, z,
-		ACT_SHOOT, order->targ1, order->targ2, order->targ3);
+		(master.round - 1) * 3000 + order->time + offset + 100, 100,
+		x, y, z, ACT_SHOOT, order->targ1, order->targ2, order->targ3);
 	      }
 	    ordered.insert(order->id);
 	    }break;

@@ -64,9 +64,10 @@ struct MapCoord {
 
 struct MapObject {
   ObjectType type;
+  int id;
   int which;
   float height;
-  map<int, Uint32> last_seen, first_seen;
+  map<int, multimap<Uint32, Uint32> > seen;
   };
 
 enum Act {	// For Example
@@ -85,16 +86,16 @@ enum Act {	// For Example
 
 struct UnitAct {
 public:
-  UnitAct(int i, int t,
+  UnitAct(int i, Uint32 f, Uint32 d,
 	int xp, int yp, int zp,
 	Act a, int t1 = 0, int t2 = 0, int t3 = 0
 	) {
-    id = i; time = t;
+    id = i; finish = f; duration = d;
     x = xp; y = yp; z = zp;
     act = a; targ1 = t1, targ2 = t2; targ3 = t3;
     };
   int id;
-  Uint32 time;
+  Uint32 finish, duration;
   int x, y, z;	//X/Y/Z position of the unit when it does this
   Act act;
   int targ1;	//Depending on action, may be a unit id, or x coord, or unused
@@ -112,7 +113,7 @@ public:
 
   void Clear();
 
-  void AddAction(int i, int t, int xp, int yp, int zp,
+  void AddAction(int i, Uint32 f, Uint32 d, int xp, int yp, int zp,
 	Act a, int t1 = 0, int t2 = 0, int t3 = 0);
 
   //Basic map info

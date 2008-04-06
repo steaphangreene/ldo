@@ -56,6 +56,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   if(!scene) {
     scene = new SimpleScene();
     }
+  scene->Clear();
   audio = SimpleAudio::Current(); //Yes, this is ok, it's static!
   if(!audio) {
     //FIXME: Initialize audio myself if it's not already done for me!
@@ -669,8 +670,8 @@ void Player_Local::UpdateEquipIDs() {
   for(; unit != percept.my_units.end(); ++unit) {
     vector<UnitAct>::iterator act = unit->second.begin();
     for(; act != unit->second.end(); ++act) {
-      if(act->act == ACT_EQUIP && act->time >= start_time
-		&& act->time < start_time+3000) {
+      if(act->act == ACT_EQUIP && act->finish >= start_time
+		&& act->finish < start_time+3000) {
 	eqtmp.insert(act->id);
 	}
       }
@@ -688,7 +689,7 @@ void Player_Local::UpdateEquipIDs() {
     for(; act != unit->second.end(); ++act) {
       if(act->act == ACT_EQUIP && eqtmp.count(act->id)
 		&& (targ == -1 || targ == act->targ1)
-		&& act->time >= start_time && act->time < start_time+3000) {
+		&& act->finish >= start_time && act->finish < start_time+3000) {
 	targ = act->targ1;
 	eqid.push_back(act->id);
 	}
