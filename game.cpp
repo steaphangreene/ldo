@@ -27,6 +27,10 @@
 #include "unit.h"
 #include "defs.h"
 
+#include <set>
+#include <map>
+#include <vector>
+
 #define HEADER_STRING "LDO_GAMESAVE_FILE"
 #define SAVEFILE_VERSION	0x00000004 // 0.0.0-r4
 
@@ -636,11 +640,12 @@ void Game::ResolveRound() {
       TermThreads();
       }
     else {
-      vector<UnitOrder>::const_iterator order = orders[pnum]->orders.begin();
-      for(; order != orders[pnum]->orders.end(); ++order) {
+      map<UnitOrder, bool>::const_iterator ordit = orders[pnum]->orders.begin();
+      for(; ordit != orders[pnum]->orders.end(); ++ordit) {
 //	fprintf(stderr, "ORDER[Player%d], %d do %d at %d to (%d,%d)\n", pnum,
 //		order->id, order->order, order->time,
 //		order->targ1, order->targ2);
+	const UnitOrder *order = &(ordit->first);
 	if(master.my_units[order->id].back().act == ACT_FALL) {
 	  continue;
 	  }
@@ -670,15 +675,16 @@ void Game::ResolveRound() {
 		Uint32 step = steps[abs(pt->x - lpt->x)
 			+ abs(pt->y - lpt->y) + abs(pt->z - lpt->z)];
 		offset += step;
-		//fprintf(stderr, "ROUND: %d\n", master.round);
-		//fprintf(stderr, "OTIME: %d\n", order->time);
-		//fprintf(stderr, "OFFSET: %d\n", offset);
-		//fprintf(stderr, "TIME: %d\n", (master.round - 1) * 3000 + order->time + offset);
+		if(offset > 3000) break;	//One Round at a Time!
 		master.AddAction(order->id,
 			(master.round - 1) * 3000 + order->time + offset, step,
 			pt->x, pt->y, pt->z, act, lpt->x, lpt->y, lpt->z);
 		lpt = pt;
 		}
+	      if(pt == path.end()) orders[pnum]->Completed(*order);
+	      }
+	    else {
+	      orders[pnum]->Completed(*order);
 	      }
 	    ordered.insert(order->id);
 	    }break;
@@ -699,6 +705,7 @@ void Game::ResolveRound() {
 		ordered.insert(order->id);
 		}
 	      }
+	    orders[pnum]->Completed(*order);
 	    }break;
 	  case(ORDER_SHOOT): {
 	    int hit = 0;
@@ -725,6 +732,7 @@ void Game::ResolveRound() {
 		(master.round - 1) * 3000 + order->time + offset + 100, 100,
 		x, y, z, ACT_SHOOT, order->targ1, order->targ2, order->targ3);
 	      }
+	    orders[pnum]->Completed(*order);
 	    ordered.insert(order->id);
 	    }break;
 	  default: {
@@ -733,7 +741,7 @@ void Game::ResolveRound() {
 	  }
 	}
       }
-    orders[pnum]->Clear();
+    orders[pnum]->ClearCompleted();
     }
   master.round++;
   }

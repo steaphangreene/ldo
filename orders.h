@@ -25,8 +25,7 @@
 
 #include "SDL.h"
 
-#include <set>
-#include <vector>
+#include <map>
 #include <cstdio>
 using namespace std;
 
@@ -54,6 +53,21 @@ public:
   int targ1;	//Depending on order, may be a unit id, or x coord, or unused
   int targ2;	//Depending on order, may be a unit id, or y coord, or unused
   int targ3;	//Depending on order, may be a unit id, or z coord, or unused
+
+  bool operator < (const UnitOrder &other) const {
+    if(time < other.time) return true;
+    if(time > other.time) return false;
+    if(id < other.id) return true;
+    if(id > other.id) return false;
+    if(order < other.order) return true;
+    if(order > other.order) return false;
+    if(targ1 < other.targ1) return true;
+    if(targ1 > other.targ1) return false;
+    if(targ2 < other.targ2) return true;
+    if(targ2 > other.targ2) return false;
+    if(targ3 < other.targ3) return true;
+    return false;
+    };
   };
 
 class Orders {
@@ -64,9 +78,16 @@ public:
   int Load(FILE *fl, unsigned int ver);
   int Save(FILE *fl, unsigned int ver);
 
+  void AddOrder(int i, int t, Order o, int t1 = 0, int t2 = 0, int t3 = 0) {
+	orders[UnitOrder(i, t, o, t1, t2, t3)] = false;
+	};
+
+
+  void Completed(const UnitOrder &ord);
+  void ClearCompleted();
   void Clear();
 
-  vector<UnitOrder> orders;	//List of unit orders
+  map<UnitOrder, bool> orders;	//List of unit orders & Completed state
   };
 
 #endif // ORDERS_H

@@ -43,7 +43,7 @@ bool Player_AI::Run() {
 	map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
 	for(; unit != percept.my_units.end(); ++unit) {
 	  if(unit->second.back().act == ACT_EQUIP) {
-	    orders.orders.push_back(UnitOrder(unit->first, 0, ORDER_EQUIP));
+	    orders.AddOrder(unit->first, 0, ORDER_EQUIP);
 	    }
 	  //SDL_Delay(10);
 	  }
@@ -51,8 +51,8 @@ bool Player_AI::Run() {
       else if(percept.round >= 1 && percept.round < 5) { // Everyone Run South
 	map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
 	for(; unit != percept.my_units.end(); ++unit) {
-	  orders.orders.push_back(UnitOrder(unit->first, 0, ORDER_RUN,
-		unit->second.back().x, unit->second.back().y - 6));
+	  orders.AddOrder(unit->first, 0, ORDER_RUN,
+		unit->second.back().x, unit->second.back().y - 6);
 	  //SDL_Delay(10);
 	  }
 	}

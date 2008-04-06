@@ -43,6 +43,19 @@ int Orders::Save(FILE *fl, unsigned int ver) {
   return 1;
   }
 
+void Orders::Completed(const UnitOrder &ord) {
+  orders[ord] = true;
+  }
+
+void Orders::ClearCompleted() {
+  map<UnitOrder, bool>::iterator ord = orders.begin();
+  while(ord != orders.end()) {
+    map<UnitOrder, bool>::iterator tmp = ord;
+    ++ord;
+    if(tmp->second) orders.erase(tmp);	//Remove only if completed
+    }
+  }
+
 void Orders::Clear() {
   orders.clear();
   }

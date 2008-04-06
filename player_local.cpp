@@ -302,7 +302,7 @@ int Player_Local::EventHandler() {
 	  vector<int>::iterator id = eqid.begin();
 	  for(; id != eqid.end(); ++id) {
 		//FIXME: Could ALLOC in this thread (Could be BAD in Windows!)!
-	    orders.orders.push_back(UnitOrder(*id, 0, ORDER_EQUIP));
+	    orders.AddOrder(*id, 0, ORDER_EQUIP);
 	    }
 	  SDL_mutexP(off_mut);
 	  nextphase = PHASE_PLAY;	//FIXME: Not Updated!
@@ -318,28 +318,22 @@ int Player_Local::EventHandler() {
 
       else if(event.user.code == SG_EVENT_MENU + 3) {
 	if(*((int*)event.user.data2) == 0 && raction == 1) {
-	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_MOVE, mouse_x, mouse_y, cur_zpos));
+	  orders.AddOrder(sel_id, 0, ORDER_MOVE, mouse_x, mouse_y, cur_zpos);
 	  }
 	else if(*((int*)event.user.data2) == 1 && raction == 1) {
-	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_RUN, mouse_x, mouse_y, cur_zpos));
+	  orders.AddOrder(sel_id, 0, ORDER_RUN, mouse_x, mouse_y, cur_zpos);
 	  }
 	else if(*((int*)event.user.data2) == 2 && raction == 1) {
-	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y, cur_zpos));
+	  orders.AddOrder(sel_id, 0, ORDER_THROW, mouse_x, mouse_y, cur_zpos);
 	  }
 	else if(*((int*)event.user.data2) == 3 && raction == 1) {
-	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y, cur_zpos));
+	  orders.AddOrder(sel_id, 0, ORDER_SHOOT, mouse_x, mouse_y, cur_zpos);
 	  }
 	else if(*((int*)event.user.data2) == 0 && raction == 2) {
-	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_SHOOT, -1, targ_id));
+	  orders.AddOrder(sel_id, 0, ORDER_SHOOT, -1, targ_id);
 	  }
 	else if(*((int*)event.user.data2) == 1 && raction == 2) {
-	  orders.orders.push_back(
-		UnitOrder(sel_id, 0, ORDER_THROW, -1, targ_id));
+	  orders.AddOrder(sel_id, 0, ORDER_THROW, -1, targ_id);
 	  }
 //	fprintf(stderr, "Got right-menu event %d\n", *((int*)event.user.data2));
 	}
@@ -677,9 +671,9 @@ void Player_Local::UpdateEquipIDs() {
       }
     }
 
-  vector<UnitOrder>::iterator order = orders.orders.begin();
+  map<UnitOrder, bool>::iterator order = orders.orders.begin();
   for(; order != orders.orders.end(); ++order) {
-    if(order->order == ORDER_EQUIP) eqtmp.erase(order->id);
+    if(order->first.order == ORDER_EQUIP) eqtmp.erase(order->first.id);
     }
 
   int targ = -1;	//Each troop/group equips SEPARATELY!

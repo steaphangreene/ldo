@@ -453,14 +453,15 @@ void World::Render(Uint32 offset) {	// Render for playback
 void World::DrawOrders(Uint32 offset) {
   int xo, yo, zo, xt, yt, zt;
   float zof, ztf;
-  vector<UnitOrder>::const_iterator ord = orders->orders.begin();
+  map<UnitOrder, bool>::const_iterator ordit = orders->orders.begin();
   glDisable(GL_LIGHTING);
   glDisable(GL_CULL_FACE);
   glBindTexture(GL_TEXTURE_2D, 0);
 //FIXME: Better Order Graphics!
 //  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //  glEnable(GL_BLEND);
-  for(; ord != orders->orders.end(); ++ord) {
+  for(; ordit != orders->orders.end(); ++ordit) {
+    const UnitOrder *ord = &(ordit->first);
     percept->GetPos(ord->id, xo, yo, zo);
     float ang = atan2f(ord->targ2 - yo, ord->targ1 - xo);
     xo = xo * 2 + 1;
