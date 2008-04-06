@@ -353,7 +353,7 @@ void World::DrawModels(Uint32 offset) {
 	    }
 	  }
 	}
-      else if(act->act == ACT_MOVE) {
+      else if(act->act == ACT_MOVE || act->act == ACT_RUN) {
 	int dx = act->x - act->targ1;
 	int dy = act->y - act->targ2;
 	float dur = act->duration;
@@ -365,32 +365,17 @@ void World::DrawModels(Uint32 offset) {
 	  }
 	else {
 	  Uint32 off = offset + act->duration - act->finish;
-	  int anim = models[mod]->LookUpAnimation("LEGS_WALK");
-	  if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
-	  if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
-	  anims[0] = anim;
-	  x = (act->targ1 * 2 + 1) * (dur - off) + (act->x * 2 + 1) * off;
-	  y = (act->targ2 * 2 + 1) * (dur - off) + (act->y * 2 + 1) * off;
-	  z = tzh * (dur - off) + azh * off;
-	  x /= dur; y /= dur; z /= dur;
-	  a = 180.0 * atan2f(dy, dx) / M_PI;
-	  }
-	}
-      else if(act->act == ACT_RUN) {
-	int dx = act->x - act->targ1;
-	int dy = act->y - act->targ2;
-	float dur = act->duration;
-	if(act->finish <= offset) {
-	  x = act->x * 2 + 1;
-	  y = act->y * 2 + 1;
-	  z = azh;
-	  a = 180.0 * atan2f(dy, dx) / M_PI;
-	  }
-	else {
-	  Uint32 off = offset + act->duration - act->finish;
-	  int anim = models[mod]->LookUpAnimation("LEGS_RUN");
-	  if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
-	  if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
+	  int anim;
+	  if(act->act == ACT_MOVE) {
+	    anim = models[mod]->LookUpAnimation("LEGS_WALK");
+	    if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
+	    if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
+	    }
+	  else {
+	    anim = models[mod]->LookUpAnimation("LEGS_RUN");
+	    if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
+	    if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
+	    }
 	  anims[0] = anim;
 	  x = (act->targ1 * 2 + 1) * (dur - off) + (act->x * 2 + 1) * off;
 	  y = (act->targ2 * 2 + 1) * (dur - off) + (act->y * 2 + 1) * off;
