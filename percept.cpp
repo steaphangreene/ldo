@@ -367,6 +367,12 @@ void Percept::FillActionsTo(int id, Uint32 f) {
       Uint32 diff = f - my_units[id].rbegin()->finish;
       my_units[id].rbegin()->finish += diff;
       my_units[id].rbegin()->duration += diff;
+      See(unplayer[id], f, my_units[id].rbegin()->x,
+	my_units[id].rbegin()->y, my_units[id].rbegin()->z,
+	my_units[id].rbegin()->angle, 20, 90.0);
+      Unsee(unplayer[id], f, my_units[id].rbegin()->x,
+	my_units[id].rbegin()->y, my_units[id].rbegin()->z,
+	my_units[id].rbegin()->angle, 20, 90.0);
       }
     else {
       AddAction(id, f, f - lasttime,
@@ -451,10 +457,10 @@ void Percept::Unsee(int plnum, Uint32 tm, int xp, int yp, int zp, float ang, int
 void MapObject::See(int plnum, Uint32 tm) {
   seers[plnum]++;
   if(seers[plnum] == 1) {
-    seen[plnum].insert(pair<Uint32,Uint32>(tm, tm));
+    seen[plnum].insert(pair<Uint32,Uint32>(tm, tm+1));
     }
   else {
-    seen[plnum].rbegin()->second = tm+3000;
+    seen[plnum].rbegin()->second = tm+1;
     }
   }
 

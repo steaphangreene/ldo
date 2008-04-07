@@ -192,8 +192,13 @@ void World::DrawMap(Uint32 offset) {
   glPushMatrix();
   map<MapCoord, MapObject>::const_iterator obj = percept->objects.begin();
   for(; obj != percept->objects.end(); ++obj) {
-    if(obj->second.seen.size() > 0
-	&& obj->second.seen.begin()->second.begin()->first <= offset) {
+    multimap<Uint32, Uint32>::const_iterator seen;
+    seen = obj->second.seen.at(plnum).begin();
+    for(; seen != obj->second.seen.at(plnum).end(); ++seen) {
+      if(seen->first <= offset && seen->second > offset) break;
+      }
+    if(seen != obj->second.seen.at(plnum).end()) {
+
       if(obj->second.type == EFFECT_FIRE) {
 	if(obj->second.which >= (int)(effectsto)
 		&& obj->second.which <= (int)(offset)) {
@@ -254,11 +259,9 @@ void World::DrawMap(Uint32 offset) {
 	else {
 	  sobj = objmap[obj->second.id];
 	  }
-	if(obj->second.seen.begin()->second.begin()->second >= effectsto
-		&& obj->second.seen.begin()->second.begin()->first <= offset) {
-	  Uint32 base = obj->second.seen.begin()->second.begin()->first;
-	  Uint32 end = obj->second.seen.begin()->second.begin()->second + 1;
-
+	if(seen->second >= effectsto && seen->first <= offset) {
+	  Uint32 base = seen->first;
+	  Uint32 end = seen->second;
 	  scene->ObjectAct(sobj, SS_ACT_VISIBLE, end, end-base);
 	  }
 	}
@@ -326,7 +329,7 @@ void World::DrawModels(Uint32 offset) {
       float x = act->x * 2 + 1;
       float y = act->y * 2 + 1;
       float z = azh;
-      float a = 0.0;
+      float a = act->angle;
       if(act->act == ACT_STAND) {
 	if(act->finish <= offset + act->duration) {
 	  x = act->targ1 * 2 + 1;
