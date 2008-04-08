@@ -181,6 +181,7 @@ void World::SetViewAngle(int ang) {
 void World::DrawMap(Uint32 offset) {
   static Uint32 mround = 0;
 
+/*
   GLfloat shininess[] = { 128.0 * 0.75 };
   GLfloat specular[] = { 0.75, 0.75, 0.75, 1.0 };
   GLfloat ambient[] = { 0.5, 0.5, 0.5, 1.0 };
@@ -190,6 +191,7 @@ void World::DrawMap(Uint32 offset) {
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
   glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+*/
 
   glPushMatrix();
   map<MapCoord, MapObject>::const_iterator obj = percept->objects.begin();
