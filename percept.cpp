@@ -367,10 +367,7 @@ void Percept::FillActionsTo(int id, Uint32 f) {
       Uint32 diff = f - my_units[id].rbegin()->finish;
       my_units[id].rbegin()->finish += diff;
       my_units[id].rbegin()->duration += diff;
-      See(unplayer[id], f, my_units[id].rbegin()->x,
-	my_units[id].rbegin()->y, my_units[id].rbegin()->z,
-	my_units[id].rbegin()->angle, 20, 90.0);
-      Unsee(unplayer[id], f, my_units[id].rbegin()->x,
+      See(id, f, my_units[id].rbegin()->x,
 	my_units[id].rbegin()->y, my_units[id].rbegin()->z,
 	my_units[id].rbegin()->angle, 20, 90.0);
       }
@@ -393,49 +390,19 @@ void Percept::AddAction(int id, Uint32 f, Uint32 d,
 
 void Percept::AddAction(const UnitAct &act) {
   FillActionsTo(act.id, act.finish-act.duration);
-  int oxp = 0, oyp = 0, ozp = 0;
-  float oang = -1000.0;
-  if(!my_units[act.id].empty()) {
-    oxp = my_units[act.id].rbegin()->x;
-    oyp = my_units[act.id].rbegin()->y;
-    ozp = my_units[act.id].rbegin()->z;
-    oang = my_units[act.id].rbegin()->angle;
-    }
   my_units[act.id].push_back(act);
-  See(unplayer[act.id], act.finish, act.x, act.y, act.z, act.angle, 20, 90.0);
-  if(oang > -1000.0) {
-    Unsee(unplayer[act.id], act.finish, oxp, oyp, ozp, oang, 20, 90.0);
-    }
+  See(act.id, act.finish, act.x, act.y, act.z, act.angle, 20, 90.0);
   }
 
-void Percept::See(int plnum, Uint32 tm, int xp, int yp, int zp, float ang, int dist, float fov) {
-  //Handle Vision/Discovery	//FIXME: This is static (no obstructions yet)
-  //fprintf(stderr, "See[%d]: (%d, %d, %d)/%f\n", plnum, xp, yp, zp, ang);
-  for(int z = -dist; z < +dist; ++z) {
-    for(int y = -dist; y < +dist; ++y) {
-      for(int x = -dist; x < +dist; ++x) {
-	float ad = fabs((180.0 * atan2f(y, x) / M_PI) - ang);
-	if(ad >= 180.0) ad = (360.0 - ad);
-	if((z+zp) >= 0 && (z+zp) < mapzs && (y+yp) >= 0 && (y+yp) < mapys
-		&& (x+xp) >= 0 && (x+xp) < mapxs
-		&& sqrt(z*z + y*y + x*x) <= dist
-		&& ad <= (fov/2.0)) {
-	  MapCoord pos = { x+xp, y+yp, z+zp };
-	  multimap<MapCoord, MapObject>::iterator obj = objects.find(pos);
-	  if(obj != objects.end()) {
-	    for(; obj != objects.upper_bound(pos); ++obj) {
-	      obj->second.See(plnum, tm);
-	      }
-	    }
-	  }
-	}
+void Percept::See(int id, Uint32 tm, int xp, int yp, int zp, float ang, int dist, float fov) {
+  if(lastseen.count(id) > 0) {
+    set<MapObject *>::iterator obj = lastseen[id].begin();
+    for(; obj != lastseen[id].end(); ++obj) {
+      (*obj)->Unsee(unplayer[id], tm);
       }
+    lastseen.erase(id);
     }
-  }
-
-void Percept::Unsee(int plnum, Uint32 tm, int xp, int yp, int zp, float ang, int dist, float fov) {
   //Handle Vision/Discovery	//FIXME: This is static (no obstructions yet)
-  //fprintf(stderr, "Unsee[%d]: (%d, %d, %d)/%f\n", plnum, xp, yp, zp, ang);
   for(int z = -dist; z < +dist; ++z) {
     for(int y = -dist; y < +dist; ++y) {
       for(int x = -dist; x < +dist; ++x) {
@@ -449,7 +416,8 @@ void Percept::Unsee(int plnum, Uint32 tm, int xp, int yp, int zp, float ang, int
 	  multimap<MapCoord, MapObject>::iterator obj = objects.find(pos);
 	  if(obj != objects.end()) {
 	    for(; obj != objects.upper_bound(pos); ++obj) {
-	      obj->second.Unsee(plnum, tm);
+	      obj->second.See(unplayer[id], tm);
+	      lastseen[id].insert(&(obj->second));
 	      }
 	    }
 	  }

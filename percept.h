@@ -25,6 +25,7 @@
 
 #include "SDL.h"
 
+#include <set>
 #include <map>
 #include <vector>
 #include <cstdio>
@@ -152,10 +153,9 @@ public:
 private:	//Utility Functions
   int RDist(const MapCoord &first, const MapCoord &second);
   int HDist(const MapCoord &first, const MapCoord &second);
-  void See(int plnum, Uint32 tm, int xp, int yp, int zp, float ang,
+  void See(int id, Uint32 tm, int xp, int yp, int zp, float ang,
 	int dist, float fov);
-  void Unsee(int plnum, Uint32 tm, int xp, int yp, int zp, float ang,
-	int dist, float fov);
+  map<int, set<MapObject *> > lastseen;
   };
 
 #endif // PERCEPT_H
