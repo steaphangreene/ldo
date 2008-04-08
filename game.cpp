@@ -247,7 +247,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      GROUND_FLOOR, oid++, 0x100 * ttype + map_data[z][y][x][0], 0.0
 	      };
 	    if((see_data[z][y][x] & 0x04) > 0) {
-	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 1));
+	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -258,7 +258,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      WALL_WEST, oid++, 0x100 * ttype + map_data[z][y][x][1], 3.0
 	      };
 	    if((see_data[z][y][x] & 0x01) > 0) {
-	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 1));
+	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -269,7 +269,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      WALL_NORTH, oid++, 0x100 * ttype + map_data[z][y][x][2], 3.0
 	      };
 	    if((see_data[z][y][x] & 0x02) > 0) {
-	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 1));
+	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -280,7 +280,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      OBJECT_MISC, oid++, 0x100 * ttype + map_data[z][y][x][3], 0.8
 	      };
 	    if((see_data[z][y][x] & 0x04) > 0) {
-	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 1));
+	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
