@@ -277,7 +277,7 @@ void World::DrawMap(Uint32 offset) {
 	    }
 	  oact = act;
 	  }
-	if(oact != act && oact->second < (percept->round-1)*3000) {
+	if(oact != act && oact->second < (percept->round - 1) * 3000 + 1) {
 	  scene->ObjectAct(sobj, SS_ACT_HALFCOLOR,
 		(percept->round - 1) * 3000 + 1,
 		(percept->round - 1) * 3000 + 1 - oact->second);
