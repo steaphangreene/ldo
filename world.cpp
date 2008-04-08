@@ -179,6 +179,8 @@ void World::SetViewAngle(int ang) {
   }
 
 void World::DrawMap(Uint32 offset) {
+  static Uint32 mround = 0;
+
   GLfloat shininess[] = { 128.0 * 0.75 };
   GLfloat specular[] = { 0.75, 0.75, 0.75, 1.0 };
   GLfloat ambient[] = { 0.5, 0.5, 0.5, 1.0 };
@@ -227,47 +229,53 @@ void World::DrawMap(Uint32 offset) {
 	    }
 	  }
 	}
+      }
+    if(obj->second.type != EFFECT_FIRE && obj->second.type != EFFECT_SMOKE) {
+      SS_Model mod;
+      if(modmap.count(obj->second.which) > 0) {
+	mod = modmap[obj->second.which];
+	}
       else {
-	SS_Model mod;
-	if(modmap.count(obj->second.which) > 0) {
-	  mod = modmap[obj->second.which];
+	mod = modmap[-(obj->second.type)];
+	}
+
+      if(mod == modmap[0x0000]) {		//Items that aren't drawn
+	continue;	//Don't draw it
+	}
+
+      SS_Object sobj;
+      if(objmap.count(obj->second.id) < 1) {
+	sobj = scene->AddObject(mod);
+	objmap[obj->second.id] = sobj;
+	scene->SetObjectPosition(sobj, obj->first.x*2.0+1.0,
+	  obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
+
+	if(texmap.count(obj->second.which) > 0) {
+	  scene->SetObjectSkin(sobj, texmap[obj->second.which]);
 	  }
 	else {
-	  mod = modmap[-(obj->second.type)];
-	  }
-
-	if(mod == modmap[0x0000]) {		//Items that aren't drawn
-	  continue;	//Don't draw it
-	  }
-
-	SS_Object sobj;
-	if(objmap.count(obj->second.id) < 1) {
-	  sobj = scene->AddObject(mod);
-	  objmap[obj->second.id] = sobj;
-	  scene->SetObjectPosition(sobj, obj->first.x*2.0+1.0,
-		obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
-
-	  if(texmap.count(obj->second.which) > 0) {
-	    scene->SetObjectSkin(sobj, texmap[obj->second.which]);
-	    }
-	  else {
-	    scene->SetObjectColor(sobj,
+	  scene->SetObjectColor(sobj,
 		obj->first.x/float(50), 0.5, obj->first.y/float(50));
-	    scene->SetObjectSkin(sobj, obj->second.which & 0xFF);
-	    }
+	  scene->SetObjectSkin(sobj, obj->second.which & 0xFF);
 	  }
-	else {
-	  sobj = objmap[obj->second.id];
-	  }
-	if(seen->second >= effectsto && seen->first <= offset) {
-	  Uint32 base = seen->first;
-	  Uint32 end = seen->second;
+	}
+      else {
+	sobj = objmap[obj->second.id];
+	}
+      if(mround != percept->round) {
+	multimap<Uint32, Uint32>::const_iterator act;
+	act = obj->second.seen.at(plnum).begin();
+	for(; act != obj->second.seen.at(plnum).end(); ++act) {
+//	  if(act->second > (percept->round - 2)*3000) {
+	  Uint32 base = act->first;
+	  Uint32 end = act->second;
 	  scene->ObjectAct(sobj, SS_ACT_VISIBLE, end, end-base);
 	  }
 	}
       }
     }
 
+  mround = percept->round;
   effectsto = offset + 1;
   glPopMatrix();
   }
