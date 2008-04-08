@@ -23,6 +23,7 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include <set>
 #include <map>
 #include <string>
 #include <vector>
@@ -90,6 +91,8 @@ public:
 
 private:
   void ResolveRound();
+  void GetActions(multiset<UnitAct> &toact);
+  void CommitActions(const multiset<UnitAct> &toact);
 
   void Clear();
 

@@ -632,6 +632,32 @@ int Game::ThreadHandler() {
   }
 
 void Game::ResolveRound() {
+  multiset<UnitAct> toact;
+  GetActions(toact);
+  CommitActions(toact);
+
+  map<int, Unit *>::iterator unit = units.begin();
+  for(; unit != units.end(); ++unit) {
+    if(master.my_units[unit->second->id].back().act != ACT_FALL) {
+      master.FillActionsTo(unit->first, master.round*3000);
+      }
+    }
+
+  ++(master.round);
+  }
+
+void Game::CommitActions(const multiset<UnitAct> &toact) {
+  //FIXME: This is where the game system goes!
+  multiset<UnitAct>::const_iterator act = toact.begin();
+  for(; act != toact.end(); ++act) {
+    if(master.my_units[act->id].back().act == ACT_FALL) {
+      continue;	// The dead can't act
+      }
+    master.AddAction(*act);
+    }
+  }
+
+void Game::GetActions(multiset<UnitAct> &toact) {
   set<int> ordered;
   vector<Player *>::const_iterator itrp = player.begin();
   for(; itrp != player.end(); ++itrp) {
@@ -679,10 +705,10 @@ void Game::ResolveRound() {
 			180.0 * atan2f(pt->y - lpt->y, pt->x - lpt->x) / M_PI;
 		offset += step;
 		if(offset > 3000) break;	//One Round at a Time!
-		master.AddAction(order->id,
+		toact.insert(UnitAct(order->id,
 			(master.round - 1) * 3000 + order->time + offset, step,
 			pt->x, pt->y, pt->z, ang,
-			act, lpt->x, lpt->y, lpt->z);
+			act, lpt->x, lpt->y, lpt->z));
 		lpt = pt;
 		}
 	      if(pt == path.end()) orders[pnum]->Completed(*order);
@@ -695,17 +721,17 @@ void Game::ResolveRound() {
 	  case(ORDER_EQUIP): {
 	    if(master.round != 1 || order->time != 0) {	// Not Initial EQUIP
 	      if(ordered.count(order->id) <= 0) {
-		master.AddAction(order->id,
+		toact.insert(UnitAct(order->id,
 			(master.round - 1) * 3000 + order->time + offset, 0,
 			x, y, z, 0.0, ACT_EQUIP,
-			order->targ1, order->targ2, order->targ3);
+			order->targ1, order->targ2, order->targ3));
 		ordered.insert(order->id);
 		}
 	      }
 	    else {				// Initial Equip is Free
 	      if(ordered.count(order->id) <= 0) {
-		master.AddAction(order->id, 0, 0, x, y, z, 0.0, ACT_EQUIP,
-			order->targ1, order->targ2, order->targ3);
+		toact.insert(UnitAct(order->id, 0, 0, x, y, z, 0.0, ACT_EQUIP,
+			order->targ1, order->targ2, order->targ3));
 		ordered.insert(order->id);
 		}
 	      }
@@ -723,22 +749,22 @@ void Game::ResolveRound() {
 	      int tx, ty, tz;
 	      float ang;
 	      master.GetPos(hit, tx, ty, tz, ang);
-	      master.AddAction(hit,
+	      toact.insert(UnitAct(hit,
 		(master.round - 1) * 3000 + order->time + 350 + offset, 100,
-		tx, ty, tz, ang, ACT_FALL);
+		tx, ty, tz, ang, ACT_FALL));
 	      ordered.insert(hit);
 
 	      ang = atan2f(tx - x, ty - y);
-	      master.AddAction(order->id,
+	      toact.insert(UnitAct(order->id,
 		(master.round - 1) * 3000 + order->time + offset + 100, 100,
-		x, y, z, ang, ACT_SHOOT, tx, ty, tz);
+		x, y, z, ang, ACT_SHOOT, tx, ty, tz));
 	      }
 	    else {
 	      float ang = atan2f(order->targ2 - x, order->targ1 - y);
-	      master.AddAction(order->id,
+	      toact.insert(UnitAct(order->id,
 		(master.round - 1) * 3000 + order->time + offset + 100, 100,
 		x, y, z, ang, ACT_SHOOT,
-		order->targ1, order->targ2, order->targ3);
+		order->targ1, order->targ2, order->targ3));
 	      }
 	    orders[pnum]->Completed(*order);
 	    ordered.insert(order->id);
@@ -751,11 +777,4 @@ void Game::ResolveRound() {
       }
     orders[pnum]->ClearCompleted();
     }
-
-  map<int, Unit *>::iterator unit = units.begin();
-  for(; unit != units.end(); ++unit) {
-    master.FillActionsTo(unit->first, master.round*3000);
-    }
-
-  master.round++;
   }

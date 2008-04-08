@@ -105,6 +105,11 @@ public:
   int targ1;	//Depending on action, may be a unit id, or x coord, or unused
   int targ2;	//Depending on action, may be a unit id, or y coord, or unused
   int targ3;	//Depending on action, may be a unit id, or z coord, or unused
+
+  bool operator < (const UnitAct &other) const {
+    return (finish < other.finish
+	|| (finish == other.finish && duration < other.duration));
+    }
   };
 
 class Percept {
@@ -120,6 +125,7 @@ public:
   void FillActionsTo(int id, Uint32 f);
   void AddAction(int i, Uint32 f, Uint32 d, int xp, int yp, int zp, float ang,
 	Act a, int t1 = 0, int t2 = 0, int t3 = 0);
+  void AddAction(const UnitAct &act);
 
   //Basic map info
   int mapxs, mapys, mapzs;

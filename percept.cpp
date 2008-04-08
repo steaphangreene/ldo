@@ -387,20 +387,24 @@ void Percept::FillActionsTo(int id, Uint32 f) {
 void Percept::AddAction(int id, Uint32 f, Uint32 d,
 	int xp, int yp, int zp, float ang,
 	Act a, int t1, int t2, int t3) {
-  FillActionsTo(id, f-d);
+  UnitAct act(id, f, d, xp, yp, zp, ang, a, t1, t2, t3);
+  AddAction(act);
+  }
+
+void Percept::AddAction(const UnitAct &act) {
+  FillActionsTo(act.id, act.finish-act.duration);
   int oxp = 0, oyp = 0, ozp = 0;
   float oang = -1000.0;
-  if(!my_units[id].empty()) {
-    oxp = my_units[id].rbegin()->x;
-    oyp = my_units[id].rbegin()->y;
-    ozp = my_units[id].rbegin()->z;
-    oang = my_units[id].rbegin()->angle;
+  if(!my_units[act.id].empty()) {
+    oxp = my_units[act.id].rbegin()->x;
+    oyp = my_units[act.id].rbegin()->y;
+    ozp = my_units[act.id].rbegin()->z;
+    oang = my_units[act.id].rbegin()->angle;
     }
-  UnitAct act(id, f, d, xp, yp, zp, ang, a, t1, t2, t3);
-  my_units[id].push_back(act);
-  See(unplayer[id], f, xp, yp, zp, ang, 20, 90.0);
+  my_units[act.id].push_back(act);
+  See(unplayer[act.id], act.finish, act.x, act.y, act.z, act.angle, 20, 90.0);
   if(oang > -1000.0) {
-    Unsee(unplayer[id], f, oxp, oyp, ozp, oang, 20, 90.0);
+    Unsee(unplayer[act.id], act.finish, oxp, oyp, ozp, oang, 20, 90.0);
     }
   }
 
