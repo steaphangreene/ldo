@@ -267,13 +267,14 @@ void World::DrawMap(Uint32 offset) {
 	act = obj->second.seen.at(plnum).begin();
 	oact = act;
 	for(; act != obj->second.seen.at(plnum).end(); ++act) {
-//	  if(act->second > (percept->round - 2)*3000) {
-	  Uint32 base = act->first;
-	  Uint32 end = act->second;
-	  if(oact != act) {
-	    scene->ObjectAct(sobj, SS_ACT_HALFCOLOR, base, base-oact->second);
+	  if(act->second > (percept->round - 2)*3000) {
+	    Uint32 base = act->first;
+	    Uint32 end = act->second;
+	    if(oact != act) {
+	      scene->ObjectAct(sobj, SS_ACT_HALFCOLOR, base, base-oact->second);
+	      }
+	    scene->ObjectAct(sobj, SS_ACT_VISIBLE, end, end-base);
 	    }
-	  scene->ObjectAct(sobj, SS_ACT_VISIBLE, end, end-base);
 	  oact = act;
 	  }
 	if(oact != act && oact->second < (percept->round-1)*3000) {
