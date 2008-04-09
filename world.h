@@ -65,7 +65,7 @@ protected:
   map<int, SS_Skin> texmap;
   map<int, SS_Object> objmap;
   int smoke, fire;
-  Uint32 effectsto;
+  Uint32 mround;
   };
 
 #endif // WORLD_H

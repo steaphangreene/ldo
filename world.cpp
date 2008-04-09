@@ -163,7 +163,7 @@ World::World(Percept *per, Orders *ord, int pl) {
   scene->SetPTypeSize0(fire, 1.0);
   scene->SetPTypeSize1(fire, 0.5);
 
-  effectsto = 0;
+  mround = 0;
   }
 
 World::~World() {
@@ -179,8 +179,6 @@ void World::SetViewAngle(int ang) {
   }
 
 void World::DrawMap(Uint32 offset) {
-  static Uint32 mround = 0;
-
 /*
   GLfloat shininess[] = { 128.0 * 0.75 };
   GLfloat specular[] = { 0.75, 0.75, 0.75, 1.0 };
@@ -262,7 +260,7 @@ void World::DrawMap(Uint32 offset) {
 	    break;
 	    }
 	  }
-      if(burn > 0) {		// Smoke and/or Fire
+      if(burn > 0 && obj->second.type == GROUND_FLOOR) { // Smoke and/or Fire
 	for(Uint32 start = (percept->round - 2)*3000;
 		start < (percept->round - 1)*3000; start += 250) {
 	  SS_Particle part = scene->AddParticle(smoke);
@@ -277,23 +275,27 @@ void World::DrawMap(Uint32 offset) {
 	for(Uint32 start = (percept->round - 2)*3000;
 		start < (percept->round - 1)*3000; start += 10) {
 	  SS_Particle part = scene->AddParticle(fire);
+	  float xo = 0.0, yo = 0.0, zo = 0.0;
+	  if(obj->second.type == WALL_NORTH) {
+	    yo = -1.0; zo = 1.5;
+	    }
+	  else if(obj->second.type == WALL_WEST) {
+	    xo = -1.0; zo = 1.5;
+	    }
+	  else if(obj->second.type == OBJECT_MISC) {
+	    zo = 0.5;
+	    }
 	  scene->SetParticlePosition(part,
-		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
-		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
-		obj->first.z*2.0);
+		xo + obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		yo + obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		zo + obj->first.z*2.0);
 	  scene->SetParticleTime(part, start);
 	  }
-	}
-      }
-    else if(obj->second.type == EFFECT_FIRE || obj->second.type == EFFECT_SMOKE) {
-      if(obj->second.which >= (int)(effectsto)
-		&& obj->second.which <= (int)(offset)) {
 	}
       }
     }
 
   mround = percept->round;
-  effectsto = offset + 1;
   glPopMatrix();
   }
 
