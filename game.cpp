@@ -274,7 +274,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(burn_data.count(pos) > 0) {
-	      obj.burn[0] = burn_data[pos] * 16;
+	      obj.burn[0] = burn_data[pos];
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -288,7 +288,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(burn_data.count(pos) > 0) {
-	      obj.burn[0] = burn_data[pos] * 16;
+	      obj.burn[0] = burn_data[pos];
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -302,7 +302,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(burn_data.count(pos) > 0) {
-	      obj.burn[0] = burn_data[pos] * 16;
+	      obj.burn[0] = burn_data[pos];
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -316,7 +316,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(burn_data.count(pos) > 0) {
-	      obj.burn[0] = burn_data[pos] * 16;
+	      obj.burn[0] = burn_data[pos];
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -654,8 +654,7 @@ void Game::ResolveRound() {
     if(!(obj->second.burn.empty())) {	// Strenghten/Spread/Dissipate
       Uint8 burn = (obj->second.burn.rbegin()->second);
       if(burn > 0) {
-	if(burn < 8) burn = 0;
-	else burn -= 8;
+	burn--;
 	obj->second.burn[master.round+1] = burn;
 	}
       }
