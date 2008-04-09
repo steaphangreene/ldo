@@ -66,6 +66,7 @@ void Percept::Clear() {	//Erases all data (re-init)
   other_units.clear();
   objects.clear();
   unplayer.clear();
+  lastseen.clear();
   mapxs = 0;
   mapys = 0;
   mapzs = 0;
