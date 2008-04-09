@@ -655,6 +655,7 @@ void Game::ResolveRound() {
       Uint8 burn = (obj->second.burn.rbegin()->second);
       if(burn > 0) {
 	burn--;
+	if(burn == 63) burn = 15;	// Fire just went out.
 	obj->second.burn[master.round+1] = burn;
 	}
       }
