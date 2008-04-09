@@ -41,8 +41,6 @@ enum ObjectType {
   WALL_NORTH,
   WALL_WEST,
   OBJECT_MISC,
-  EFFECT_SMOKE,
-  EFFECT_FIRE,
   OBJECT_MAX
   };
 

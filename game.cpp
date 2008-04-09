@@ -245,9 +245,6 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	y = master.mapys - 1 - int(effect_data[effect][0]);
 	z = master.mapzs - 1 - int(effect_data[effect][2]);
 	MapCoord pos = { x, y, z };
-//	MapObject obj = { EFFECT_SMOKE, oid++, 0, 0.0 };
-//	if(effect_data[effect][6] == 1) obj.type = EFFECT_FIRE;
-//	master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
 	burn_data[pos] = 3 - (effect_data[effect][6]);
 	}
       }
