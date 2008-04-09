@@ -271,7 +271,7 @@ void World::DrawMap(Uint32 offset) {
 	  scene->SetParticleTime(part, start);
 	  }
 	}
-      if(burn > 1)		// Fire
+      if(burn >= 64)		// Fire
 	for(Uint32 start = (percept->round - 2)*3000;
 		start < (percept->round - 1)*3000; start += 10) {
 	  SS_Particle part = scene->AddParticle(fire);

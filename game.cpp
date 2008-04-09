@@ -245,7 +245,12 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	y = master.mapys - 1 - int(effect_data[effect][0]);
 	z = master.mapzs - 1 - int(effect_data[effect][2]);
 	MapCoord pos = { x, y, z };
-	burn_data[pos] = 3 - (effect_data[effect][6]);
+	if(effect_data[effect][6] == 2) {	// Smoke
+	  burn_data[pos] = effect_data[effect][3];
+	  }
+	else {	// Fire
+	  burn_data[pos] = 64 + effect_data[effect][4];
+	  }
 	}
       }
     }
@@ -269,7 +274,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(burn_data.count(pos) > 0) {
-	      obj.burn[0] = burn_data[pos];
+	      obj.burn[0] = burn_data[pos] * 16;
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -283,7 +288,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(burn_data.count(pos) > 0) {
-	      obj.burn[0] = burn_data[pos];
+	      obj.burn[0] = burn_data[pos] * 16;
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -297,7 +302,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(burn_data.count(pos) > 0) {
-	      obj.burn[0] = burn_data[pos];
+	      obj.burn[0] = burn_data[pos] * 16;
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -311,7 +316,7 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	      obj.seen[0].insert(pair<Uint32,Uint32>(0, 0));
 	      }
 	    if(burn_data.count(pos) > 0) {
-	      obj.burn[0] = burn_data[pos];
+	      obj.burn[0] = burn_data[pos] * 16;
 	      }
 	    if(height.count(obj.which) > 0) obj.height = height[obj.which];
 	    master.objects.insert(pair<MapCoord, MapObject>(pos, obj));
@@ -643,7 +648,18 @@ int Game::ThreadHandler() {
   }
 
 void Game::ResolveRound() {
-  //FIXME: Update Smoke and Fire
+  //FIXME: Real Spread/Strenghten of Smoke and Fire
+  map<MapCoord, MapObject>::iterator obj = master.objects.begin();
+  for(; obj != master.objects.end(); ++obj) {
+    if(!(obj->second.burn.empty())) {	// Strenghten/Spread/Dissipate
+      Uint8 burn = (obj->second.burn.rbegin()->second);
+      if(burn > 0) {
+	if(burn < 8) burn = 0;
+	else burn -= 8;
+	obj->second.burn[master.round+1] = burn;
+	}
+      }
+    }
 
   multiset<UnitAct> toact;
   GetActions(toact);
