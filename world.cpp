@@ -201,37 +201,6 @@ void World::DrawMap(Uint32 offset) {
     for(; seen != obj->second.seen.at(plnum).end(); ++seen) {
       if(seen->first <= offset && seen->second > offset) break;
       }
-    if(seen != obj->second.seen.at(plnum).end()) {
-
-      if(obj->second.type == EFFECT_FIRE) {
-	if(obj->second.which >= (int)(effectsto)
-		&& obj->second.which <= (int)(offset)) {
-	  for(Uint32 start = obj->second.which;
-		(int)(start) < obj->second.which + 20000; start += 10) {
-	    SS_Particle part = scene->AddParticle(fire);
-	    scene->SetParticlePosition(part,
-		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
-		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
-		obj->first.z*2.0);
-	    scene->SetParticleTime(part, start);
-	    }
-	  }
-	}
-      else if(obj->second.type == EFFECT_FIRE || obj->second.type == EFFECT_SMOKE) {
-	if(obj->second.which >= (int)(effectsto)
-		&& obj->second.which <= (int)(offset)) {
-	  for(Uint32 start = obj->second.which;
-		(int)(start) < obj->second.which + 20000; start += 250) {
-	    SS_Particle part = scene->AddParticle(smoke);
-	    scene->SetParticlePosition(part,
-		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
-		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
-		obj->first.z*2.0);
-	    scene->SetParticleTime(part, start);
-	    }
-	  }
-	}
-      }
     if(obj->second.type != EFFECT_FIRE && obj->second.type != EFFECT_SMOKE) {
       SS_Model mod;
       if(modmap.count(obj->second.which) > 0) {
@@ -283,6 +252,43 @@ void World::DrawMap(Uint32 offset) {
 	  scene->ObjectAct(sobj, SS_ACT_HALFCOLOR,
 		(percept->round - 1) * 3000 + 1,
 		(percept->round - 1) * 3000 + 1 - oact->second);
+	  }
+	Uint8 burn = 0;
+	if(!(obj->second.burn.empty())) {	// Check for Smoke and/or Fire
+	  map<Uint32, Uint8>::const_reverse_iterator bit
+		= obj->second.burn.rbegin();
+	  for(; bit != obj->second.burn.rend(); ++bit) {
+	    if(bit->first <= percept->round) {
+	      burn = bit->second;
+	      break;
+	      }
+	    }
+	if(burn > 0) {		// Smoke and/or Fire
+	  for(Uint32 start = (percept->round - 2)*3000;
+		start < (percept->round - 1)*3000; start += 250) {
+	    SS_Particle part = scene->AddParticle(smoke);
+	    scene->SetParticlePosition(part,
+		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		obj->first.z*2.0);
+	    scene->SetParticleTime(part, start);
+	    }
+	  }
+	if(burn > 1)		// Fire
+	  for(Uint32 start = (percept->round - 2)*3000;
+		start < (percept->round - 1)*3000; start += 10) {
+	    SS_Particle part = scene->AddParticle(fire);
+	    scene->SetParticlePosition(part,
+		obj->first.x*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		obj->first.y*2.0 + 1.0 + float(rand()) / RAND_MAX / 2.0,
+		obj->first.z*2.0);
+	    scene->SetParticleTime(part, start);
+	    }
+	  }
+	}
+      else if(obj->second.type == EFFECT_FIRE || obj->second.type == EFFECT_SMOKE) {
+	if(obj->second.which >= (int)(effectsto)
+		&& obj->second.which <= (int)(offset)) {
 	  }
 	}
       }

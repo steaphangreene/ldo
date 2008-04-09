@@ -69,6 +69,8 @@ struct MapObject {
   int which;
   float height;
   map<int, multimap<Uint32, Uint32> > seen;
+
+  map<Uint32, Uint8> burn;
   map<int, int> seers;
   void See(int plnum, Uint32 tm);
   void Unsee(int plnum, Uint32 tm);
@@ -150,7 +152,7 @@ public:
   vector<MapCoord> GetPath(const MapCoord &start, const MapCoord &end);
   vector<MapCoord> GetPath2x2(const MapCoord &start, const MapCoord &end);
 
-private:	//Utility Functions
+private:	//Utility Functions & Cache Data
   int RDist(const MapCoord &first, const MapCoord &second);
   int HDist(const MapCoord &first, const MapCoord &second);
   void See(int id, Uint32 tm, int xp, int yp, int zp, float ang,
