@@ -393,10 +393,6 @@ void World::DrawModels(Uint32 offset) {
 	  }
 	}
       else if(act->act == ACT_SHOOT) {
-	int dx = act->targ1 - act->x;
-	int dy = act->targ2 - act->y;
-	//int dz = act->targ3 - act->z;
-	a = 180.0 * atan2f(dy, dx) / M_PI;
 	if(act->finish + 1500 <= offset + act->duration) {
 	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
