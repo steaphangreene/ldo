@@ -783,13 +783,13 @@ void Game::GetActions(multiset<UnitAct> &toact) {
 		tx, ty, tz, ang, ACT_FALL));
 	      ordered.insert(hit);
 
-	      ang = atan2f(tx - x, ty - y);
+	      ang = 180.0 * atan2f(tx - x, ty - y);
 	      toact.insert(UnitAct(order->id,
 		(master.round - 1) * 3000 + order->time + offset + 100, 100,
 		x, y, z, ang, ACT_SHOOT, tx, ty, tz));
 	      }
 	    else {
-	      float ang = atan2f(order->targ2 - x, order->targ1 - y);
+	      float ang = 180.0 * atan2f(order->targ2 - x, order->targ1 - y);
 	      toact.insert(UnitAct(order->id,
 		(master.round - 1) * 3000 + order->time + offset + 100, 100,
 		x, y, z, ang, ACT_SHOOT,
