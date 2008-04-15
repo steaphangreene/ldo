@@ -367,14 +367,16 @@ int Game::LoadXCom(FILE *fl, const string &dir) {
 	x = int(unit_data[unit][1]);
 	y = master.mapys - 1 - int(unit_data[unit][0]);
 	z = master.mapzs - 1 - int(unit_data[unit][2]);
+	float ang = 90.0 - 45.0 * unitref_data[unit][10];
+	if(ang < 0.0) ang += 360.0;
 	unit_ptr = new Unit;
 	unit_ptr->id = unit_id;
 	unit_ptr->troop = unit_data[unit][9];
 	unit_ptr->name = (char*)(unitref_data[unit]+86);
 	units[unit_id] = unit_ptr;
 	master.unplayer[unit_id] = unit_data[unit][9];
-	master.AddAction(unit_id, 0, 0, x, y, z, 0.0, ACT_START);
-	master.AddAction(unit_id, 0, 0, x, y, z, 0.0, ACT_EQUIP, 0, 1);
+	master.AddAction(unit_id, 0, 0, x, y, z, ang, ACT_START);
+	master.AddAction(unit_id, 0, 0, x, y, z, ang, ACT_EQUIP, 0, 1);
 //	printf("Unit at %dx%dx%d\t[%.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X %.2X]\n",
 //		unit_data[unit][1], unit_data[unit][0], unit_data[unit][2],
 //		unit_data[unit][3], unit_data[unit][4], unit_data[unit][5],
