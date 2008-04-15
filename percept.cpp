@@ -129,10 +129,10 @@ void Percept::GetPos(int id, int &x, int &y, int &z, float &a) {
     if(last == other_units[id].begin()) return;
     }
   --last;
-  GetPos(id, x, y, z);
-
-  //FIXME: Backward Sometimes
-  a = 180.0 * atan2f(last->targ2 - y, last->targ1 - x) / M_PI;
+  x = last->x;
+  y = last->y;
+  z = last->z;
+  a = last->angle;
   }
 
 void Percept::GetPos(int id, int &x, int &y, int &z) {
