@@ -308,7 +308,7 @@ void World::DrawModels(Uint32 offset) {
 		act->finish, act->duration
 		);
 	  scene->TurnObject(unitmap[unitacts->first], act->angle,
-		act->finish - act->duration
+		act->finish - act->duration / 2, act->duration / 2
 		);
 	  }
 	}
