@@ -44,16 +44,19 @@ World::World(Percept *per, Orders *ord, int pl) {
 
   SimpleModel *weap = SM_LoadModel("models/weapons2/machinegun/machinegun.md3");
 
-  models.push_back(SM_LoadModel("models/players/trooper"));
-  models.back()->AttachSubmodel("tag_weapon", weap);
+  SimpleModel *mod = SM_LoadModel("models/players/trooper");
+  mod->AttachSubmodel("tag_weapon", weap);
+  models.push_back(scene->AddModel(mod));
 
   SimpleModel::AddSourceFile("models");
-  models.push_back(SM_LoadModel("grey/tris.md2"));
+  models.push_back(scene->AddModel(SM_LoadModel("grey/tris.md2")));
 
-  models.push_back(SM_LoadModel("models/players/trooper", "blue"));
-  models.back()->AttachSubmodel("tag_weapon", weap);
-  models.push_back(SM_LoadModel("models/players/trooper", "red"));
-  models.back()->AttachSubmodel("tag_weapon", weap);
+  mod = SM_LoadModel("models/players/trooper", "blue");
+  mod->AttachSubmodel("tag_weapon", weap);
+  models.push_back(scene->AddModel(mod));
+  mod = SM_LoadModel("models/players/trooper", "red");
+  mod->AttachSubmodel("tag_weapon", weap);
+  models.push_back(scene->AddModel(mod));
 
   //For Items that aren't drawn
   modmap[0x0000] = (SS_Model)(-1);
@@ -331,11 +334,11 @@ void World::DrawModels(Uint32 offset) {
       {	MapCoord tpos = { act->targ1, act->targ2, act->targ3 };
 	tzh = act->targ3 * CELL_HEIGHT + percept->HeightAt(tpos);
 	}
-      anims[0] = models[mod]->LookUpAnimation("LEGS_IDLE");
-      anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
+      anims[0] = scene->Model(mod)->LookUpAnimation("LEGS_IDLE");
+      anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
       if(anims[0] < 0) {
-	anims[0] = models[mod]->LookUpAnimation("STAND");
-	anims[1] = models[mod]->LookUpAnimation("STAND");
+	anims[0] = scene->Model(mod)->LookUpAnimation("STAND");
+	anims[1] = scene->Model(mod)->LookUpAnimation("STAND");
 	}
       times[0] = act->finish - act->duration;
       times[1] = act->finish - act->duration;
@@ -352,14 +355,14 @@ void World::DrawModels(Uint32 offset) {
 	}
       else if(act->act == ACT_FALL) {
 	if(act->finish + 1000 <= offset + act->duration) {
-	  int anim = models[mod]->LookUpAnimation("BOTH_DEAD1");
-	  if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
+	  int anim = scene->Model(mod)->LookUpAnimation("BOTH_DEAD1");
+	  if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("DEATH3");
 	  anims[0] = anim;
 	  anims[1] = anim;
 	  }
 	else {
-	  int anim = models[mod]->LookUpAnimation("BOTH_DEATH1");
-	  if(anim < 0) anim = models[mod]->LookUpAnimation("DEATH3");
+	  int anim = scene->Model(mod)->LookUpAnimation("BOTH_DEATH1");
+	  if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("DEATH3");
 	  anims[0] = anim;
 	  anims[1] = anim;
 	  }
@@ -375,14 +378,14 @@ void World::DrawModels(Uint32 offset) {
 	  Uint32 off = offset + act->duration - act->finish;
 	  int anim;
 	  if(act->act == ACT_MOVE) {
-	    anim = models[mod]->LookUpAnimation("LEGS_WALK");
-	    if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
-	    if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
+	    anim = scene->Model(mod)->LookUpAnimation("LEGS_WALK");
+	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("WALK");
+	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("RUN");
 	    }
 	  else {
-	    anim = models[mod]->LookUpAnimation("LEGS_RUN");
-	    if(anim < 0) anim = models[mod]->LookUpAnimation("RUN");
-	    if(anim < 0) anim = models[mod]->LookUpAnimation("WALK");
+	    anim = scene->Model(mod)->LookUpAnimation("LEGS_RUN");
+	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("RUN");
+	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("WALK");
 	    }
 	  anims[0] = anim;
 	  x = (act->targ1 * 2 + 1) * (dur - off) + (act->x * 2 + 1) * off;
@@ -394,35 +397,35 @@ void World::DrawModels(Uint32 offset) {
 	}
       else if(act->act == ACT_SHOOT) {
 	if(act->finish + 1500 <= offset + act->duration) {
-	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
+	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
 	  }
 	else {
-	  anims[1] = models[mod]->LookUpAnimation("TORSO_ATTACK");
+	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_ATTACK");
 	  }
 	}
       else if(act->act == ACT_EQUIP && act->finish > 0) { // First EQUIP Free
 	if(act->finish + 1500 <= offset + act->duration) {
-	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
+	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
 	  }
 	else if(act->finish + 1000 <= offset + act->duration) {
-	  anims[1] = models[mod]->LookUpAnimation("TORSO_RAISE");
+	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_RAISE");
 	  times[1] += 1000;
 	  }
 	else if(act->finish + 500 <= offset + act->duration) {
-	  anims[1] = models[mod]->LookUpAnimation("TORSO_DROP");
+	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_DROP");
 	  times[1] += 500;
 	  }
 	else {
-	  anims[1] = models[mod]->LookUpAnimation("TORSO_STAND");
+	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
 	  }
 	}
       if(z < (cur_zpos+1)*CELL_HEIGHT) {
 	glPushMatrix();
 	glTranslatef(x, y, z);
 	glRotatef(a, 0.0, 0.0, 1.0);
-	models[mod]->Render(offset, anims, times);
+	scene->Model(mod)->Render(offset, anims, times);
 	glPopMatrix();
 	}
       }
