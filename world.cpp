@@ -46,17 +46,17 @@ World::World(Percept *per, Orders *ord, int pl) {
 
   SimpleModel *mod = SM_LoadModel("models/players/trooper");
   mod->AttachSubmodel("tag_weapon", weap);
-  models.push_back(scene->AddModel(mod));
+  scene->AddModel(mod);
 
   SimpleModel::AddSourceFile("models");
-  models.push_back(scene->AddModel(SM_LoadModel("grey/tris.md2")));
+  scene->AddModel(SM_LoadModel("grey/tris.md2"));
 
   mod = SM_LoadModel("models/players/trooper", "blue");
   mod->AttachSubmodel("tag_weapon", weap);
-  models.push_back(scene->AddModel(mod));
+  scene->AddModel(mod);
   mod = SM_LoadModel("models/players/trooper", "red");
   mod->AttachSubmodel("tag_weapon", weap);
-  models.push_back(scene->AddModel(mod));
+  scene->AddModel(mod);
 
   //For Items that aren't drawn
   modmap[0x0000] = (SS_Model)(-1);

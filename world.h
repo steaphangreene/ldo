@@ -59,8 +59,6 @@ protected:
 
   SimpleScene *scene;
 
-  vector<SS_Model> models;
-  vector<SS_Skin> textures;
   map<int, SS_Model> modmap;
   map<int, SS_Skin> texmap;
   map<int, SS_Object> objmap;
