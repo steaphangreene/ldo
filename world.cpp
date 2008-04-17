@@ -205,7 +205,7 @@ void World::DrawMap(Uint32 offset) {
     if(objmap.count(obj->second.id) < 1) {
       sobj = scene->AddObject(mod);
       objmap[obj->second.id] = sobj;
-      scene->SetObjectPosition(sobj, obj->first.x*2.0+1.0,
+      scene->MoveObject(sobj, obj->first.x*2.0+1.0,
 	obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
 
       if(texmap.count(obj->second.which) > 0) {
@@ -284,11 +284,37 @@ void World::DrawMap(Uint32 offset) {
 	}
       }
     }
-
-  mround = percept->round;
   }
 
 void World::DrawModels(Uint32 offset) {
+  if(mround != percept->round) {
+    map<int, vector<UnitAct> >::const_iterator unitacts;
+    unitacts = percept->my_units.begin();
+    for(; unitacts != percept->other_units.end(); ++unitacts) {
+      if(unitacts == percept->my_units.end()) {
+	unitacts = percept->other_units.begin();
+	if(unitacts == percept->other_units.end()) break;
+	}
+      if(unitmap.count(unitacts->first) < 1) {
+	//FIXME: Real Unit Type
+	int mod = cur_game->PlayerForUnit(unitacts->first)->Color();
+	unitmap[unitacts->first] = scene->AddObject(mod);
+	}
+      vector<UnitAct>::const_iterator act = unitacts->second.begin();
+      for(; act != unitacts->second.end(); ++act) {
+	if(act->act == ACT_MOVE || act->act == ACT_RUN || act->act == ACT_START) {
+	  scene->MoveObject(unitmap[unitacts->first],
+		act->x * 2 + 1, act->y * 2 + 1, act->z * CELL_HEIGHT,
+		act->finish, act->duration
+		);
+	  scene->TurnObject(unitmap[unitacts->first], act->angle,
+		act->finish - act->duration
+		);
+	  }
+	}
+      }
+    }
+
   vector<int> anims;
   vector<Uint32> times;
 
@@ -346,14 +372,7 @@ void World::DrawModels(Uint32 offset) {
       float y = act->y * 2 + 1;
       float z = azh;
       float a = act->angle;
-      if(act->act == ACT_STAND) {
-	if(act->finish <= offset + act->duration) {
-	  x = act->targ1 * 2 + 1;
-	  y = act->targ2 * 2 + 1;
-	  z = tzh;
-	  }
-	}
-      else if(act->act == ACT_FALL) {
+      if(act->act == ACT_FALL) {
 	if(act->finish + 1000 <= offset + act->duration) {
 	  int anim = scene->Model(mod)->LookUpAnimation("BOTH_DEAD1");
 	  if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("DEATH3");
@@ -367,34 +386,34 @@ void World::DrawModels(Uint32 offset) {
 	  anims[1] = anim;
 	  }
 	}
-      else if(act->act == ACT_MOVE || act->act == ACT_RUN) {
-	int dx = act->x - act->targ1;
-	int dy = act->y - act->targ2;
-	float dur = act->duration;
-	if(act->finish <= offset) {
-	  a = 180.0 * atan2f(dy, dx) / M_PI;
-	  }
-	else {
-	  Uint32 off = offset + act->duration - act->finish;
-	  int anim;
-	  if(act->act == ACT_MOVE) {
-	    anim = scene->Model(mod)->LookUpAnimation("LEGS_WALK");
-	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("WALK");
-	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("RUN");
-	    }
-	  else {
-	    anim = scene->Model(mod)->LookUpAnimation("LEGS_RUN");
-	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("RUN");
-	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("WALK");
-	    }
-	  anims[0] = anim;
-	  x = (act->targ1 * 2 + 1) * (dur - off) + (act->x * 2 + 1) * off;
-	  y = (act->targ2 * 2 + 1) * (dur - off) + (act->y * 2 + 1) * off;
-	  z = tzh * (dur - off) + azh * off;
-	  x /= dur; y /= dur; z /= dur;
-	  a = 180.0 * atan2f(dy, dx) / M_PI;
-	  }
-	}
+//      else if(act->act == ACT_MOVE || act->act == ACT_RUN) {
+//	int dx = act->x - act->targ1;
+//	int dy = act->y - act->targ2;
+//	float dur = act->duration;
+//	if(act->finish <= offset) {
+//	  a = 180.0 * atan2f(dy, dx) / M_PI;
+//	  }
+//	else {
+//	  Uint32 off = offset + act->duration - act->finish;
+//	  int anim;
+//	  if(act->act == ACT_MOVE) {
+//	    anim = scene->Model(mod)->LookUpAnimation("LEGS_WALK");
+//	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("WALK");
+//	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("RUN");
+//	    }
+//	  else {
+//	    anim = scene->Model(mod)->LookUpAnimation("LEGS_RUN");
+//	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("RUN");
+//	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("WALK");
+//	    }
+//	  anims[0] = anim;
+//	  x = (act->targ1 * 2 + 1) * (dur - off) + (act->x * 2 + 1) * off;
+//	  y = (act->targ2 * 2 + 1) * (dur - off) + (act->y * 2 + 1) * off;
+//	  z = tzh * (dur - off) + azh * off;
+//	  x /= dur; y /= dur; z /= dur;
+//	  a = 180.0 * atan2f(dy, dx) / M_PI;
+//	  }
+//	}
       else if(act->act == ACT_SHOOT) {
 	if(act->finish + 1500 <= offset + act->duration) {
 	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
@@ -421,6 +440,9 @@ void World::DrawModels(Uint32 offset) {
 	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
 	  }
 	}
+      else {
+	continue;	// Not drawn here.
+	}
       if(z < (cur_zpos+1)*CELL_HEIGHT) {
 	glPushMatrix();
 	glTranslatef(x, y, z);
@@ -440,6 +462,7 @@ void World::Render(Uint32 offset) {	// Render for playback
   DrawMap(offset);
   DrawModels(offset);
   if(offset == (percept->round - 1) * 3000) DrawOrders(offset);
+  mround = percept->round;
   }
 
 void World::DrawOrders(Uint32 offset) {
