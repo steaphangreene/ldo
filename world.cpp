@@ -207,13 +207,12 @@ void World::DrawMap(Uint32 offset) {
       objmap[obj->second.id] = sobj;
       scene->MoveObject(sobj, obj->first.x*2.0+1.0,
 	obj->first.y*2.0+1.0, obj->first.z*CELL_HEIGHT);
+      scene->ColorObject(sobj, 0.5, 0.5, 0.5, 0);	//Initially Unseen
 
       if(texmap.count(obj->second.which) > 0) {
 	scene->SetObjectSkin(sobj, texmap[obj->second.which]);
 	}
       else {
-	scene->SetObjectColor(sobj,
-		obj->first.x/float(50), 0.5, obj->first.y/float(50));
 	scene->SetObjectSkin(sobj, obj->second.which & 0xFF);
 	}
       }
@@ -226,19 +225,18 @@ void World::DrawMap(Uint32 offset) {
       oact = act;
       for(; act != obj->second.seen.at(plnum).end(); ++act) {
 	if(act->second > (percept->round - 2)*3000) {
-	  Uint32 base = act->first;
-	  Uint32 end = act->second;
 	  if(oact != act) {
-	    scene->ObjectAct(sobj, SS_ACT_HALFCOLOR, base, base-oact->second);
+	    scene->ColorObject(sobj, 0.5, 0.5, 0.5, oact->second);
 	    }
-	  scene->ObjectAct(sobj, SS_ACT_VISIBLE, end, end-base);
+	  else {
+	    scene->ShowObject(sobj, act->first);
+	    }
+	  scene->ColorObject(sobj, 1.0, 1.0, 1.0, act->first);
 	  }
 	oact = act;
 	}
       if(oact != act && oact->second < (percept->round - 1) * 3000 + 1) {
-	scene->ObjectAct(sobj, SS_ACT_HALFCOLOR,
-		(percept->round - 1) * 3000 + 1,
-		(percept->round - 1) * 3000 + 1 - oact->second);
+	scene->ColorObject(sobj, 0.5, 0.5, 0.5, oact->second);
 	}
       Uint8 burn = 0;
       if(!(obj->second.burn.empty())) {	// Check for Smoke and/or Fire
@@ -386,34 +384,6 @@ void World::DrawModels(Uint32 offset) {
 	  anims[1] = anim;
 	  }
 	}
-//      else if(act->act == ACT_MOVE || act->act == ACT_RUN) {
-//	int dx = act->x - act->targ1;
-//	int dy = act->y - act->targ2;
-//	float dur = act->duration;
-//	if(act->finish <= offset) {
-//	  a = 180.0 * atan2f(dy, dx) / M_PI;
-//	  }
-//	else {
-//	  Uint32 off = offset + act->duration - act->finish;
-//	  int anim;
-//	  if(act->act == ACT_MOVE) {
-//	    anim = scene->Model(mod)->LookUpAnimation("LEGS_WALK");
-//	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("WALK");
-//	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("RUN");
-//	    }
-//	  else {
-//	    anim = scene->Model(mod)->LookUpAnimation("LEGS_RUN");
-//	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("RUN");
-//	    if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("WALK");
-//	    }
-//	  anims[0] = anim;
-//	  x = (act->targ1 * 2 + 1) * (dur - off) + (act->x * 2 + 1) * off;
-//	  y = (act->targ2 * 2 + 1) * (dur - off) + (act->y * 2 + 1) * off;
-//	  z = tzh * (dur - off) + azh * off;
-//	  x /= dur; y /= dur; z /= dur;
-//	  a = 180.0 * atan2f(dy, dx) / M_PI;
-//	  }
-//	}
       else if(act->act == ACT_SHOOT) {
 	if(act->finish + 1500 <= offset + act->duration) {
 	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
