@@ -210,10 +210,10 @@ void World::DrawMap(Uint32 offset) {
       scene->ColorObject(sobj, 0.5, 0.5, 0.5, 0);	//Initially Unseen
 
       if(texmap.count(obj->second.which) > 0) {
-	scene->SetObjectSkin(sobj, texmap[obj->second.which]);
+	scene->SkinObject(sobj, texmap[obj->second.which]);
 	}
       else {
-	scene->SetObjectSkin(sobj, obj->second.which & 0xFF);
+	scene->SkinObject(sobj, obj->second.which & 0xFF);
 	}
       }
     else {
