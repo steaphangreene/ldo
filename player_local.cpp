@@ -508,6 +508,16 @@ int Player_Local::EventHandler() {
 //      else if(event.user.code == SG_EVENT_DNDDENIED) {
 //	fprintf(stderr, "DEBUG: Denied that DnD request!\n");
 //	}
+      else if(event.user.code >= SG_EDGE_DOWNLEFT
+		&& event.user.code <= SG_EDGE_UPRIGHT) {
+	xspd = MOVE_SPEED * ((event.user.code - SG_EDGE_DOWNLEFT) % 3 - 1);
+	yspd = MOVE_SPEED * ((event.user.code - SG_EDGE_DOWNLEFT) / 3 - 1);
+	SDL_mutexP(vid_mut);
+	video->SetMove(xspd, yspd);
+	SDL_mutexV(vid_mut);
+	mouse_x = -1;
+	mouse_y = -1;
+	}
       }
     }
   return exiting;
