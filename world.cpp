@@ -309,6 +309,15 @@ void World::DrawModels(Uint32 offset) {
 		act->finish - act->duration / 2, act->duration / 2
 		);
 	  }
+	else if(act->act == ACT_SHOOT) {
+	  scene->TargetObject(unitmap[unitacts->first],
+		act->targ1*2 + 1, act->targ2*2 + 1, act->targ3 * CELL_HEIGHT,
+		act->finish, act->duration
+		);
+	  scene->ActObject(unitmap[unitacts->first], ACT_SHOOT,
+		act->finish, act->duration
+		);
+	  }
 	}
       }
     }
@@ -358,11 +367,11 @@ void World::DrawModels(Uint32 offset) {
       {	MapCoord tpos = { act->targ1, act->targ2, act->targ3 };
 	tzh = act->targ3 * CELL_HEIGHT + percept->HeightAt(tpos);
 	}
-      anims[0] = scene->Model(mod)->LookUpAnimation("LEGS_IDLE");
-      anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
+      anims[0] = scene->GetModel(mod)->LookUpAnimation("LEGS_IDLE");
+      anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_STAND");
       if(anims[0] < 0) {
-	anims[0] = scene->Model(mod)->LookUpAnimation("STAND");
-	anims[1] = scene->Model(mod)->LookUpAnimation("STAND");
+	anims[0] = scene->GetModel(mod)->LookUpAnimation("STAND");
+	anims[1] = scene->GetModel(mod)->LookUpAnimation("STAND");
 	}
       times[0] = act->finish - act->duration;
       times[1] = act->finish - act->duration;
@@ -372,42 +381,42 @@ void World::DrawModels(Uint32 offset) {
       float a = act->angle;
       if(act->act == ACT_FALL) {
 	if(act->finish + 1000 <= offset + act->duration) {
-	  int anim = scene->Model(mod)->LookUpAnimation("BOTH_DEAD1");
-	  if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("DEATH3");
+	  int anim = scene->GetModel(mod)->LookUpAnimation("BOTH_DEAD1");
+	  if(anim < 0) anim = scene->GetModel(mod)->LookUpAnimation("DEATH3");
 	  anims[0] = anim;
 	  anims[1] = anim;
 	  }
 	else {
-	  int anim = scene->Model(mod)->LookUpAnimation("BOTH_DEATH1");
-	  if(anim < 0) anim = scene->Model(mod)->LookUpAnimation("DEATH3");
+	  int anim = scene->GetModel(mod)->LookUpAnimation("BOTH_DEATH1");
+	  if(anim < 0) anim = scene->GetModel(mod)->LookUpAnimation("DEATH3");
 	  anims[0] = anim;
 	  anims[1] = anim;
 	  }
 	}
-      else if(act->act == ACT_SHOOT) {
-	if(act->finish + 1500 <= offset + act->duration) {
-	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
-	  times[1] += 1500;
-	  }
-	else {
-	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_ATTACK");
-	  }
-	}
+//      else if(act->act == ACT_SHOOT) {
+//	if(act->finish + 1500 <= offset + act->duration) {
+//	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_STAND");
+//	  times[1] += 1500;
+//	  }
+//	else {
+//	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_ATTACK");
+//	  }
+//	}
       else if(act->act == ACT_EQUIP && act->finish > 0) { // First EQUIP Free
 	if(act->finish + 1500 <= offset + act->duration) {
-	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
+	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_STAND");
 	  times[1] += 1500;
 	  }
 	else if(act->finish + 1000 <= offset + act->duration) {
-	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_RAISE");
+	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_RAISE");
 	  times[1] += 1000;
 	  }
 	else if(act->finish + 500 <= offset + act->duration) {
-	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_DROP");
+	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_DROP");
 	  times[1] += 500;
 	  }
 	else {
-	  anims[1] = scene->Model(mod)->LookUpAnimation("TORSO_STAND");
+	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_STAND");
 	  }
 	}
       else {
@@ -417,7 +426,7 @@ void World::DrawModels(Uint32 offset) {
 	glPushMatrix();
 	glTranslatef(x, y, z);
 	glRotatef(a, 0.0, 0.0, 1.0);
-	scene->Model(mod)->Render(offset, anims, times);
+	scene->GetModel(mod)->Render(offset, anims, times);
 	glPopMatrix();
 	}
       }
