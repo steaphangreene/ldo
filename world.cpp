@@ -48,19 +48,30 @@ World::World(Percept *per, Orders *ord, int pl) {
   mod->AttachSubmodel("tag_weapon", weap);
   int ssmod = scene->AddModel(mod);
   scene->SetModelAnim(ssmod, ACT_SHOOT, "TORSO_ATTACK", 1);
+  scene->SetModelAnim(ssmod, ACT_EQUIP, "TORSO_DROP", 1);
+  scene->SetModelAnim(ssmod, ACT_FALL, "BOTH_DEATH1", 0);
+  scene->SetModelAnim(ssmod, ACT_FALL, "BOTH_DEATH1", 1);
 
   SimpleModel::AddSourceFile("models");
   ssmod = scene->AddModel(SM_LoadModel("grey/tris.md2"));
+  scene->SetModelAnim(ssmod, ACT_SHOOT, "ATTACK");
+  scene->SetModelAnim(ssmod, ACT_FALL, "DEATH3");
 
   mod = SM_LoadModel("models/players/trooper", "blue");
   mod->AttachSubmodel("tag_weapon", weap);
   ssmod = scene->AddModel(mod);
   scene->SetModelAnim(ssmod, ACT_SHOOT, "TORSO_ATTACK", 1);
+  scene->SetModelAnim(ssmod, ACT_EQUIP, "TORSO_DROP", 0);
+  scene->SetModelAnim(ssmod, ACT_FALL, "BOTH_DEATH1", 0);
+  scene->SetModelAnim(ssmod, ACT_FALL, "BOTH_DEATH1", 1);
 
   mod = SM_LoadModel("models/players/trooper", "red");
   mod->AttachSubmodel("tag_weapon", weap);
   ssmod = scene->AddModel(mod);
   scene->SetModelAnim(ssmod, ACT_SHOOT, "TORSO_ATTACK", 1);
+  scene->SetModelAnim(ssmod, ACT_EQUIP, "TORSO_DROP", 1);
+  scene->SetModelAnim(ssmod, ACT_FALL, "BOTH_DEATH1", 0);
+  scene->SetModelAnim(ssmod, ACT_FALL, "BOTH_DEATH1", 1);
 
   //For Items that aren't drawn
   modmap[0x0000] = (SS_Model)(-1);
@@ -325,121 +336,19 @@ void World::DrawModels(Uint32 offset) {
 		act->finish, act->duration
 		);
 	  }
-	}
-      }
-    }
-
-  vector<int> anims;
-  vector<Uint32> times;
-
-  anims.push_back(0);
-  anims.push_back(0);
-  times.push_back(0);
-  times.push_back(0);
-
-  map<int, UnitAct> unitact;
-  map<int, vector<UnitAct> >::const_iterator unitacts;
-  unitacts = percept->my_units.begin();
-  for(; unitacts != percept->my_units.end(); ++unitacts) {
-    unitact.erase(unitacts->first);
-    vector<UnitAct>::const_reverse_iterator act = unitacts->second.rbegin();
-    while(act != unitacts->second.rend()
-	&& act->finish > (offset + act->duration)) {
-      ++act;
-      }
-    unitact.insert(pair<int,UnitAct>(unitacts->first, *act));
-    }
-  unitacts = percept->other_units.begin();
-  for(; unitacts != percept->other_units.end(); ++unitacts) {
-    unitact.erase(unitacts->first);
-    vector<UnitAct>::const_reverse_iterator act = unitacts->second.rbegin();
-    while(act != unitacts->second.rend()
-	&& act->finish > (offset + act->duration)) {
-      ++act;
-      }
-    unitact.insert(pair<int,UnitAct>(unitacts->first, *act));
-    }
-
-  map<int, UnitAct>::const_iterator mapact = unitact.begin();
-  for(; mapact != unitact.end(); ++mapact) {
-    const UnitAct *act = &(mapact->second);
-    int mod = cur_game->PlayerForUnit(act->id)->Color();
-    if(act->finish <= (offset + act->duration)) {
-//      fprintf(stderr, "Doing %d on %d, since %d <= (%d + %d)\n",
-//	act->act, act->id, act->finish, offset, act->duration);
-      float azh, tzh;
-      {	MapCoord apos = { act->x, act->y, act->z };
-	azh = act->z * CELL_HEIGHT + percept->HeightAt(apos);
-	}
-      {	MapCoord tpos = { act->targ1, act->targ2, act->targ3 };
-	tzh = act->targ3 * CELL_HEIGHT + percept->HeightAt(tpos);
-	}
-      anims[0] = scene->GetModel(mod)->LookUpAnimation("LEGS_IDLE");
-      anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_STAND");
-      if(anims[0] < 0) {
-	anims[0] = scene->GetModel(mod)->LookUpAnimation("STAND");
-	anims[1] = scene->GetModel(mod)->LookUpAnimation("STAND");
-	}
-      times[0] = act->finish - act->duration;
-      times[1] = act->finish - act->duration;
-      float x = act->x * 2 + 1;
-      float y = act->y * 2 + 1;
-      float z = azh;
-      float a = act->angle;
-      if(act->act == ACT_FALL) {
-	if(act->finish + 1000 <= offset + act->duration) {
-	  int anim = scene->GetModel(mod)->LookUpAnimation("BOTH_DEAD1");
-	  if(anim < 0) anim = scene->GetModel(mod)->LookUpAnimation("DEATH3");
-	  anims[0] = anim;
-	  anims[1] = anim;
+	else if(act->act == ACT_EQUIP) {
+	  if(act->finish > 0) { // Initial EQUIP is NOT Shown
+	    scene->ActObject(unitmap[unitacts->first], act->act,
+		act->finish, act->duration
+		);
+	    }
 	  }
 	else {
-	  int anim = scene->GetModel(mod)->LookUpAnimation("BOTH_DEATH1");
-	  if(anim < 0) anim = scene->GetModel(mod)->LookUpAnimation("DEATH3");
-	  anims[0] = anim;
-	  anims[1] = anim;
+	  scene->ActObject(unitmap[unitacts->first], act->act,
+		act->finish, act->duration
+		);
 	  }
 	}
-//      else if(act->act == ACT_SHOOT) {
-//	if(act->finish + 1500 <= offset + act->duration) {
-//	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_STAND");
-//	  times[1] += 1500;
-//	  }
-//	else {
-//	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_ATTACK");
-//	  }
-//	}
-      else if(act->act == ACT_EQUIP && act->finish > 0) { // First EQUIP Free
-	if(act->finish + 1500 <= offset + act->duration) {
-	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_STAND");
-	  times[1] += 1500;
-	  }
-	else if(act->finish + 1000 <= offset + act->duration) {
-	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_RAISE");
-	  times[1] += 1000;
-	  }
-	else if(act->finish + 500 <= offset + act->duration) {
-	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_DROP");
-	  times[1] += 500;
-	  }
-	else {
-	  anims[1] = scene->GetModel(mod)->LookUpAnimation("TORSO_STAND");
-	  }
-	}
-      else {
-	continue;	// Not drawn here.
-	}
-      if(z < (cur_zpos+1)*CELL_HEIGHT) {
-	glPushMatrix();
-	glTranslatef(x, y, z);
-	glRotatef(a, 0.0, 0.0, 1.0);
-	scene->GetModel(mod)->Render(offset, anims, times);
-	glPopMatrix();
-	}
-      }
-    else {
-//      fprintf(stderr, "Not Doing %d on %d, since %d > (%d + %d)\n",
-//	act->act, act->id, act->finish, offset, act->duration);
       }
     }
   }
