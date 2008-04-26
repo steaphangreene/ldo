@@ -196,7 +196,7 @@ void World::SetViewAngle(int ang) {
   angle = ang;
   }
 
-void World::DrawMap(Uint32 offset) {
+void World::AddMap(Uint32 offset) {
   map<MapCoord, MapObject>::const_iterator obj = percept->objects.begin();
   for(; obj != percept->objects.end(); ++obj) {
     multimap<Uint32, Uint32>::const_iterator seen;
@@ -234,35 +234,35 @@ void World::DrawMap(Uint32 offset) {
     else {
       sobj = objmap[obj->second.id];
       }
-    if(mround != percept->round) {
-      multimap<Uint32, Uint32>::const_iterator act, oact;
-      act = obj->second.seen.at(plnum).begin();
+
+    multimap<Uint32, Uint32>::const_iterator act, oact;
+    act = obj->second.seen.at(plnum).begin();
+    oact = act;
+    for(; act != obj->second.seen.at(plnum).end(); ++act) {
+      if(act->second > (percept->round - 2)*3000) {
+	if(oact != act) {
+	  scene->ColorObject(sobj, 0.5, 0.5, 0.5, oact->second);
+	  }
+	else {
+	  scene->ShowObject(sobj, act->first);
+	  }
+	scene->ColorObject(sobj, 1.0, 1.0, 1.0, act->first);
+	}
       oact = act;
-      for(; act != obj->second.seen.at(plnum).end(); ++act) {
-	if(act->second > (percept->round - 2)*3000) {
-	  if(oact != act) {
-	    scene->ColorObject(sobj, 0.5, 0.5, 0.5, oact->second);
-	    }
-	  else {
-	    scene->ShowObject(sobj, act->first);
-	    }
-	  scene->ColorObject(sobj, 1.0, 1.0, 1.0, act->first);
-	  }
-	oact = act;
-	}
-      if(oact != act && oact->second < (percept->round - 1) * 3000 + 1) {
-	scene->ColorObject(sobj, 0.5, 0.5, 0.5, oact->second);
-	}
-      Uint8 burn = 0;
-      if(!(obj->second.burn.empty())) {	// Check for Smoke and/or Fire
-	map<Uint32, Uint8>::const_reverse_iterator bit
+      }
+    if(oact != act && oact->second < (percept->round - 1) * 3000 + 1) {
+      scene->ColorObject(sobj, 0.5, 0.5, 0.5, oact->second);
+      }
+    Uint8 burn = 0;
+    if(!(obj->second.burn.empty())) {	// Check for Smoke and/or Fire
+      map<Uint32, Uint8>::const_reverse_iterator bit
 		= obj->second.burn.rbegin();
-	for(; bit != obj->second.burn.rend(); ++bit) {
-	  if(bit->first <= percept->round) {
-	    burn = bit->second;
-	    break;
-	    }
+      for(; bit != obj->second.burn.rend(); ++bit) {
+	if(bit->first <= percept->round) {
+	  burn = bit->second;
+	  break;
 	  }
+	}
       if(burn > 0 && obj->second.type == GROUND_FLOOR) { // Smoke and/or Fire
 	for(Uint32 start = (percept->round - 2)*3000;
 		start < (percept->round - 1)*3000; start += 250) {
@@ -274,7 +274,7 @@ void World::DrawMap(Uint32 offset) {
 	  scene->SetParticleTime(part, start);
 	  }
 	}
-      if(burn >= 64)		// Fire
+      if(burn >= 64) {		// Fire
 	for(Uint32 start = (percept->round - 2)*3000;
 		start < (percept->round - 1)*3000; start += 10) {
 	  SS_Particle part = scene->AddParticle(fire);
@@ -299,66 +299,66 @@ void World::DrawMap(Uint32 offset) {
     }
   }
 
-void World::DrawModels(Uint32 offset) {
-  if(mround != percept->round) {
-    map<int, vector<UnitAct> >::const_iterator unitacts;
-    unitacts = percept->my_units.begin();
-    for(; unitacts != percept->other_units.end(); ++unitacts) {
-      if(unitacts == percept->my_units.end()) {
-	unitacts = percept->other_units.begin();
-	if(unitacts == percept->other_units.end()) break;
-	}
-      if(unitmap.count(unitacts->first) < 1) {
+void World::AddModels(Uint32 offset) {
+  map<int, vector<UnitAct> >::const_iterator unitacts;
+  unitacts = percept->my_units.begin();
+  for(; unitacts != percept->other_units.end(); ++unitacts) {
+    if(unitacts == percept->my_units.end()) {
+      unitacts = percept->other_units.begin();
+      if(unitacts == percept->other_units.end()) break;
+      }
+    if(unitmap.count(unitacts->first) < 1) {
 	//FIXME: Real Unit Type
-	int mod = cur_game->PlayerForUnit(unitacts->first)->Color();
-	unitmap[unitacts->first] = scene->AddObject(mod);
-	}
-      vector<UnitAct>::const_iterator act = unitacts->second.begin();
-      for(; act != unitacts->second.end(); ++act) {
-	if(act->act == ACT_MOVE || act->act == ACT_RUN || act->act == ACT_START) {
-	  scene->MoveObject(unitmap[unitacts->first],
+      int mod = cur_game->PlayerForUnit(unitacts->first)->Color();
+      unitmap[unitacts->first] = scene->AddObject(mod);
+      }
+    vector<UnitAct>::const_iterator act = unitacts->second.begin();
+    for(; act != unitacts->second.end(); ++act) {
+      if(act->act == ACT_MOVE || act->act == ACT_RUN || act->act == ACT_START) {
+	scene->MoveObject(unitmap[unitacts->first],
 		act->x * 2 + 1, act->y * 2 + 1, act->z * CELL_HEIGHT,
 		act->finish, act->duration
 		);
-	  scene->TurnObject(unitmap[unitacts->first], act->angle,
+	scene->TurnObject(unitmap[unitacts->first], act->angle,
 		act->finish - act->duration / 2, act->duration / 2
 		);
 	  }
-	else if(act->act == ACT_SHOOT) {
-	  scene->TurnObject(unitmap[unitacts->first], act->angle,
+      else if(act->act == ACT_SHOOT) {
+	scene->TurnObject(unitmap[unitacts->first], act->angle,
 		act->finish - act->duration, 250
 		);
-	  scene->TargetObject(unitmap[unitacts->first],
+	scene->TargetObject(unitmap[unitacts->first],
 		act->targ1*2 + 1, act->targ2*2 + 1, act->targ3 * CELL_HEIGHT,
 		act->finish - act->duration, 250
 		);
-	  scene->ActObject(unitmap[unitacts->first], ACT_SHOOT,
+	scene->ActObject(unitmap[unitacts->first], ACT_SHOOT,
 		act->finish, act->duration
 		);
-	  scene->UnTargetObject(unitmap[unitacts->first],
+	scene->UnTargetObject(unitmap[unitacts->first],
 		act->finish + 250, 250
 		);
-	  }
-	else if(act->act == ACT_EQUIP) {
-	  if(act->finish > 0) { // Initial EQUIP is NOT Shown
+	}
+      else if(act->act == ACT_EQUIP) {
+	if(act->finish > 0) { // Initial EQUIP is NOT Shown
 	    scene->ActObject(unitmap[unitacts->first], act->act,
 		act->finish, act->duration
 		);
-	    }
 	  }
-	else {
+	}
+      else {
 	  scene->ActObject(unitmap[unitacts->first], act->act,
 		act->finish, act->duration
 		);
-	  }
 	}
       }
     }
   }
 
 void World::Render(Uint32 offset) {	// Render for playback
-  DrawMap(offset);
-  DrawModels(offset);
+  if(mround != percept->round) {
+    AddMap(offset);
+    AddModels(offset);
+    }
   if(offset == (percept->round - 1) * 3000) DrawOrders(offset);
   mround = percept->round;
   }

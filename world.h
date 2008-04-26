@@ -46,8 +46,8 @@ public:
 	float r=1.0, float g=1.0, float b=1.0);
 
 protected:
-  void DrawMap(Uint32 offset);
-  void DrawModels(Uint32 offset);
+  void AddMap(Uint32 offset);
+  void AddModels(Uint32 offset);
   void DrawOrders(Uint32 offset);
 
   Percept *percept;
