@@ -508,10 +508,9 @@ int Player_Local::EventHandler() {
 //      else if(event.user.code == SG_EVENT_DNDDENIED) {
 //	fprintf(stderr, "DEBUG: Denied that DnD request!\n");
 //	}
-      else if(event.user.code >= SG_EDGE_DOWNLEFT
-		&& event.user.code <= SG_EDGE_UPRIGHT) {
-	xspd = MOVE_SPEED * ((event.user.code - SG_EDGE_DOWNLEFT) % 3 - 1);
-	yspd = MOVE_SPEED * ((event.user.code - SG_EDGE_DOWNLEFT) / 3 - 1);
+      else if(event.user.code >= SG_EDGE_BEGIN && event.user.code < SG_EDGE_END) {
+	xspd = MOVE_SPEED * ((event.user.code - SG_EDGE_BEGIN) % 3 - 1);
+	yspd = MOVE_SPEED * ((event.user.code - SG_EDGE_BEGIN) / 3 - 1);
 	SDL_mutexP(vid_mut);
 	video->SetMove(xspd, yspd);
 	SDL_mutexV(vid_mut);
