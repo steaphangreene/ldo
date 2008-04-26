@@ -335,6 +335,9 @@ void World::DrawModels(Uint32 offset) {
 	  scene->ActObject(unitmap[unitacts->first], ACT_SHOOT,
 		act->finish, act->duration
 		);
+	  scene->UnTargetObject(unitmap[unitacts->first],
+		act->finish + 250, 250
+		);
 	  }
 	else if(act->act == ACT_EQUIP) {
 	  if(act->finish > 0) { // Initial EQUIP is NOT Shown
