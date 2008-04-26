@@ -46,17 +46,21 @@ World::World(Percept *per, Orders *ord, int pl) {
 
   SimpleModel *mod = SM_LoadModel("models/players/trooper");
   mod->AttachSubmodel("tag_weapon", weap);
-  scene->AddModel(mod);
+  int ssmod = scene->AddModel(mod);
+  scene->SetModelAnim(ssmod, ACT_SHOOT, "TORSO_ATTACK", 1);
 
   SimpleModel::AddSourceFile("models");
-  scene->AddModel(SM_LoadModel("grey/tris.md2"));
+  ssmod = scene->AddModel(SM_LoadModel("grey/tris.md2"));
 
   mod = SM_LoadModel("models/players/trooper", "blue");
   mod->AttachSubmodel("tag_weapon", weap);
-  scene->AddModel(mod);
+  ssmod = scene->AddModel(mod);
+  scene->SetModelAnim(ssmod, ACT_SHOOT, "TORSO_ATTACK", 1);
+
   mod = SM_LoadModel("models/players/trooper", "red");
   mod->AttachSubmodel("tag_weapon", weap);
-  scene->AddModel(mod);
+  ssmod = scene->AddModel(mod);
+  scene->SetModelAnim(ssmod, ACT_SHOOT, "TORSO_ATTACK", 1);
 
   //For Items that aren't drawn
   modmap[0x0000] = (SS_Model)(-1);
@@ -310,9 +314,12 @@ void World::DrawModels(Uint32 offset) {
 		);
 	  }
 	else if(act->act == ACT_SHOOT) {
+	  scene->TurnObject(unitmap[unitacts->first], act->angle,
+		act->finish - act->duration, 250
+		);
 	  scene->TargetObject(unitmap[unitacts->first],
 		act->targ1*2 + 1, act->targ2*2 + 1, act->targ3 * CELL_HEIGHT,
-		act->finish, act->duration
+		act->finish - act->duration, 250
 		);
 	  scene->ActObject(unitmap[unitacts->first], ACT_SHOOT,
 		act->finish, act->duration
