@@ -92,8 +92,6 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
 
   //Define base GUI for Play phase
   wind[PHASE_PLAY] = new SG_Table(48, 14, 0.0625, 0.125);
-  wind[PHASE_PLAY]->SetBackground(
-	new SG_PassThrough(SG_PT_CLICK, SG_PT_CLICK, SG_PT_CLICK));
   poptb = new SG_StickyButton("Options");
   wind[PHASE_PLAY]->AddWidget(poptb, 0, 13, 8, 1);
   ppastb = new SG_StickyButton("+");
@@ -124,6 +122,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   wind[PHASE_PLAY]->AddWidget(pcontrols, 16, 13, 16, 1);
   ppass = new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU);
   wind[PHASE_PLAY]->SetBackground(ppass);
+  wind[PHASE_PLAY]->EnableEdgeEvents();
   ppass->SetSendMotion();
 
   maction = 0;
