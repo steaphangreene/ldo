@@ -692,28 +692,28 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *
       }
     else if(event.user.code == SG_EVENT_CONNECTDONE) {
       SimpleConnections conn = connector->ClaimConnections();
-      char buf[16] = {0};
-      if(conn.sock) { // Client
-	SDLNet_TCP_Recv(conn.sock, buf, 16);
-	fprintf(stderr, "Received '%s' from server\n", buf);
-	SDLNet_TCP_Close(conn.sock);
-	conn.sock = NULL;
-
-	fprintf(stderr, "ERROR: Networking not yet implemented!\n");
-	exit(1);
-	}
-      else {		// Server
-	sprintf(buf, "Hello%c", 0);
-	vector<SlotData>::iterator slot = conn.slots.begin();
-	for(; slot != conn.slots.end(); ++slot) {
-	  if(slot->sock) {
-	    SDLNet_TCP_Send(slot->sock, buf, 16);
-	    SDLNet_TCP_Close(slot->sock);	// Close it, no networking yet
-	    slot->sock = NULL;
-	    }
-	  }
-	fprintf(stderr, "Sent data to clients\n");
-	}
+//      char buf[16] = {0};
+//      if(conn.sock) { // Client
+//	SDLNet_TCP_Recv(conn.sock, buf, 16);
+//	fprintf(stderr, "Received '%s' from server\n", buf);
+//	SDLNet_TCP_Close(conn.sock);
+//	conn.sock = NULL;
+//
+//	fprintf(stderr, "ERROR: Networking not yet implemented!\n");
+//	exit(1);
+//	}
+//      else {		// Server
+//	sprintf(buf, "Hello%c", 0);
+//	vector<SlotData>::iterator slot = conn.slots.begin();
+//	for(; slot != conn.slots.end(); ++slot) {
+//	  if(slot->sock) {
+//	    SDLNet_TCP_Send(slot->sock, buf, 16);
+//	    SDLNet_TCP_Close(slot->sock);	// Close it, no networking yet
+//	    slot->sock = NULL;
+//	    }
+//	  }
+//	fprintf(stderr, "Sent data to clients\n");
+//	}
       gob->Disable();
       return SCREEN_PLAY;
       }
