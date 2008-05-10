@@ -791,14 +791,6 @@ ScreenNum Screen_Results::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio
   }
 
 Screen_Play::Screen_Play() {
-//  //Setup SCREEN_PLAY (Temporary - will be handled by Game, not Screens)
-//  main = new SG_Table(6, 7, 0.0625, 0.125);
-//  main->AddWidget(new SG_TextArea("Playing LDO", drkred),
-//	0, 0, 4, 2);
-//  optb = new SG_Button("Options");
-//  main->AddWidget(optb, 0, 6);
-//  doneb = new SG_Button("Done");
-//  main->AddWidget(doneb, 5, 6);
   }
 
 Screen_Play::~Screen_Play() {
