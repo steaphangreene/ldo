@@ -200,8 +200,8 @@ void World::AddMap(Uint32 offset) {
   map<MapCoord, MapObject>::const_iterator obj = percept->objects.begin();
   for(; obj != percept->objects.end(); ++obj) {
     multimap<Uint32, Uint32>::const_iterator seen;
-    seen = obj->second.seen.at(plnum).begin();
-    for(; seen != obj->second.seen.at(plnum).end(); ++seen) {
+    seen = obj->second.seen.find(plnum)->second.begin();
+    for(; seen != obj->second.seen.find(plnum)->second.end(); ++seen) {
       if(seen->first <= offset && seen->second > offset) break;
       }
     SS_Model mod;
@@ -236,9 +236,9 @@ void World::AddMap(Uint32 offset) {
       }
 
     multimap<Uint32, Uint32>::const_iterator act, oact;
-    act = obj->second.seen.at(plnum).begin();
+    act = obj->second.seen.find(plnum)->second.begin();
     oact = act;
-    for(; act != obj->second.seen.at(plnum).end(); ++act) {
+    for(; act != obj->second.seen.find(plnum)->second.end(); ++act) {
       if(act->second > (percept->round - 2)*3000) {
 	if(oact != act) {
 	  scene->ColorObject(sobj, 0.5, 0.5, 0.5, oact->second);
