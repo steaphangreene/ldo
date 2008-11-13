@@ -592,7 +592,7 @@ PlayResult Game::Play() {
   threads_term = false;
 
   unsigned int n = 1;		//Reserve a place for ThreadHandler thread
-  thread.resize(player.size());
+  thread.resize(player.size()+1);
   vector<Player *>::const_iterator itrp = player.begin();
   for(; itrp != player.end(); ++itrp) {
     if((*itrp)->Type() != PLAYER_LOCAL) {
