@@ -91,23 +91,24 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   ednd = NULL;
 
   //Define base GUI for Play phase
-  wind[PHASE_PLAY] = new SG_Table(48, 14, 0.0625, 0.125);
+  SG_AspectTable *plscr = new SG_AspectTable(16.0/10.0, 48, 14, 0.0625, 0.125);
+  wind[PHASE_PLAY] = plscr;
   poptb = new SG_StickyButton("Options");
-  wind[PHASE_PLAY]->AddWidget(poptb, 0, 13, 8, 1);
+  plscr->AddWidget(poptb, 0, 13, 8, 1, SG_DOWN_LEFT);
   ppastb = new SG_StickyButton("+");
   ppastb->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_PLAY]->AddWidget(ppastb, 14, 13, 2, 1);
+  plscr->AddWidget(ppastb, 14, 13, 2, 1, SG_DOWN);
   pdoneb = new SG_StickyButton("Ready");
-  wind[PHASE_PLAY]->AddWidget(pdoneb, 40, 13, 8, 1);
+  plscr->AddWidget(pdoneb, 40, 13, 8, 1, SG_DOWN_RIGHT);
   ptext = new SG_TransLabel("Declare Turn (#1)", drkred);
   ptext->SetFontSize(50);
   ptext->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_PLAY]->AddWidget(ptext, 8, 12, 32, 1);
+  plscr->AddWidget(ptext, 8, 12, 32, 1, SG_DOWN);
   distime = 0;
   pstamp = new SG_TransLabel("0.000 seconds", drkred);
   pstamp->SetFontSize(24);
   pstamp->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_PLAY]->AddWidget(pstamp, 8, 11, 32, 1);
+  plscr->AddWidget(pstamp, 8, 11, 32, 1, SG_DOWN);
   vector<string> conts;			//Temporary - until textures
   conts.push_back("<<");
   conts.push_back("<");
@@ -119,10 +120,10 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   pcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
   pcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
   pcontrols->SetAlignment(SG_ALIGN_CENTER);
-  wind[PHASE_PLAY]->AddWidget(pcontrols, 16, 13, 16, 1);
+  plscr->AddWidget(pcontrols, 16, 13, 16, 1, SG_DOWN);
   ppass = new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU);
-  wind[PHASE_PLAY]->SetBackground(ppass);
-  wind[PHASE_PLAY]->EnableEdgeEvents();
+  plscr->SetBackground(ppass);
+  plscr->EnableEdgeEvents();
   ppass->SetSendMotion();
 
   maction = 0;
