@@ -81,7 +81,7 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   equip_bg = IMG_Load("graphics/equip_bg.png");
 
   //Define base GUI for Equip phase
-  wind[PHASE_EQUIP] = new SG_Table(16, 24, 0.0, 0.0);
+  wind[PHASE_EQUIP] = new SG_AspectTable(16.0/10.0, 16, 24, 0.0, 0.0);
   ecancelb = new SG_Button("Cancel");
   wind[PHASE_EQUIP]->AddWidget(ecancelb, 12, 0, 2, 1);
   edoneb = new SG_Button("Done");
@@ -91,24 +91,23 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   ednd = NULL;
 
   //Define base GUI for Play phase
-  SG_AspectTable *plscr = new SG_AspectTable(16.0/10.0, 48, 14, 0.0625, 0.125);
-  wind[PHASE_PLAY] = plscr;
+  wind[PHASE_PLAY] = new SG_AspectTable(16.0/10.0, 48, 14, 0.0625, 0.125);
   poptb = new SG_StickyButton("Options");
-  plscr->AddWidget(poptb, 0, 13, 8, 1, SG_DOWN_LEFT);
+  wind[PHASE_PLAY]->AddWidget(poptb, 0, 13, 8, 1, SG_DOWN_LEFT);
   ppastb = new SG_StickyButton("+");
   ppastb->SetAlignment(SG_ALIGN_CENTER);
-  plscr->AddWidget(ppastb, 14, 13, 2, 1, SG_DOWN);
+  wind[PHASE_PLAY]->AddWidget(ppastb, 14, 13, 2, 1, SG_DOWN);
   pdoneb = new SG_StickyButton("Ready");
-  plscr->AddWidget(pdoneb, 40, 13, 8, 1, SG_DOWN_RIGHT);
+  wind[PHASE_PLAY]->AddWidget(pdoneb, 40, 13, 8, 1, SG_DOWN_RIGHT);
   ptext = new SG_TransLabel("Declare Turn (#1)", drkred);
   ptext->SetFontSize(50);
   ptext->SetAlignment(SG_ALIGN_CENTER);
-  plscr->AddWidget(ptext, 8, 12, 32, 1, SG_DOWN);
+  wind[PHASE_PLAY]->AddWidget(ptext, 8, 12, 32, 1, SG_DOWN);
   distime = 0;
   pstamp = new SG_TransLabel("0.000 seconds", drkred);
   pstamp->SetFontSize(24);
   pstamp->SetAlignment(SG_ALIGN_CENTER);
-  plscr->AddWidget(pstamp, 8, 11, 32, 1, SG_DOWN);
+  wind[PHASE_PLAY]->AddWidget(pstamp, 8, 11, 32, 1, SG_DOWN);
   vector<string> conts;			//Temporary - until textures
   conts.push_back("<<");
   conts.push_back("<");
@@ -120,10 +119,10 @@ Player_Local::Player_Local(Game *gm, PlayerType tp, int num, int c)
   pcontrols = new SG_Tabs(conts, SG_AUTOSIZE, 1);
   pcontrols->SetBorder(0.0625, 0.0);	//Temporary - until textures
   pcontrols->SetAlignment(SG_ALIGN_CENTER);
-  plscr->AddWidget(pcontrols, 16, 13, 16, 1, SG_DOWN);
+  wind[PHASE_PLAY]->AddWidget(pcontrols, 16, 13, 16, 1, SG_DOWN);
   ppass = new SG_PassThrough(SG_PT_CLICK, SG_PT_MENU, SG_PT_MENU);
-  plscr->SetBackground(ppass);
-  plscr->EnableEdgeEvents();
+  wind[PHASE_PLAY]->SetBackground(ppass);
+  wind[PHASE_PLAY]->EnableEdgeEvents();
   ppass->SetSendMotion();
 
   maction = 0;

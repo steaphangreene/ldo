@@ -66,8 +66,8 @@ protected:
   SimpleAudio *audio;
   World *world;
 
-  SG_Table *wind[PHASE_MAX];	//Screens for each phase
-  int drkred;			//Colors
+  SG_AspectTable *wind[PHASE_MAX];	//Screens for each phase
+  int drkred;				//Colors
 
   SG_MultiTab *ednd;		//Widgets for Equip phase
   vector<SG_DNDBoxes*> dnds;
