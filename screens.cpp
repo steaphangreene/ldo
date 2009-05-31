@@ -426,7 +426,7 @@ Screen_Title::Screen_Title() {
     delete [] data;
     fclose(credfl);
 
-    double vislines = credits->NumLines()+30.0;
+    float vislines = credits->NumLines()+30.0;
     scr->SetYScroll(-15.0, vislines-15.0, vislines*2.0);
     }
 

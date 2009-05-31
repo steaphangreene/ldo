@@ -25,7 +25,7 @@ using namespace std;
 
 #include "SDL_image.h"
 
-double cur_zoom = 16.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
+float cur_zoom = 16.0, xspd = 0.0, yspd = 0.0, cur_ang = 45.0, cur_down = 22.5;
 int cur_zpos = 0;
 int sel_x = -1, sel_y = -1, sel_z = -1, sel_id = -1;
 int mouse_x = -1, mouse_y = -1;
@@ -431,8 +431,8 @@ int Player_Local::EventHandler() {
 	SDL_mutexV(vid_mut);
 	}
       else if(event.user.code == SG_EVENT_LEFTCLICK) {
-	double x = ((float*)(event.user.data2))[0];
-	double y = ((float*)(event.user.data2))[1];
+	float x = ((float*)(event.user.data2))[0];
+	float y = ((float*)(event.user.data2))[1];
 	SDL_mutexP(vid_mut);
 	video->ScreenToMap(x, y, cur_zpos*CELL_HEIGHT);
 	SDL_mutexV(vid_mut);
@@ -459,8 +459,8 @@ int Player_Local::EventHandler() {
 	  }
 	}
       else if(event.user.code == SG_EVENT_MOTION) {
-	double x = ((float*)(event.user.data2))[0];
-	double y = ((float*)(event.user.data2))[1];
+	float x = ((float*)(event.user.data2))[0];
+	float y = ((float*)(event.user.data2))[1];
 	SDL_mutexP(vid_mut);
 	video->ScreenToMap(x, y, cur_zpos*CELL_HEIGHT);
 	SDL_mutexV(vid_mut);
