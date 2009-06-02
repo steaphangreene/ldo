@@ -149,6 +149,8 @@ public:
   Popup_LoadMap();
   virtual ~Popup_LoadMap();
   virtual ScreenNum Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *audio, SDL_Event &event);
+protected:
+  SG_FileBrowser *browser;
   };
 
 
@@ -825,8 +827,8 @@ ScreenNum Screen_Play::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *a
 
 Popup_LoadMap::Popup_LoadMap() {
   main = new SG_AspectTable(16.0/10.0, 1, 1);
-  SG_FileBrowser *fb = new SG_FileBrowser("*.map");
-  main->AddWidget(fb, 0, 0);
+  browser = new SG_FileBrowser("*.map");
+  main->AddWidget(browser, 0, 0);
   }
 
 Popup_LoadMap::~Popup_LoadMap() {
@@ -836,7 +838,7 @@ Popup_LoadMap::~Popup_LoadMap() {
 ScreenNum Popup_LoadMap::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *audio, SDL_Event &event) {
   if(event.type == SDL_SG_EVENT) {
     if(event.user.code == SG_EVENT_FILEOPEN) {
-      string fn = ((SG_FileBrowser *)(main))->FileName();
+      string fn = ((SG_FileBrowser *)(browser))->FileName();
       if(!cur_game) cur_game = new Game;
       if(!cur_game->Load(fn)) {
 	delete cur_game;
