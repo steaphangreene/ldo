@@ -423,7 +423,7 @@ Screen_Title::Screen_Title() {
     SG_TransLabel *credits = new SG_TransLabel(data, drkred);
     credits->SetMargins(0.125, 0.03125);
     credits->SetFontSize(20);
-    credits->SetVisibleLines(15);
+    credits->SetVisibleSize(SG_KEEPASPECT, 20);
     scr->AddWidget(credits);
     delete [] data;
     fclose(credfl);
