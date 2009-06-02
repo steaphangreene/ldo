@@ -52,7 +52,7 @@ public:
   virtual ScreenNum Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *audio, SDL_Event &event);
   virtual void Finish(SimpleGUI *gui);
 protected:
-  SG_Table *main;
+  SG_AspectTable *main;
   };
 
 class Screen_Title : public Screen {
@@ -330,7 +330,7 @@ void Popup::Finish(SimpleGUI *gui) {
   }
 
 Screen_Config::Screen_Config() {
-  main = new SG_Table(6, 10, 0.0625, 0.125);
+  main = new SG_AspectTable(16.0/10.0, 6, 10, 0.0625, 0.125);
 
 /*
   SG_Alignment *align;	// For temporary storage;
@@ -387,27 +387,27 @@ ScreenNum Screen_Config::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
   }
 
 Screen_Title::Screen_Title() {
-  main = new SG_Table(4, 13, 0.0625, 0.125);
+  main = new SG_AspectTable(16.0/10.0, 16, 10, 0.0625, 0.125);
   optb = new SG_Button("Options");
-  main->AddWidget(optb, 3, 1);
+  main->AddWidget(optb, 10, 1, 6, 1, SG_RIGHT);
   multb = new SG_Button("Multiplayer");
-  main->AddWidget(multb, 3, 3);
+  main->AddWidget(multb, 10, 3, 6, 1, SG_RIGHT);
   singb = new SG_Button("Single Player");
-  main->AddWidget(singb, 3, 4);
+  main->AddWidget(singb, 10, 4, 6, 1, SG_RIGHT);
   replb = new SG_Button("View Replay");
-  main->AddWidget(replb, 3, 6);
+  main->AddWidget(replb, 10, 6, 6, 1, SG_RIGHT);
   quitb = new SG_Button("Quit Game");
-  main->AddWidget(quitb, 3, 8);
+  main->AddWidget(quitb, 10, 8, 6, 1, SG_RIGHT);
 
   SG_TextArea *title = new SG_TextArea("LDO", drkred);
   title->SetMargins(0.125, 0.0);
   title->SetVisibleSize(SG_AUTOSIZE, SG_AUTOSIZE);
   title->SetFontSize(400);
-  main->AddWidget(title, 0, 0, 3, 4);
+  main->AddWidget(title, 0, 0, 10, 3, SG_UP_LEFT);
 
   SG_AutoScroll *scr =
 	new SG_AutoScroll(1.0, 15.0, 0.0, -15.0, 0.0, -15.0, 0.0, 60.0);
-  main->AddWidget(scr, 0, 4, 3, 9);
+  main->AddWidget(scr, 0, 3, 10, 7, SG_LEFT);
 
   FILE *credfl = fopen("CREDITS", "r");
   if(credfl) {
@@ -487,7 +487,7 @@ ScreenNum Screen_Title::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *
 
 
 Screen_Single::Screen_Single() {
-  main = new SG_Table(6, 12, 0.0625, 0.125);
+  main = new SG_AspectTable(16.0/10.0, 6, 12, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Define Teams", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel");
   main->AddWidget(cancelb, 5, 0);
@@ -570,7 +570,7 @@ ScreenNum Screen_Single::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
 
 Screen_Multi::Screen_Multi() {
   net_init = false;
-  main = new SG_Table(6, 12, 0.0625, 0.125);
+  main = new SG_AspectTable(16.0/10.0, 6, 12, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Gather Players", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel");
   main->AddWidget(cancelb, 5, 0);
@@ -722,7 +722,7 @@ ScreenNum Screen_Multi::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *
   }
 
 Screen_Replay::Screen_Replay() {
-  main = new SG_Table(6, 12, 0.0625, 0.125);
+  main = new SG_AspectTable(16.0/10.0, 6, 12, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Load Replay", drkred), 0, 0, 5, 2);
   cancelb = new SG_Button("Cancel");
   main->AddWidget(cancelb, 5, 0);
@@ -757,7 +757,7 @@ ScreenNum Screen_Replay::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio 
 
 
 Screen_Results::Screen_Results() {
-  main = new SG_Table(6, 10, 0.0625, 0.125);
+  main = new SG_AspectTable(16.0/10.0, 6, 10, 0.0625, 0.125);
   main->AddWidget(new SG_TextArea("Game Results", drkred), 0, 0, 5, 2);
   replb = new SG_Button("Replay");
   main->AddWidget(replb, 5, 0);
@@ -824,7 +824,9 @@ ScreenNum Screen_Play::Handle(SimpleGUI *gui, SimpleVideo *video, SimpleAudio *a
   }
 
 Popup_LoadMap::Popup_LoadMap() {
-  main = new SG_FileBrowser("*.map");
+  main = new SG_AspectTable(16.0/10.0, 1, 1);
+  SG_FileBrowser *fb = new SG_FileBrowser("*.map");
+  main->AddWidget(fb, 0, 0);
   }
 
 Popup_LoadMap::~Popup_LoadMap() {
