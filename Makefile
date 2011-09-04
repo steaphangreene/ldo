@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with LDO (see the file named "COPYING");
 #  If not, see <http://www.gnu.org/licenses/>.
-#  
+#
 # *************************************************************************
 
 ARCH=	$(shell gcc -v 2>&1 | grep Target | cut -f2 -d" ")

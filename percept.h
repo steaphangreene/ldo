@@ -17,7 +17,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with LDO (see the file named "COPYING");
 //  If not, see <http://www.gnu.org/licenses/>.
-//  
+//
 // *************************************************************************
 
 #ifndef PERCEPT_H
@@ -57,7 +57,7 @@ struct MapCoord {
     return (z != b.z || y != b.y || x != b.x);
     }
   bool operator == (const MapCoord &b) const {
-    return (z != b.z || y != b.y || x != b.x);
+    return (z == b.z && y == b.y && x == b.x);
     }
   };
 
