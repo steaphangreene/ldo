@@ -263,9 +263,9 @@ vector<MapCoord> Percept::GetPath(const MapCoord &start, const MapCoord &end) {
   map<MapCoord, int> gdist;
   multimap<int, MapCoord> openlist;
 
-  prev[end] = end;
-  gdist[end] = 0;
-  open[end] = HDist(end, start);
+  prev.insert(pair<MapCoord, MapCoord>(end, end));
+  gdist.insert(pair<MapCoord, int>(end, 0));
+  open.insert(pair<MapCoord, int>(end, HDist(end, start)));
   openlist.insert(pair<int, MapCoord>(open[end], end));
   while(openlist.size() > 0 && closed.count(openlist.begin()->second) > 0) {
     openlist.erase(openlist.begin());
