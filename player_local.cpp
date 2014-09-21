@@ -546,7 +546,7 @@ bool Player_Local::Run() {
   video->SetDown(cur_down, 0);
 
   exiting = 0;
-  SDL_Thread *th = SDL_CreateThread(event_thread_func, (void*)(this));
+  SDL_Thread *th = SDL_CreateThread(event_thread_func, "local", (void*)(this));
 
   while(exiting == 0) {
     if(!(game->PerceptUpToDate(id))) {

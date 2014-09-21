@@ -596,7 +596,7 @@ PlayResult Game::Play() {
   vector<Player *>::const_iterator itrp = player.begin();
   for(; itrp != player.end(); ++itrp) {
     if((*itrp)->Type() != PLAYER_LOCAL) {
-      thread[n] = SDL_CreateThread(player_thread_func, (void*)(*itrp));
+      thread[n] = SDL_CreateThread(player_thread_func, "player", (void*)(*itrp));
       ++n;
       }
     else {
@@ -609,7 +609,7 @@ PlayResult Game::Play() {
     }
 
   //I can't be the ThreadHandler due to SDL/OpenGL limitations
-  thread[0] = SDL_CreateThread(game_thread_func, (void*)(this));
+  thread[0] = SDL_CreateThread(game_thread_func, "game", (void*)(this));
 
   //I have to be the local player due to SDL/OpenGL limitations
   localp->Run();
