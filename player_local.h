@@ -39,26 +39,22 @@ enum Phase {
   PHASE_EQUIP,
   PHASE_PLAY,
   PHASE_MAX,
-  };
-enum PopPhase {
-  POPPHASE_NONE = -1,
-  POPPHASE_OPTIONS,
-  POPPHASE_MAX
-  };
+};
+enum PopPhase { POPPHASE_NONE = -1, POPPHASE_OPTIONS, POPPHASE_MAX };
 
 class Player_Local : public Player {
-public:
-  Player_Local(Game *gm, PlayerType tp, int num, int c=0);
+ public:
+  Player_Local(Game *gm, PlayerType tp, int num, int c = 0);
   virtual ~Player_Local();
   virtual bool Run();
 
-protected:
+ protected:
   void UpdateEquipIDs();
 
-  Phase phase;			//Current phase of main window GUI
-  Phase nextphase;		//Current phase of main window GUI
-  PopPhase popphase;		//Current phase of popup
-  PopPhase nextpopphase;	//Current phase of popup
+  Phase phase;            // Current phase of main window GUI
+  Phase nextphase;        // Current phase of main window GUI
+  PopPhase popphase;      // Current phase of popup
+  PopPhase nextpopphase;  // Current phase of popup
 
   SimpleGUI *gui;
   SimpleVideo *video;
@@ -66,49 +62,49 @@ protected:
   SimpleAudio *audio;
   World *world;
 
-  SG_AspectTable *wind[PHASE_MAX];	//Screens for each phase
-  int drkred;				//Colors
+  SG_AspectTable *wind[PHASE_MAX];  // Screens for each phase
+  int drkred;                       // Colors
 
-  SG_MultiTab *ednd;		//Widgets for Equip phase
-  vector<SG_DNDBoxes*> dnds;
+  SG_MultiTab *ednd;  // Widgets for Equip phase
+  vector<SG_DNDBoxes *> dnds;
   SG_TextArea *estats;
   SG_Button *ecancelb, *edoneb;
-  vector<int> eqid;		//Data for Equip phase
+  vector<int> eqid;  // Data for Equip phase
 
-				//Textures for Equip phase
+  // Textures for Equip phase
   SDL_Surface *gun_icon, *gren_icon;
   SDL_Surface *equip_bg;
 
-  unsigned int disround;	//Currently Displayed Round for Playback
-  unsigned int distime;		//Currently Displayed Time for Playback
+  unsigned int disround;  // Currently Displayed Round for Playback
+  unsigned int distime;   // Currently Displayed Time for Playback
   SG_StickyButton *ppastb;
-  SG_Button *poptb, *pdoneb;	//Widgets for Play phase
+  SG_Button *poptb, *pdoneb;  // Widgets for Play phase
   SG_TransLabel *ptext, *pstamp;
   SG_Tabs *pcontrols;
   SG_PassThrough *ppass;
 
-  Uint32 last_time;		//Data for Play phase
+  Uint32 last_time;  // Data for Play phase
   Uint32 offset, last_offset;
   int playback_speed, past;
-  SDL_mutex *off_mut;		//MutEx to protect offsets
+  SDL_mutex *off_mut;  // MutEx to protect offsets
 
   void CalcOffset(Uint32);
 
   SimpleConfig *config_gui;
 
-  int targ_id;			//ID Of Unit Targeted
+  int targ_id;  // ID Of Unit Targeted
   int maction, raction;
-  vector<string> mactions[3];	//For noselect, friendly, enemy
-  vector<string> ractions[3];	//For noselect, friendly, enemy
+  vector<string> mactions[3];  // For noselect, friendly, enemy
+  vector<string> ractions[3];  // For noselect, friendly, enemy
 
-  int music;			//Background Music (Temporary)
-  PlayingSound cur_music;	//Currently Playing Music (Temporary)
+  int music;               // Background Music (Temporary)
+  PlayingSound cur_music;  // Currently Playing Music (Temporary)
 
-  SDL_mutex *vid_mut;		//MutEx to protect renderer
+  SDL_mutex *vid_mut;  // MutEx to protect renderer
 
   static int event_thread_func(void *arg);
   int EventHandler();
-  int exiting;			//Are we exiting?
-  };
+  int exiting;  // Are we exiting?
+};
 
-#endif // PLAYER_LOCAL_H
+#endif  // PLAYER_LOCAL_H

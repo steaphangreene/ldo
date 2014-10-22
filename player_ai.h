@@ -26,12 +26,12 @@
 #include "player.h"
 
 class Player_AI : public Player {
-public:
-  Player_AI(Game *gm, PlayerType tp, int num, int c=0);
+ public:
+  Player_AI(Game *gm, PlayerType tp, int num, int c = 0);
   virtual ~Player_AI();
   virtual bool Run();
 
-protected:
-  };
+ protected:
+};
 
-#endif // PLAYER_AI_H
+#endif  // PLAYER_AI_H

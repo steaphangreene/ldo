@@ -33,19 +33,19 @@
 #include "orders.h"
 
 class World {
-public:
+ public:
   World(Percept *per, Orders *ord, int pl);
   ~World();
 
-  void Render(Uint32 offset);		// Render for playback
+  void Render(Uint32 offset);  // Render for playback
 
   void SetViewPoint(float xv, float yv);
   void SetViewAngle(int ang);
 
-  void DrawSelBox(int sel_x, int sel_y, int sel_z,
-	float r=1.0, float g=1.0, float b=1.0);
+  void DrawSelBox(int sel_x, int sel_y, int sel_z, float r = 1.0, float g = 1.0,
+                  float b = 1.0);
 
-protected:
+ protected:
   void AddMap(Uint32 offset);
   void AddModels(Uint32 offset);
   void DrawOrders(Uint32 offset);
@@ -65,7 +65,6 @@ protected:
   map<int, SS_Object> unitmap;
   int smoke, fire;
   Uint32 mround;
-  };
+};
 
-#endif // WORLD_H
-
+#endif  // WORLD_H

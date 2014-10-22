@@ -42,24 +42,24 @@ enum ObjectType {
   WALL_WEST,
   OBJECT_MISC,
   OBJECT_MAX
-  };
+};
 
 struct MapCoord {
   int x, y, z;
-  //These are so set<> and map<> can sort by these, and for basic comparisons.
-  bool operator < (const MapCoord &b) const {
+  // These are so set<> and map<> can sort by these, and for basic comparisons.
+  bool operator<(const MapCoord &b) const {
     return (z < b.z || (z == b.z && (y < b.y || (y == b.y && x < b.x))));
-    }
-  bool operator > (const MapCoord &b) const {
+  }
+  bool operator>(const MapCoord &b) const {
     return (z > b.z || (z == b.z && (y > b.y || (y == b.y && x > b.x))));
-    }
-  bool operator != (const MapCoord &b) const {
+  }
+  bool operator!=(const MapCoord &b) const {
     return (z != b.z || y != b.y || x != b.x);
-    }
-  bool operator == (const MapCoord &b) const {
+  }
+  bool operator==(const MapCoord &b) const {
     return (z == b.z && y == b.y && x == b.x);
-    }
-  };
+  }
+};
 
 struct MapObject {
   ObjectType type;
@@ -72,13 +72,13 @@ struct MapObject {
   map<int, int> seers;
   void See(int plnum, Uint32 tm);
   void Unsee(int plnum, Uint32 tm);
-  };
+};
 
-enum Act {	// For Example
+enum Act {  // For Example
   ACT_NONE,
   ACT_FALL,
-  ACT_START,	// Unit just arrived, or just became visible
-  ACT_EQUIP,	// Unit needs to be (re)equipped
+  ACT_START,  // Unit just arrived, or just became visible
+  ACT_EQUIP,  // Unit needs to be (re)equipped
   ACT_DUCK,
   ACT_STAND,
   ACT_MOVE,
@@ -86,35 +86,40 @@ enum Act {	// For Example
   ACT_SHOOT,
   ACT_THROW,
   ACT_MAX
-  };
+};
 
 struct UnitAct {
-public:
-  UnitAct(int i, Uint32 f, Uint32 d,
-	int xp, int yp, int zp, float ang,
-	Act a, int t1 = 0, int t2 = 0, int t3 = 0
-	) {
-    id = i; finish = f; duration = d;
-    x = xp; y = yp; z = zp; angle = ang;
-    act = a; targ1 = t1, targ2 = t2; targ3 = t3;
-    };
+ public:
+  UnitAct(int i, Uint32 f, Uint32 d, int xp, int yp, int zp, float ang, Act a,
+          int t1 = 0, int t2 = 0, int t3 = 0) {
+    id = i;
+    finish = f;
+    duration = d;
+    x = xp;
+    y = yp;
+    z = zp;
+    angle = ang;
+    act = a;
+    targ1 = t1, targ2 = t2;
+    targ3 = t3;
+  };
   int id;
   Uint32 finish, duration;
-  int x, y, z;	//X/Y/Z position of the unit when it does this
+  int x, y, z;  // X/Y/Z position of the unit when it does this
   float angle;
   Act act;
-  int targ1;	//Depending on action, may be a unit id, or x coord, or unused
-  int targ2;	//Depending on action, may be a unit id, or y coord, or unused
-  int targ3;	//Depending on action, may be a unit id, or z coord, or unused
+  int targ1;  // Depending on action, may be a unit id, or x coord, or unused
+  int targ2;  // Depending on action, may be a unit id, or y coord, or unused
+  int targ3;  // Depending on action, may be a unit id, or z coord, or unused
 
-  bool operator < (const UnitAct &other) const {
-    return (finish < other.finish
-	|| (finish == other.finish && duration < other.duration));
-    }
-  };
+  bool operator<(const UnitAct &other) const {
+    return (finish < other.finish ||
+            (finish == other.finish && duration < other.duration));
+  }
+};
 
 class Percept {
-public:
+ public:
   Percept();
   ~Percept();
 
@@ -125,15 +130,15 @@ public:
 
   void FillActionsTo(int id, Uint32 f);
   void AddAction(int i, Uint32 f, Uint32 d, int xp, int yp, int zp, float ang,
-	Act a, int t1 = 0, int t2 = 0, int t3 = 0);
+                 Act a, int t1 = 0, int t2 = 0, int t3 = 0);
   void AddAction(const UnitAct &act);
 
-  //Basic map info
+  // Basic map info
   int mapxs, mapys, mapzs;
   string mapname, mapdesc;
-  unsigned int round;		//Current To-Be-Declared Game Round
+  unsigned int round;  // Current To-Be-Declared Game Round
 
-  //List of all of unit ids and actions for own and others
+  // List of all of unit ids and actions for own and others
   map<int, vector<UnitAct> > my_units;
   map<int, vector<UnitAct> > other_units;
   multimap<MapCoord, MapObject> objects;
@@ -142,7 +147,7 @@ public:
   int UnitPresent(int xc, int yc, int zc, int &id);
   int UnitAt(int xc, int yc, int zc);
   int PlayerIDForUnit(const int unitid) { return unplayer[unitid]; };
-  map<int, int> unplayer;		// Lookup PlayerID by UnitID
+  map<int, int> unplayer;  // Lookup PlayerID by UnitID
 
   float HeightAt(const MapCoord &pos);
   void GetPos(int id, int &x, int &y, int &z);
@@ -150,13 +155,12 @@ public:
   vector<MapCoord> GetPath(const MapCoord &start, const MapCoord &end);
   vector<MapCoord> GetPath2x2(const MapCoord &start, const MapCoord &end);
 
-private:	//Utility Functions & Cache Data
+ private:  // Utility Functions & Cache Data
   int RDist(const MapCoord &first, const MapCoord &second);
   int HDist(const MapCoord &first, const MapCoord &second);
-  void See(int id, Uint32 tm, int xp, int yp, int zp, float ang,
-	int dist, float fov);
+  void See(int id, Uint32 tm, int xp, int yp, int zp, float ang, int dist,
+           float fov);
   map<int, set<MapObject *> > lastseen;
-  };
+};
 
-#endif // PERCEPT_H
-
+#endif  // PERCEPT_H

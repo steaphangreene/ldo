@@ -24,47 +24,45 @@
 #include "game.h"
 
 Player_AI::Player_AI(Game *gm, PlayerType tp, int num, int c)
-	: Player(gm, tp, num, c) {
-  }
+    : Player(gm, tp, num, c) {}
 
-Player_AI::~Player_AI() {
-  }
+Player_AI::~Player_AI() {}
 
 bool Player_AI::Run() {
-  Player::Run();	// Start with the basics
+  Player::Run();  // Start with the basics
 
   int exiting = 0;
-  while(exiting == 0) {
-    if(!(game->PerceptUpToDate(id))) {
+  while (exiting == 0) {
+    if (!(game->PerceptUpToDate(id))) {
       game->UpdatePercept(id);
-      //SDL_Delay(10);
+      // SDL_Delay(10);
 
-      if(percept.round == 0) {
-	map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
-	for(; unit != percept.my_units.end(); ++unit) {
-	  if(unit->second.back().act == ACT_EQUIP) {
-	    orders.AddOrder(unit->first, 0, ORDER_EQUIP);
-	    }
-	  //SDL_Delay(10);
-	  }
-	}
-      else if(percept.round >= 1 && percept.round < 5) { // Everyone Run South
-	map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
-	for(; unit != percept.my_units.end(); ++unit) {
-	  orders.AddOrder(unit->first, 0, ORDER_RUN,
-		unit->second.back().x, unit->second.back().y - 6);
-	  //SDL_Delay(10);
-	  }
-	}
+      if (percept.round == 0) {
+        map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
+        for (; unit != percept.my_units.end(); ++unit) {
+          if (unit->second.back().act == ACT_EQUIP) {
+            orders.AddOrder(unit->first, 0, ORDER_EQUIP);
+          }
+          // SDL_Delay(10);
+        }
+      } else if (percept.round >= 1 &&
+                 percept.round < 5) {  // Everyone Run South
+        map<int, vector<UnitAct> >::iterator unit = percept.my_units.begin();
+        for (; unit != percept.my_units.end(); ++unit) {
+          orders.AddOrder(unit->first, 0, ORDER_RUN, unit->second.back().x,
+                          unit->second.back().y - 6);
+          // SDL_Delay(10);
+        }
+      }
 
       game->SetReady(id, true);
-      //SDL_Delay(10);
-      }
-    if(game->ShouldTerm()) exiting = 1;
-    SDL_Delay(10);
+      // SDL_Delay(10);
     }
+    if (game->ShouldTerm()) exiting = 1;
+    SDL_Delay(10);
+  }
 
-  game->TermThreads();	// Tell everyone else to exit too
+  game->TermThreads();  // Tell everyone else to exit too
 
   return exiting;
-  }
+}

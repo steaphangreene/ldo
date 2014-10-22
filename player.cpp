@@ -32,11 +32,8 @@ Player::Player(Game *gm, PlayerType tp, int num, int c) {
   color = c;
   cur_game->SetPercept(num, &percept);
   cur_game->SetOrders(num, &orders);
-  }
+}
 
-Player::~Player() {
-  }
+Player::~Player() {}
 
-bool Player::Run() {
-  return true;
-  }
+bool Player::Run() { return true; }

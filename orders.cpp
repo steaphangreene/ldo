@@ -24,38 +24,31 @@
 #include "unit.h"
 #include "defs.h"
 
-Orders::Orders() {
-  }
+Orders::Orders() {}
 
-Orders::~Orders() {
-  Clear();
-  }
+Orders::~Orders() { Clear(); }
 
-//static char buf[BUF_LEN];
+// static char buf[BUF_LEN];
 
 int Orders::Load(FILE *fl, unsigned int ver) {
-  //FIXME: Implement this!
+  // FIXME: Implement this!
   return 1;
-  }
+}
 
 int Orders::Save(FILE *fl, unsigned int ver) {
-  //FIXME: Implement this!
+  // FIXME: Implement this!
   return 1;
-  }
+}
 
-void Orders::Completed(const UnitOrder &ord) {
-  orders[ord] = true;
-  }
+void Orders::Completed(const UnitOrder &ord) { orders[ord] = true; }
 
 void Orders::ClearCompleted() {
   map<UnitOrder, bool>::iterator ord = orders.begin();
-  while(ord != orders.end()) {
+  while (ord != orders.end()) {
     map<UnitOrder, bool>::iterator tmp = ord;
     ++ord;
-    if(tmp->second) orders.erase(tmp);	//Remove only if completed
-    }
+    if (tmp->second) orders.erase(tmp);  // Remove only if completed
   }
+}
 
-void Orders::Clear() {
-  orders.clear();
-  }
+void Orders::Clear() { orders.clear(); }

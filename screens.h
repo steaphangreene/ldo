@@ -21,7 +21,7 @@
 // *************************************************************************
 
 #ifndef SCREENS_H
-#define	SCREENS_H
+#define SCREENS_H
 
 #include <map>
 #include <vector>
@@ -46,31 +46,31 @@ enum ScreenNum {
   SCREEN_SINGLE,
   SCREEN_MULTI,
   SCREEN_REPLAY,
-  SCREEN_PLAY,    //Actually not handled here but in the player object
-//  SCREEN_EQUIP,   //Not really going to be handled within Screens class
-//  SCREEN_DECLARE, //Not really going to be handled within Screens class
-//  SCREEN_WATCH,   //Not really going to be handled within Screens class
+  SCREEN_PLAY,  // Actually not handled here but in the player object
+  //  SCREEN_EQUIP,   //Not really going to be handled within Screens class
+  //  SCREEN_DECLARE, //Not really going to be handled within Screens class
+  //  SCREEN_WATCH,   //Not really going to be handled within Screens class
   SCREEN_RESULTS,
   SCREEN_MAX
-  };
+};
 
 class Screen;
 
 class Screens {
-public:
+ public:
   Screens();
   ~Screens();
   int Handle();
 
-private:
+ private:
   void Set(ScreenNum s);
   ScreenNum screen, last_screen, popup;
   SimpleGUI *gui;
 
-  map<ScreenNum, Screen *> sscr;	//Map of ScreenNums to Screens
+  map<ScreenNum, Screen *> sscr;  // Map of ScreenNums to Screens
 
   SimpleVideo *video;
   SimpleAudio *audio;
-  };
+};
 
-#endif // SCREENS_H
+#endif  // SCREENS_H

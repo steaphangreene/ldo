@@ -36,18 +36,18 @@ using namespace std;
 #include "player.h"
 
 enum PlayResult {
-  PLAY_ERROR,		//Something broke
-  PLAY_FINISHED,	//Game's over, show results.
-  PLAY_CONFIG,		//Game's not over, run configuration.
-  PLAY_SAVE,		//Game's not over, save and continue game.
+  PLAY_ERROR,     // Something broke
+  PLAY_FINISHED,  // Game's over, show results.
+  PLAY_CONFIG,    // Game's not over, run configuration.
+  PLAY_SAVE,      // Game's not over, save and continue game.
   PLAY_MAX
-  };
+};
 
 class SDL_Thread;
 class SDL_mutex;
 
 class Game {
-public:
+ public:
   Game();
   ~Game();
   void AttachPlayer(Player *pl);
@@ -57,10 +57,10 @@ public:
   int Load(FILE *fl);
   int LoadXCom(FILE *fl, const string &dir);
   int Save(FILE *fl);
-  static int Load(vector< vector<int> > &vec, FILE *fl);
-  static int Save(const vector< vector<int> > &vec, FILE *fl);
+  static int Load(vector<vector<int> > &vec, FILE *fl);
+  static int Save(const vector<vector<int> > &vec, FILE *fl);
 
-  const Unit *UnitRef(int id);	//Temporary!
+  const Unit *UnitRef(int id);  // Temporary!
 
   const string &MapName() { return master.mapname; };
   const string &MapDesc() { return master.mapdesc; };
@@ -75,47 +75,48 @@ public:
 
   PlayResult Play();
 
-  Player *PlayerForUnit(const int unitid) { return player[master.unplayer[unitid]]; };
+  Player *PlayerForUnit(const int unitid) {
+    return player[master.unplayer[unitid]];
+  };
   Player *PlayerByID(const int plid) { return player[plid]; };
 
-  bool Ready(int plnum);		// Returns ready state for player
-  bool SetReady(int plnum, bool rdy);	// Returns new ready state
-  bool AllReady();			// returns true on all ready
-  bool AllReadyLock();			// Locks and returns true on all ready
-  void ResetReady();			// Unlocks and unreadys all
+  bool Ready(int plnum);               // Returns ready state for player
+  bool SetReady(int plnum, bool rdy);  // Returns new ready state
+  bool AllReady();                     // returns true on all ready
+  bool AllReadyLock();                 // Locks and returns true on all ready
+  void ResetReady();                   // Unlocks and unreadys all
 
   void TermThreads();
   bool ShouldTerm();
 
-  int ThreadHandler();				// NOT FOR EXTERNAL USE!
+  int ThreadHandler();  // NOT FOR EXTERNAL USE!
 
-private:
+ private:
   void ResolveRound();
   void GetActions(multiset<UnitAct> &toact);
   void CommitActions(const multiset<UnitAct> &toact);
 
   void Clear();
 
-  vector< vector<int> > sides;		// List of all player ids per side
+  vector<vector<int> > sides;  // List of all player ids per side
 
-  vector< vector<int> > plsquads;	// List of squad ids per player
+  vector<vector<int> > plsquads;  // List of squad ids per player
 
-  vector< vector<int> > squnits;	// List of unit ids per squad
+  vector<vector<int> > squnits;  // List of unit ids per squad
 
-  map<int, Unit *> units;		// Actual unit container
+  map<int, Unit *> units;  // Actual unit container
 
-  Percept master;			// Master game percept
-  map<int, Percept *> percept;		// Percept for each player
-  map<int, Orders *> orders;		// Orders from each player
+  Percept master;               // Master game percept
+  map<int, Percept *> percept;  // Percept for each player
+  map<int, Orders *> orders;    // Orders from each player
 
-  vector<Player *> player;		// Current ordered list of players
+  vector<Player *> player;  // Current ordered list of players
 
-  vector<SDL_Thread *> thread;		// Player (and Handler) Thread List
-  SDL_mutex *status_mut;		// Status Protector MutEx
-  vector<bool> status_ready;		// Ready states of each player
-  int status_locked;			// Are Ready states allowed to change?
-  bool threads_term;			// Should the game threads terminate?
-  };
+  vector<SDL_Thread *> thread;  // Player (and Handler) Thread List
+  SDL_mutex *status_mut;        // Status Protector MutEx
+  vector<bool> status_ready;    // Ready states of each player
+  int status_locked;            // Are Ready states allowed to change?
+  bool threads_term;            // Should the game threads terminate?
+};
 
-#endif // UNIT_H
-
+#endif  // UNIT_H

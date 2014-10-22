@@ -38,11 +38,11 @@ enum PlayerType {
   PLAYER_AI,
   PLAYER_REMOTE,
   PLAYER_MAX
-  };
+};
 
 class Player {
-public:
-  Player(Game *gm, PlayerType tp, int num, int c=0);
+ public:
+  Player(Game *gm, PlayerType tp, int num, int c = 0);
   virtual ~Player();
 
   void SetColor(int c) { color = c; };
@@ -53,13 +53,13 @@ public:
 
   virtual bool Run();
 
-protected:
+ protected:
   int id;
   PlayerType type;
   Percept percept;
   Orders orders;
   int color;
   Game *game;
-  };
+};
 
-#endif // PLAYER_H
+#endif  // PLAYER_H
